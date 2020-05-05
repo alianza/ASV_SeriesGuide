@@ -8,6 +8,11 @@ Release notes
 🔨 = Resolved or fixed.
 📝 = Notable change.
 
+Version J.W. ASV
+
+Fixed test: ShowsActivityTest.java
+Merged newest version
+
 Version 54
 ----------
 *2020-04-30*
