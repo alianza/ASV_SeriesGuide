@@ -60,6 +60,10 @@ buildscript {
     }
 }
 
+plugins {
+    id "org.sonarqube" version "2.7"
+}
+
 apply plugin: 'com.github.ben-manes.versions'
 
 // reject preview releases for dependencyUpdates task
