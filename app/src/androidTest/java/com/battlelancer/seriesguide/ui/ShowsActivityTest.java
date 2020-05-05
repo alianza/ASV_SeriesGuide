@@ -47,7 +47,7 @@ public class ShowsActivityTest {
             ShowsActivity.class);
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         // delete the database and close the database helper inside the provider
         // to ensure a clean state for the add show test
         Context context = ApplicationProvider.getApplicationContext();
@@ -67,16 +67,16 @@ public class ShowsActivityTest {
             e.printStackTrace();
         }
 
-//        ViewInteraction floatingActionButton = onView(
-//                allOf(withId(R.id.buttonShowsAdd), withContentDescription(R.string.action_shows_add),
-//                        childAtPosition(
-//                                allOf(withId(R.id.rootLayoutShows),
-//                                        childAtPosition(
-//                                                withId(R.id.drawer_layout),
-//                                                0)),
-//                                2),
-//                        isDisplayed()));
-//        floatingActionButton.perform(click());
+        ViewInteraction floatingActionButton = onView(
+                allOf(withId(R.id.buttonShowsAdd), withContentDescription(R.string.action_shows_add),
+                        childAtPosition(
+                                allOf(withId(R.id.rootLayoutShows),
+                                        childAtPosition(
+                                                withId(R.id.linearLayoutActivityShows),
+                                                0)),
+                                2),
+                        isDisplayed()));
+        floatingActionButton.perform(click());
 
         // Added a sleep statement to match the app's execution delay.
         // The recommended way to handle such scenarios is to use Espresso idling resources:
