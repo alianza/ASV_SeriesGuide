@@ -5,7 +5,6 @@
 
 # Local configuration files (sdk path, etc)
 keystore.properties
-secret.properties
 
 ### bundletool
 bundletool
