@@ -1,10 +1,17 @@
 pipeline {
     agent any
 
+    tools {
+            gradle 'Gradle 6.5-rc-1'
+        }
+
     stages {
-        stage('Clone') {
+        stage('Build') {
             steps {
-                echo 'Hello World!'
+                echo 'Building...'
+                withGradle {
+                    sh './gradlew app:build'
+               }
             }
         }
     }
