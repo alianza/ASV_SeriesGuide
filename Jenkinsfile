@@ -4,7 +4,11 @@ pipeline {
     stages {
         stage('Clone') {
             steps {
-                echo 'Hello World!'
+                node {
+                  withGradle {
+                    sh './gradlew build'
+                  }
+                }
             }
         }
     }
