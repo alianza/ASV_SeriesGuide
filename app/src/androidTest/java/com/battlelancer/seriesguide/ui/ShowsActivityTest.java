@@ -23,6 +23,7 @@ import androidx.test.rule.ActivityTestRule;
 import com.battlelancer.seriesguide.R;
 import com.battlelancer.seriesguide.provider.SeriesGuideContract;
 import com.battlelancer.seriesguide.provider.SeriesGuideDatabase;
+import kotlin.jvm.JvmField;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
@@ -43,8 +44,8 @@ import org.junit.runner.RunWith;
 public class ShowsActivityTest {
 
     @Rule
-    public ActivityTestRule<ShowsActivity> mActivityTestRule = new ActivityTestRule<>(
-            ShowsActivity.class);
+    @JvmField
+    public ActivityTestRule<ShowsActivity> mActivityTestRule = new ActivityTestRule<>(ShowsActivity.class, false, false);
 
     @Before
     public void setUp() {
