@@ -1,25 +1,11 @@
 pipeline {
-    node {
-      // Mark the code checkout 'stage'....
-      stage 'Stage Checkout'
+    agent any
 
-      // Checkout code from repository and update any submodules
-      checkout scm
-      sh 'git submodule update --init'  
-
-      stage 'Stage Build'
-
-      //branch name from Jenkins environment variables
-      echo "My branch is: ${env.BRANCH_NAME}"
-
-      //build your gradle
-      sh "./gradlew app:clean"
-
-      //build your gradle
-      sh "./gradlew app:build"
-
-      stage 'Stage Archive'
-      //tell Jenkins to archive the apks
-      archiveArtifacts artifacts: 'app/build/outputs/apk/*.apk', fingerprint: true
+    stages {
+        stage('Clone') {
+            steps {
+                echo 'Hello World!'
+            }
+        }
     }
 }
