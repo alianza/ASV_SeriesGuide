@@ -45,7 +45,7 @@ public class ShowsActivityTest {
 
     @Rule
     @JvmField
-    public ActivityTestRule<ShowsActivity> mActivityTestRule = new ActivityTestRule<>(ShowsActivity.class, false, false);
+    public ActivityTestRule<ShowsActivity> mActivityTestRule = new ActivityTestRule<>(ShowsActivity.class);
 
     @Before
     public void setUp() {
