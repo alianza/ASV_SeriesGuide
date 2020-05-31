@@ -54,7 +54,7 @@ class R3 {
         val floatingActionButton = onView(
             allOf(
                 withId(R.id.buttonShowsAdd),
-                ViewMatchers.withContentDescription("Add show"),
+                withContentDescription("Add show"),
                 childAtPosition(
                     allOf(
                         withId(R.id.rootLayoutShows),
@@ -65,7 +65,7 @@ class R3 {
                     ),
                     2
                 ),
-                ViewMatchers.isDisplayed()
+                isDisplayed()
             )
         )
         floatingActionButton.perform(ViewActions.click())
@@ -82,7 +82,7 @@ class R3 {
                     ),
                     0
                 ),
-                ViewMatchers.isDisplayed()
+                isDisplayed()
             )
         )
         appCompatAutoCompleteTextViewDiscover.perform(
@@ -102,7 +102,7 @@ class R3 {
                     ),
                     0
                 ),
-                ViewMatchers.isDisplayed()
+                isDisplayed()
             )
         )
         appCompatAutoCompleteTextView1.perform(ViewActions.pressImeActionButton())
@@ -121,7 +121,7 @@ class R3 {
             allOf(
                 withId(R.id.buttonPositive),
                 withText("Add show"),
-                ViewMatchers.isDisplayed()
+                isDisplayed()
             )
         ).perform(ViewActions.click())
 
@@ -135,7 +135,7 @@ class R3 {
 
         val recyclerViewShows = onView(withId(R.id.recyclerViewShows))
 
-        recyclerViewShows.check(matches(ViewMatchers.isDisplayed()))
+        recyclerViewShows.check(matches(isDisplayed()))
 
         sleep(1000)
 
@@ -152,7 +152,7 @@ class R3 {
         val actionMenuItemView = onView(
             allOf(
                 withId(R.id.menu_search),
-                ViewMatchers.withContentDescription("Search"),
+                withContentDescription("Search"),
                 childAtPosition(
                     childAtPosition(
                         withId(R.id.sgToolbar),
@@ -160,7 +160,7 @@ class R3 {
                     ),
                     0
                 ),
-                ViewMatchers.isDisplayed()
+                isDisplayed()
             )
         )
         actionMenuItemView.perform(ViewActions.click())
@@ -177,7 +177,7 @@ class R3 {
                     ),
                     0
                 ),
-                ViewMatchers.isDisplayed()
+                isDisplayed()
             )
         )
         appCompatAutoCompleteTextViewShows.perform(
