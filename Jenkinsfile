@@ -1,5 +1,3 @@
-// Powered by Infostretch 
-
 timestamps {
 
 node () {
