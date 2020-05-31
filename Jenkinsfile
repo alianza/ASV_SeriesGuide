@@ -2,14 +2,9 @@ pipeline {
     agent any
 
     stages {
-        stage('Build') {
+        stage('Clone') {
             steps {
-                node {
-                  label 'Gradle'
-                  withGradle {
-                    sh './gradlew build'
-                  }
-                }
+                echo 'Hello World!'
             }
         }
     }
