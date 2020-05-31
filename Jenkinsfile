@@ -10,7 +10,7 @@ pipeline {
             steps {
                 echo 'Building...'
                 withGradle {
-                    sh './gradlew app:build'
+                    sh './gradlew app:assembleAmazonDebug'
                }
             }
         }
