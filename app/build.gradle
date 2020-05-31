@@ -61,6 +61,8 @@ android {
         // for CI server: log reports (report files are not public)
         textReport true
         textOutput 'stdout'
+
+        abortOnError false
     }
 
     testOptions {
