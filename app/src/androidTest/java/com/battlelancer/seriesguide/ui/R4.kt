@@ -1,30 +1,27 @@
 package com.battlelancer.seriesguide.ui
 
-import android.content.Context
 import androidx.recyclerview.widget.RecyclerView
-import androidx.test.core.app.ApplicationProvider
+import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.withClassName
 import androidx.test.espresso.matcher.ViewMatchers.withContentDescription
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
 import androidx.test.runner.AndroidJUnit4
 import com.battlelancer.seriesguide.R
-import com.battlelancer.seriesguide.provider.SeriesGuideContract
-import com.battlelancer.seriesguide.provider.SeriesGuideDatabase
 import com.battlelancer.seriesguide.utils.ChildAtPosition.Companion.childAtPosition
-import com.battlelancer.seriesguide.utils.GlobalUtils
-import com.battlelancer.seriesguide.utils.GlobalUtils.Companion.closeFiltersNotice
-import com.battlelancer.seriesguide.utils.GlobalUtils.Companion.closeFirstRunNotice
-import com.battlelancer.seriesguide.utils.GlobalUtils.Companion.doRepeatedCheck
-import com.battlelancer.seriesguide.utils.GlobalUtils.Companion.refreshApp
 import com.battlelancer.seriesguide.utils.RecyclerViewItemCountAssertion.Companion.withItemCount
 import com.battlelancer.seriesguide.utils.SleepIdlingHelper.Companion.sleep
+import com.battlelancer.seriesguide.utils.GlobalUtils
+import com.battlelancer.seriesguide.utils.GlobalUtils.Companion.doRepeatedCheck
 import org.hamcrest.Matchers
 import org.hamcrest.Matchers.allOf
 import org.junit.Before
@@ -32,9 +29,14 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+/**
+ * Tests for Requirement-ID: 1
+ *
+ */
 
+@LargeTest
 @RunWith(AndroidJUnit4::class)
-class R2 {
+class R4 {
 
     @Rule
     @JvmField
@@ -42,7 +44,7 @@ class R2 {
 //    var mActivityTestRule = ActivityTestRule(ShowsActivity::class.java)
 
     @Before
-    open fun setUp() {
+    fun setUp() {
         GlobalUtils.setUp()
     }
 
@@ -72,7 +74,7 @@ class R2 {
         )
         floatingActionButton.perform(click())
 
-        sleep(1000)
+        sleep(2500)
 
         onView(withId(R.id.recyclerViewShowsDiscover))
             .perform(
@@ -96,7 +98,7 @@ class R2 {
                     allOf(
                         withId(R.id.sgToolbar),
                         childAtPosition(
-                            ViewMatchers.withClassName(Matchers.`is`("com.google.android.material.appbar.AppBarLayout")),
+                            withClassName(Matchers.`is`("com.google.android.material.appbar.AppBarLayout")),
                             0
                         )
                     ),
@@ -107,11 +109,13 @@ class R2 {
         )
         appCompatImageButton.perform(click())
 //
-        refreshApp(mActivityTestRule)
+//        sleep(5000)
+
+        GlobalUtils.refreshApp(mActivityTestRule)
 
         sleep(1000)
 
-        closeFiltersNotice()
+        GlobalUtils.closeFiltersNotice()
 
         val recyclerViewShows = onView(withId(R.id.recyclerViewShows))
 
@@ -119,79 +123,38 @@ class R2 {
 
         recyclerViewShows.check(matches(isDisplayed()))
 
-        closeFirstRunNotice()
+        GlobalUtils.closeFirstRunNotice()
 
-        sleep(1000)
-
-        recyclerViewShows.check(withItemCount(Matchers.equalTo(1)))
-
-//        doRepeatedCheck(recyclerViewShows,  withItemCount(Matchers.equalTo(1)))
-
-    }
-
-    @Test
-    fun scenario_2() {
-        sleep(1000)
-
-        mActivityTestRule.launchActivity(null)
-
-        sleep(1000)
-
-        val overflowMenuButton = onView(
-            allOf(
-                withContentDescription("More options"),
-                childAtPosition(
-                    childAtPosition(
-                        withId(R.id.sgToolbar),
-                        2
-                    ),
-                    2
-                ),
-                isDisplayed()
-            )
-        )
-        overflowMenuButton.perform(click())
-
-        val materialTextView = onView(
-            allOf(
-                withId(R.id.title), withText("Add show"),
-                childAtPosition(
-                    childAtPosition(
-                        withId(R.id.content),
-                        0
-                    ),
-                    0
-                ),
-                isDisplayed()
-            )
-        )
-        materialTextView.perform(click())
-
-        sleep(1000)
-
-        onView(withId(R.id.recyclerViewShowsDiscover))
+        recyclerViewShows
             .perform(
-                RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(2, click())
+                RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(0, click())
             )
 
-        sleep(1000)
-
-        onView(
+        val appCompatImageButton3 = onView(
             allOf(
-                withId(R.id.buttonPositive), withText("Add show"), isDisplayed()
+                withId(R.id.imageButtonFavorite), withContentDescription("Add to favorites"),
+                childAtPosition(
+                    allOf(
+                        withId(R.id.containerOverviewShow),
+                        childAtPosition(
+                            withId(R.id.overview_container),
+                            0
+                        )
+                    ),
+                    1
+                )
             )
-        ).perform(click())
+        )
+        appCompatImageButton3.perform(ViewActions.scrollTo(), click())
 
-        sleep(1000)
-
-        val appCompatImageButton = onView(
+        val appCompatImageButton4 = onView(
             allOf(
                 withContentDescription("Navigate up"),
                 childAtPosition(
                     allOf(
                         withId(R.id.sgToolbar),
                         childAtPosition(
-                            ViewMatchers.withClassName(Matchers.`is`("com.google.android.material.appbar.AppBarLayout")),
+                            withClassName(Matchers.`is`("com.google.android.material.appbar.AppBarLayout")),
                             0
                         )
                     ),
@@ -200,28 +163,43 @@ class R2 {
                 isDisplayed()
             )
         )
-        appCompatImageButton.perform(click())
+        appCompatImageButton4.perform(click())
 
-//        sleep(5000)
+        val actionMenuItemView = onView(
+            allOf(
+                withId(R.id.menu_action_shows_filter), withContentDescription("Filter shows"),
+                childAtPosition(
+                    childAtPosition(
+                        withId(R.id.sgToolbar),
+                        2
+                    ),
+                    1
+                ),
+                isDisplayed()
+            )
+        )
+        actionMenuItemView.perform(click())
 
-        refreshApp(mActivityTestRule)
+        val filterBox = onView(
+            allOf(
+                withId(R.id.checkbox_shows_filter_favorites),
+                childAtPosition(
+                    childAtPosition(
+                        withId(R.id.viewPagerShowsDistillation),
+                        0
+                    ),
+                    3
+                )
+            )
+        )
+        filterBox.perform(ViewActions.scrollTo(), click())
 
-        sleep(1000)
-
-        closeFiltersNotice()
-
-        val recyclerViewShows = onView(withId(R.id.recyclerViewShows))
-
-//        doRepeatedCheck(recyclerViewShows, matches(isDisplayed()))
-
-        recyclerViewShows.check(matches(isDisplayed()))
-
-        closeFirstRunNotice()
+        Espresso.pressBack()
 
         sleep(1000)
 
         recyclerViewShows.check(withItemCount(Matchers.equalTo(1)))
 
-//        doRepeatedCheck(recyclerViewShows,  withItemCount(Matchers.equalTo(1)))
+//        doRepeatedCheck(recyclerViewShows, withItemCount(Matchers.equalTo(1)))
     }
 }

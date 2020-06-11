@@ -1,9 +1,5 @@
 package com.battlelancer.seriesguide.ui
 
-import android.content.Context
-import android.view.View
-import android.view.ViewGroup
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -15,18 +11,12 @@ import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
 import androidx.test.runner.AndroidJUnit4
 import com.battlelancer.seriesguide.R
-import com.battlelancer.seriesguide.provider.SeriesGuideContract
-import com.battlelancer.seriesguide.provider.SeriesGuideDatabase
 import com.battlelancer.seriesguide.utils.ChildAtPosition.Companion.childAtPosition
-import com.battlelancer.seriesguide.utils.RecyclerViewItemCountAssertion
 import com.battlelancer.seriesguide.utils.RecyclerViewItemCountAssertion.Companion.withItemCount
 import com.battlelancer.seriesguide.utils.SleepIdlingHelper.Companion.sleep
-import com.battlelancer.seriesguide.utils.globalUtils
-import org.hamcrest.Description
-import org.hamcrest.Matcher
+import com.battlelancer.seriesguide.utils.GlobalUtils
 import org.hamcrest.Matchers
 import org.hamcrest.Matchers.allOf
-import org.hamcrest.TypeSafeMatcher
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -44,15 +34,16 @@ class R1 {
     @Rule
     @JvmField
     var mActivityTestRule = ActivityTestRule(ShowsActivity::class.java, false, false)
+//    var mActivityTestRule = ActivityTestRule(ShowsActivity::class.java)
 
     @Before
     fun setUp() {
-        globalUtils.setUp()
+        GlobalUtils.setUp()
     }
 
     @Test
     fun scenario_1() {
-        sleep(1000)
+        sleep(2500)
 
         mActivityTestRule.launchActivity(null)
 
@@ -140,7 +131,7 @@ class R1 {
         )
         materialTextView.perform(click())
 
-        sleep(2500)
+        sleep(1000)
 
         val recyclerView = onView(
             allOf(
