@@ -5,15 +5,21 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.NoMatchingViewException
 import androidx.test.espresso.PerformException
+import androidx.test.espresso.ViewAssertion
+import androidx.test.espresso.ViewInteraction
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.rule.ActivityTestRule
 import com.battlelancer.seriesguide.R
 import com.battlelancer.seriesguide.provider.SeriesGuideContract
 import com.battlelancer.seriesguide.provider.SeriesGuideDatabase
+import com.battlelancer.seriesguide.settings.WidgetSettings
+import com.battlelancer.seriesguide.ui.ShowsActivity
+import junit.framework.AssertionFailedError
 import org.hamcrest.Matchers
 import org.junit.Before
 
-class globalUtils {
+class GlobalUtils {
     companion object {
         @Before
         fun setUp() {
@@ -27,6 +33,7 @@ class globalUtils {
                 SeriesGuideContract.Shows.CONTENT_URI_CLOSE,
                 null, null, null, null
             )
+            context.deleteSharedPreferences(WidgetSettings.SETTINGS_FILE)
         }
 
         fun closeFirstRunNotice() {
@@ -58,6 +65,24 @@ class globalUtils {
                 SleepIdlingHelper.sleep(1000)
             } catch (e: PerformException) {
                 println("No filters set")
+            }
+        }
+
+        fun refreshApp(activityTestRule: ActivityTestRule<ShowsActivity>) {
+            with(activityTestRule) {
+                finishActivity()
+                launchActivity(null)
+            }
+        }
+
+        fun doRepeatedCheck(element: ViewInteraction, assertion: ViewAssertion) {
+            try {
+                element.check(assertion)
+                println("RepeatedCheck Successful!")
+            } catch (e: AssertionFailedError) {
+                println("RepeatedCheck e: $e")
+                SleepIdlingHelper.sleep(1000)
+                doRepeatedCheck(element, assertion)
             }
         }
     }
