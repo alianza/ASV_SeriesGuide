@@ -1,9 +1,15 @@
 package com.battlelancer.seriesguide;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.DVDNUMBER;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.NUMBER;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.RATING_GLOBAL;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.TITLE;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.WATCHED;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.SeasonsColumns.COMBINED;
+import static com.battlelancer.seriesguide.provider.SeriesGuideDatabase.Tables.EPISODES;
+
 import androidx.annotation.NonNull;
 import com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes;
-import com.battlelancer.seriesguide.provider.SeriesGuideContract.Seasons;
-import com.battlelancer.seriesguide.provider.SeriesGuideDatabase.Tables;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -14,22 +20,23 @@ public class Constants {
      * See {@link Episodes#FIRSTAIREDMS}.
      */
     public static final int EPISODE_UNKNOWN_RELEASE = -1;
+    public static final String DESC = " DESC";
 
     public enum EpisodeSorting {
-        LATEST_FIRST(0, "latestfirst", Episodes.NUMBER + " DESC"),
+        LATEST_FIRST(0, "latestfirst", NUMBER + DESC),
 
-        OLDEST_FIRST(1, "oldestfirst", Episodes.NUMBER + " ASC"),
+        OLDEST_FIRST(1, "oldestfirst", NUMBER + " ASC"),
 
-        UNWATCHED_FIRST(2, "unwatchedfirst", Episodes.WATCHED + " ASC," + Episodes.NUMBER + " ASC"),
+        UNWATCHED_FIRST(2, "unwatchedfirst", WATCHED + " ASC," + NUMBER + " ASC"),
 
-        ALPHABETICAL_ASC(3, "atoz", Episodes.TITLE + " COLLATE NOCASE ASC"),
+        ALPHABETICAL_ASC(3, "atoz", TITLE + " COLLATE NOCASE ASC"),
 
-        TOP_RATED(4, "toprated", Tables.EPISODES + "." + Episodes.RATING_GLOBAL + " COLLATE NOCASE DESC"),
+        TOP_RATED(4, "toprated", EPISODES + "." + RATING_GLOBAL + " COLLATE NOCASE DESC"),
 
-        DVDLATEST_FIRST(5, "dvdlatestfirst", Episodes.DVDNUMBER + " DESC," + Episodes.NUMBER
-                + " DESC"),
+        DVDLATEST_FIRST(5, "dvdlatestfirst", DVDNUMBER + " DESC," + NUMBER
+                + DESC),
 
-        DVDOLDEST_FIRST(6, "dvdoldestfirst", Episodes.DVDNUMBER + " ASC," + Episodes.NUMBER
+        DVDOLDEST_FIRST(6, "dvdoldestfirst", DVDNUMBER + " ASC," + NUMBER
                 + " ASC");
 
         private final int index;
@@ -76,9 +83,9 @@ public class Constants {
     }
 
     public enum SeasonSorting {
-        LATEST_FIRST(0, "latestfirst", Seasons.COMBINED + " DESC"),
+        LATEST_FIRST(0, "latestfirst", COMBINED + DESC),
 
-        OLDEST_FIRST(1, "oldestfirst", Seasons.COMBINED + " ASC");
+        OLDEST_FIRST(1, "oldestfirst", COMBINED + " ASC");
 
         private final int index;
 

@@ -1,5 +1,14 @@
 package com.battlelancer.seriesguide.ui.stats;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.CONTENT_URI;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.IN_WATCHLIST;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.RUNTIME_MIN;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.WATCHED;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies._ID;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.RUNTIME;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.STATUS;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ShowsColumns.NEXTEPISODE;
+
 import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -10,7 +19,6 @@ import android.util.SparseIntArray;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
-import com.battlelancer.seriesguide.provider.SeriesGuideContract;
 import com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes;
 import com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows;
 import com.battlelancer.seriesguide.settings.DisplaySettings;
@@ -131,11 +139,11 @@ class StatsLiveData extends LiveData<StatsLiveData.StatsUpdateEvent> {
 
         private boolean processMovies(ContentResolver resolver, Stats stats) {
             // movies (count, in watchlist, runtime of watchlist)
-            final Cursor movies = resolver.query(SeriesGuideContract.Movies.CONTENT_URI,
-                    new String[]{SeriesGuideContract.Movies._ID,
-                            SeriesGuideContract.Movies.IN_WATCHLIST, // 1
-                            SeriesGuideContract.Movies.WATCHED, // 2
-                            SeriesGuideContract.Movies.RUNTIME_MIN // 3
+            final Cursor movies = resolver.query(CONTENT_URI,
+                    new String[]{_ID,
+                            IN_WATCHLIST, // 1
+                            WATCHED, // 2
+                            RUNTIME_MIN // 3
                     }, null, null, null
             );
             if (movies == null) {
@@ -170,10 +178,10 @@ class StatsLiveData extends LiveData<StatsLiveData.StatsUpdateEvent> {
         private SparseIntArray processShows(ContentResolver resolver, Stats stats) {
             Cursor shows = resolver.query(Shows.CONTENT_URI,
                     new String[]{
-                            Shows._ID, // 0
-                            Shows.STATUS,
-                            Shows.NEXTEPISODE,
-                            Shows.RUNTIME // 3
+                            _ID, // 0
+                            STATUS,
+                            NEXTEPISODE,
+                            RUNTIME // 3
                     }, null, null, null
             );
             if (shows == null) {

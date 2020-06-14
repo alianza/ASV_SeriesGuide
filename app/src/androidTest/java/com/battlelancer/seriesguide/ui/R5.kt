@@ -1,13 +1,12 @@
+@file:Suppress("DEPRECATION")
+
 package com.battlelancer.seriesguide.ui
 
 import androidx.recyclerview.widget.RecyclerView
-import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
-import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withClassName
 import androidx.test.espresso.matcher.ViewMatchers.withContentDescription
@@ -19,18 +18,14 @@ import androidx.test.rule.ActivityTestRule
 import androidx.test.runner.AndroidJUnit4
 import com.battlelancer.seriesguide.R
 import com.battlelancer.seriesguide.utils.ChildAtPosition.Companion.childAtPosition
-import com.battlelancer.seriesguide.utils.RecyclerViewItemCountAssertion.Companion.withItemCount
-import com.battlelancer.seriesguide.utils.SleepIdlingHelper.Companion.sleep
 import com.battlelancer.seriesguide.utils.GlobalUtils
-import com.battlelancer.seriesguide.utils.GlobalUtils.Companion.doRepeatedCheck
+import com.battlelancer.seriesguide.utils.SleepIdlingHelper.Companion.sleep
 import org.hamcrest.Matchers
 import org.hamcrest.Matchers.allOf
-import org.hamcrest.core.IsInstanceOf
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import kotlin.random.Random
 import kotlin.random.Random.Default.nextInt
 
 /**

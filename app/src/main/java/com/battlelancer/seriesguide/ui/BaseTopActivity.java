@@ -1,6 +1,8 @@
 
 package com.battlelancer.seriesguide.ui;
 
+import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_INDEFINITE;
+
 import android.accounts.Account;
 import android.content.ContentResolver;
 import android.content.Intent;
@@ -108,6 +110,8 @@ public abstract class BaseTopActivity extends BaseMessageActivity {
                 launchIntent = new Intent(this, MoreOptionsActivity.class)
                         .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + itemId);
         }
 
         if (launchIntent != null) {
@@ -220,7 +224,7 @@ public abstract class BaseTopActivity extends BaseMessageActivity {
         Snackbar newSnackbar = Snackbar.make(
                 getSnackbarParentView(),
                 R.string.autobackup_failed,
-                Snackbar.LENGTH_INDEFINITE
+                LENGTH_INDEFINITE
         );
 
         // Manually increase max lines.
@@ -256,7 +260,7 @@ public abstract class BaseTopActivity extends BaseMessageActivity {
         Snackbar newSnackbar = Snackbar.make(
                 getSnackbarParentView(),
                 R.string.autobackup_files_missing,
-                Snackbar.LENGTH_INDEFINITE
+                LENGTH_INDEFINITE
         );
 
         // Manually increase max lines.
@@ -279,7 +283,7 @@ public abstract class BaseTopActivity extends BaseMessageActivity {
 
         Snackbar newSnackbar = Snackbar
                 .make(getSnackbarParentView(), R.string.hexagon_signed_out,
-                        Snackbar.LENGTH_INDEFINITE);
+                        LENGTH_INDEFINITE);
         newSnackbar.addCallback(new Snackbar.Callback() {
             @Override
             public void onDismissed(Snackbar snackbar, int event) {
@@ -290,34 +294,37 @@ public abstract class BaseTopActivity extends BaseMessageActivity {
                     hexagonTools.setDisabled();
                 }
             }
-        }).setAction(R.string.hexagon_signin, v -> {
+        }).setAction(R.string.hexagon_signin, v ->
             // forward to cloud setup which can help fix the account issue
-            startActivity(new Intent(BaseTopActivity.this, CloudSetupActivity.class));
-        }).show();
+            startActivity(new Intent(BaseTopActivity.this, CloudSetupActivity.class))
+        ).show();
 
         snackbar = newSnackbar;
     }
 
-    /**
-     * Shows or hides the indeterminate sync progress indicator inside this activity layout.
-     */
-    private void setSyncProgressVisibility(boolean isVisible) {
-        if (syncProgressBar == null ||
-                syncProgressBar.getVisibility() == (isVisible ? View.VISIBLE : View.GONE)) {
-            // not enabled or already in desired state, avoid replaying animation
-            return;
-        }
-        syncProgressBar.startAnimation(AnimationUtils.loadAnimation(syncProgressBar.getContext(),
-                isVisible ? R.anim.fade_in : R.anim.fade_out));
-        syncProgressBar.setVisibility(isVisible ? View.VISIBLE : View.GONE);
-    }
+
 
     /**
      * Create a new anonymous SyncStatusObserver. It's attached to the app's ContentResolver in
      * onResume(), and removed in onPause(). If a sync is active or pending, a progress bar is
      * shown.
      */
-    private SyncStatusObserver syncStatusObserver = new SyncStatusObserver() {
+    private final SyncStatusObserver syncStatusObserver = new SyncStatusObserver() {
+
+        /**
+         * Shows or hides the indeterminate sync progress indicator inside this activity layout.
+         */
+        void setSyncProgressVisibility(boolean isVisible) {
+            if (syncProgressBar == null ||
+                    syncProgressBar.getVisibility() == (isVisible ? View.VISIBLE : View.GONE)) {
+                // not enabled or already in desired state, avoid replaying animation
+                return;
+            }
+            syncProgressBar.startAnimation(AnimationUtils.loadAnimation(syncProgressBar.getContext(),
+                    isVisible ? R.anim.fade_in : R.anim.fade_out));
+            syncProgressBar.setVisibility(isVisible ? View.VISIBLE : View.GONE);
+        }
+
         /** Callback invoked with the sync adapter status changes. */
         @Override
         public void onStatusChanged(int which) {

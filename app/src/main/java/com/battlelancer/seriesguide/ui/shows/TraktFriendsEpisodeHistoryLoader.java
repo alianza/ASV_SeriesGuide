@@ -33,7 +33,7 @@ class TraktFriendsEpisodeHistoryLoader extends GenericSimpleLoader<List<NowAdapt
     @Override
     public List<NowAdapter.NowItem> loadInBackground() {
         if (!TraktCredentials.get(getContext()).hasCredentials()) {
-            return null;
+            return new ArrayList<>();
         }
 
         // get all trakt friends
@@ -41,12 +41,12 @@ class TraktFriendsEpisodeHistoryLoader extends GenericSimpleLoader<List<NowAdapt
         List<Friend> friends = SgTrakt.executeAuthenticatedCall(getContext(),
                 traktUsers.friends(UserSlug.ME, Extended.FULL), "get friends");
         if (friends == null) {
-            return null;
+            return new ArrayList<>();
         }
 
         int size = friends.size();
         if (size == 0) {
-            return null; // no friends, done.
+            return new ArrayList<>(); // no friends, done.
         }
 
         // estimate list size
@@ -75,7 +75,7 @@ class TraktFriendsEpisodeHistoryLoader extends GenericSimpleLoader<List<NowAdapt
             List<HistoryEntry> history = SgTrakt.executeCall(
                     traktUsers.history(new UserSlug(userSlug), HistoryType.EPISODES, 1, 1,
                             null, null, null), "get friend episode history");
-            if (history == null || history.size() == 0) {
+            if (history == null || history.isEmpty()) {
                 continue; // no history
             }
 

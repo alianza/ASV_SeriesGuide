@@ -1,5 +1,9 @@
 package com.battlelancer.seriesguide.util;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Activity.EPISODE_TVDB_ID;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Activity.SHOW_TVDB_ID;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Activity.TIMESTAMP_MS;
+
 import android.content.ContentProviderOperation;
 import android.content.ContentValues;
 import android.content.Context;
@@ -17,6 +21,10 @@ import timber.log.Timber;
  */
 public class ActivityTools {
 
+    private ActivityTools() {
+        throw new IllegalStateException("Utility class");
+    }
+
     private static final long HISTORY_THRESHOLD = 30 * DateUtils.DAY_IN_MILLIS;
 
     /**
@@ -31,15 +39,15 @@ public class ActivityTools {
         // delete all entries older than 30 days
         int deleted = context.getContentResolver()
                 .delete(Activity.CONTENT_URI,
-                        Activity.TIMESTAMP_MS + "<" + timeMonthAgo, null);
+                        TIMESTAMP_MS + "<" + timeMonthAgo, null);
         Timber.d("addActivity: removed %d outdated activities", deleted);
 
         // add new entry
         ContentValues values = new ContentValues();
-        values.put(Activity.EPISODE_TVDB_ID, episodeTvdbId);
-        values.put(Activity.SHOW_TVDB_ID, showTvdbId);
+        values.put(EPISODE_TVDB_ID, episodeTvdbId);
+        values.put(SHOW_TVDB_ID, showTvdbId);
         long currentTime = System.currentTimeMillis();
-        values.put(Activity.TIMESTAMP_MS, currentTime);
+        values.put(TIMESTAMP_MS, currentTime);
 
         context.getContentResolver().insert(Activity.CONTENT_URI, values);
         Timber.d("addActivity: episode: %d timestamp: %d", episodeTvdbId, currentTime);
@@ -50,7 +58,7 @@ public class ActivityTools {
      */
     public static void removeActivity(Context context, int episodeTvdbId) {
         int deleted = context.getContentResolver().delete(Activity.CONTENT_URI,
-                Activity.EPISODE_TVDB_ID + "=" + episodeTvdbId, null);
+                EPISODE_TVDB_ID + "=" + episodeTvdbId, null);
         Timber.d("removeActivity: deleted %d activity entries", deleted);
     }
 
@@ -60,7 +68,7 @@ public class ActivityTools {
     public static void populateShowsLastWatchedTime(Context context) {
         Cursor query = context.getContentResolver()
                 .query(Activity.CONTENT_URI,
-                        new String[] { Activity.TIMESTAMP_MS, Activity.SHOW_TVDB_ID },
+                        new String[] { TIMESTAMP_MS, SHOW_TVDB_ID },
                         null, null,
                         Activity.SORT_LATEST);
         if (query == null) {

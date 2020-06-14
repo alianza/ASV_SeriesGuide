@@ -1,12 +1,16 @@
 package com.battlelancer.seriesguide.service;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.NUMBER;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.SEASON;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ShowsColumns.REF_SHOW_ID;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import androidx.core.app.NotificationManagerCompat;
 import com.battlelancer.seriesguide.SgApp;
-import com.battlelancer.seriesguide.provider.SeriesGuideContract;
 import com.battlelancer.seriesguide.ui.episodes.EpisodeFlags;
 import com.battlelancer.seriesguide.ui.episodes.EpisodeTools;
 
@@ -29,11 +33,11 @@ public class NotificationActionReceiver extends BroadcastReceiver {
 
         // query for episode details
         Cursor query = context.getContentResolver()
-                .query(SeriesGuideContract.Episodes.buildEpisodeWithShowUri(episodeTvdbvId),
+                .query(Episodes.buildEpisodeWithShowUri(episodeTvdbvId),
                         new String[] {
-                                SeriesGuideContract.Shows.REF_SHOW_ID,
-                                SeriesGuideContract.Episodes.SEASON,
-                                SeriesGuideContract.Episodes.NUMBER }, null, null, null);
+                                REF_SHOW_ID,
+                                SEASON,
+                                NUMBER }, null, null, null);
         if (query == null) {
             return;
         }

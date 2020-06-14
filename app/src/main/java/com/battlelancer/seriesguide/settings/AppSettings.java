@@ -14,9 +14,17 @@ import timber.log.Timber;
 
 public class AppSettings {
 
+    private AppSettings() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static final String KEY_VERSION = "oldversioncode";
 
     public static final String KEY_GOOGLEANALYTICS = "enableGAnalytics";
+
+    /**
+ * @deprecated ASV
+ */
 
     @SuppressWarnings("unused")
     @Deprecated

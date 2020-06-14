@@ -1,5 +1,7 @@
 package com.battlelancer.seriesguide.sync;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ShowsColumns.HEXAGON_MERGE_COMPLETE;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -82,7 +84,7 @@ public class HexagonSync {
         // get shows that need episode merging
         Cursor query = context.getContentResolver().query(SeriesGuideContract.Shows.CONTENT_URI,
                 new String[] { SeriesGuideContract.Shows._ID },
-                SeriesGuideContract.Shows.HEXAGON_MERGE_COMPLETE + "=0",
+                HEXAGON_MERGE_COMPLETE + "=0",
                 null, null);
         if (query == null) {
             return false;
@@ -110,7 +112,7 @@ public class HexagonSync {
             if (success) {
                 // set merge as completed
                 ContentValues values = new ContentValues();
-                values.put(SeriesGuideContract.Shows.HEXAGON_MERGE_COMPLETE, 1);
+                values.put(HEXAGON_MERGE_COMPLETE, 1);
                 context.getContentResolver()
                         .update(SeriesGuideContract.Shows.buildShowUri(showTvdbId), values,
                                 null, null);

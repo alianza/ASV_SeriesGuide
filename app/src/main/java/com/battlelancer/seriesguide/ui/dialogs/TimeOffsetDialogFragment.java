@@ -70,9 +70,9 @@ public class TimeOffsetDialogFragment extends AppCompatDialogFragment {
     }
 
     private void bindViews() {
-        int hours = DisplaySettings.getShowsTimeOffset(getContext());
+        int showsTimeOffset = DisplaySettings.getShowsTimeOffset(getContext());
 
-        editTextValue.setText(String.valueOf(hours));
+        editTextValue.setText(String.valueOf(showsTimeOffset));
         // text views are updated by text watcher
     }
 
@@ -81,6 +81,7 @@ public class TimeOffsetDialogFragment extends AppCompatDialogFragment {
         try {
             value = Integer.parseInt(s.toString());
         } catch (NumberFormatException ignored) {
+            Timber.e(ignored, "Error");
         }
 
         // do only allow values between +/-24
@@ -131,10 +132,12 @@ public class TimeOffsetDialogFragment extends AppCompatDialogFragment {
     private TextWatcher textWatcher = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            // Empty
         }
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
+            // Empty
         }
 
         @Override

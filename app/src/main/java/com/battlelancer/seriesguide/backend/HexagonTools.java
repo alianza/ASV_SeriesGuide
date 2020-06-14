@@ -96,12 +96,12 @@ public class HexagonTools {
      */
     @Nullable
     public synchronized Account buildAccountService() {
-        GoogleAccountCredential credential = getAccountCredential(true);
-        if (credential.getSelectedAccount() == null) {
+        GoogleAccountCredential buildCredential = getAccountCredential(true);
+        if (buildCredential.getSelectedAccount() == null) {
             return null;
         }
         Account.Builder builder = new Account.Builder(
-                HTTP_TRANSPORT, JSON_FACTORY, credential
+                HTTP_TRANSPORT, JSON_FACTORY, buildCredential
         );
         return CloudEndpointUtils.updateBuilder(context, builder).build();
     }
@@ -113,13 +113,13 @@ public class HexagonTools {
      */
     @Nullable
     public synchronized Shows getShowsService() {
-        GoogleAccountCredential credential = getAccountCredential(true);
-        if (credential.getSelectedAccount() == null) {
+        GoogleAccountCredential buildCredential = getAccountCredential(true);
+        if (buildCredential.getSelectedAccount() == null) {
             return null;
         }
         if (showsService == null) {
             Shows.Builder builder = new Shows.Builder(
-                    HTTP_TRANSPORT, JSON_FACTORY, credential
+                    HTTP_TRANSPORT, JSON_FACTORY, buildCredential
             );
             showsService = CloudEndpointUtils.updateBuilder(context, builder).build();
         }
@@ -133,13 +133,13 @@ public class HexagonTools {
      */
     @Nullable
     public synchronized Episodes getEpisodesService() {
-        GoogleAccountCredential credential = getAccountCredential(true);
-        if (credential.getSelectedAccount() == null) {
+        GoogleAccountCredential buildCredential = getAccountCredential(true);
+        if (buildCredential.getSelectedAccount() == null) {
             return null;
         }
         if (episodesService == null) {
             Episodes.Builder builder = new Episodes.Builder(
-                    HTTP_TRANSPORT, JSON_FACTORY, credential
+                    HTTP_TRANSPORT, JSON_FACTORY, buildCredential
             );
             episodesService = CloudEndpointUtils.updateBuilder(context, builder).build();
         }
@@ -153,13 +153,13 @@ public class HexagonTools {
      */
     @Nullable
     public synchronized Movies getMoviesService() {
-        GoogleAccountCredential credential = getAccountCredential(true);
-        if (credential.getSelectedAccount() == null) {
+        GoogleAccountCredential buildCredential = getAccountCredential(true);
+        if (buildCredential.getSelectedAccount() == null) {
             return null;
         }
         if (moviesService == null) {
             Movies.Builder builder = new Movies.Builder(
-                    HTTP_TRANSPORT, JSON_FACTORY, credential
+                    HTTP_TRANSPORT, JSON_FACTORY, buildCredential
             );
             moviesService = CloudEndpointUtils.updateBuilder(context, builder).build();
         }
@@ -171,13 +171,13 @@ public class HexagonTools {
      */
     @Nullable
     public synchronized Lists getListsService() {
-        GoogleAccountCredential credential = getAccountCredential(true);
-        if (credential.getSelectedAccount() == null) {
+        GoogleAccountCredential buildCredential = getAccountCredential(true);
+        if (buildCredential.getSelectedAccount() == null) {
             return null;
         }
         if (listsService == null) {
             Lists.Builder builder = new Lists.Builder(
-                    HTTP_TRANSPORT, JSON_FACTORY, credential
+                    HTTP_TRANSPORT, JSON_FACTORY, buildCredential
             );
             listsService = CloudEndpointUtils.updateBuilder(context, builder).build();
         }

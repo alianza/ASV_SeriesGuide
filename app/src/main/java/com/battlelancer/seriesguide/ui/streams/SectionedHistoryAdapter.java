@@ -169,24 +169,24 @@ abstract class SectionedHistoryAdapter extends ArrayAdapter<HistoryEntry> implem
     protected List<HeaderData> generateHeaderList() {
         int count = getCount();
         if (count == 0) {
-            return null;
+            return new ArrayList<>();
         }
 
         LongSparseArray<HeaderData> mapping = new LongSparseArray<>();
-        List<HeaderData> headers = new ArrayList<>();
+        List<HeaderData> headers1 = new ArrayList<>();
 
         for (int position = 0; position < count; position++) {
             long headerId = getHeaderId(position);
             HeaderData headerData = mapping.get(headerId);
             if (headerData == null) {
                 headerData = new HeaderData(position);
-                headers.add(headerData);
+                headers1.add(headerData);
             }
             headerData.incrementCount();
             mapping.put(headerId, headerData);
         }
 
-        return headers;
+        return headers1;
     }
 
     /**

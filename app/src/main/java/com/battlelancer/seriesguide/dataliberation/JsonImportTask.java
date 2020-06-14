@@ -1,5 +1,9 @@
 package com.battlelancer.seriesguide.dataliberation;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ListItems.ITEM_REF_ID;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ListItems.LIST_ITEM_ID;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ListItems.TYPE;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Lists.LIST_ID;
 import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies;
 
 import android.annotation.SuppressLint;
@@ -39,6 +43,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import org.greenrobot.eventbus.EventBus;
 import timber.log.Timber;
@@ -167,21 +172,26 @@ public class JsonImportTask extends AsyncTask<Void, Integer, Integer> {
                 return ERROR_FILE_ACCESS;
             }
             // ...and the file actually exists
-            ParcelFileDescriptor pfd;
+            ParcelFileDescriptor pfd = null;
             try {
                 pfd = context.getContentResolver().openFileDescriptor(backupFileUri, "r");
             } catch (FileNotFoundException | SecurityException e) {
                 Timber.e(e, "Backup file not found.");
                 errorCause = e.getMessage();
                 return ERROR_FILE_ACCESS;
+            } finally {
+                if (pfd != null) {
+                    try {
+
+                        pfd.close();
+                    } catch (IOException e) {
+                        Timber.e(e, "Error");
+                    }
+                }
             }
             if (pfd == null) {
                 Timber.e("File descriptor is null.");
                 return ERROR_FILE_ACCESS;
-            }
-
-            if (!clearExistingData(type)) {
-                return ERROR;
             }
 
             // Access JSON from backup file and try to import data
@@ -209,25 +219,20 @@ public class JsonImportTask extends AsyncTask<Void, Integer, Integer> {
             }
 
             File backupFile = backupFileOrNull.getFile();
-            FileInputStream in; // Closed by reader after importing.
-            try {
+            // Closed by reader after importing.
+
+            try (FileInputStream in = new FileInputStream(backupFile)) {
                 if (!backupFile.canRead()) {
                     return ERROR_FILE_ACCESS;
                 }
-                in = new FileInputStream(backupFile);
             } catch (Exception e) {
                 Timber.e(e, "Unable to open backup file.");
                 errorCause = e.getMessage();
                 return ERROR_FILE_ACCESS;
             }
 
-            // Only clear data after backup file could be opened.
-            if (!clearExistingData(type)) {
-                return ERROR;
-            }
-
             // Access JSON from backup file and try to import data
-            try {
+            try (FileInputStream in = new FileInputStream(backupFile)) {
                 importFromJson(type, in);
             } catch (JsonParseException | IOException | IllegalStateException e) {
                 // the given Json might not be valid or unreadable
@@ -274,7 +279,7 @@ public class JsonImportTask extends AsyncTask<Void, Integer, Integer> {
     }
 
     private void importFromJson(@JsonExportTask.BackupType int type, FileInputStream in)
-            throws JsonParseException, IOException, IllegalArgumentException {
+            throws IOException {
         if (in.getChannel().size() == 0) {
             Timber.i("Backup file is empty, nothing to import.");
             in.close();
@@ -282,7 +287,7 @@ public class JsonImportTask extends AsyncTask<Void, Integer, Integer> {
         }
 
         Gson gson = new Gson();
-        JsonReader reader = new JsonReader(new InputStreamReader(in, "UTF-8"));
+        JsonReader reader = new JsonReader(new InputStreamReader(in, StandardCharsets.UTF_8));
         reader.beginArray();
 
         if (type == JsonExportTask.BACKUP_SHOWS) {
@@ -381,7 +386,7 @@ public class JsonImportTask extends AsyncTask<Void, Integer, Integer> {
                 }
 
                 ContentValues episodeValues = episode
-                        .toContentValues(show.tvdb_id, season.tvdbId, season.season);
+                        .toContentValues(show.tvdb_id, season.tvdbId, season.seasonProp);
                 episodeBatch.add(episodeValues);
             }
         }
@@ -434,10 +439,10 @@ public class JsonImportTask extends AsyncTask<Void, Integer, Integer> {
             }
 
             ContentValues itemValues = new ContentValues();
-            itemValues.put(ListItems.LIST_ITEM_ID, item.listItemId);
-            itemValues.put(Lists.LIST_ID, list.listId);
-            itemValues.put(ListItems.ITEM_REF_ID, item.tvdbId);
-            itemValues.put(ListItems.TYPE, type);
+            itemValues.put(LIST_ITEM_ID, item.listItemId);
+            itemValues.put(LIST_ID, list.listId);
+            itemValues.put(ITEM_REF_ID, item.tvdbId);
+            itemValues.put(TYPE, type);
 
             items.add(itemValues);
         }

@@ -1,11 +1,17 @@
 package com.battlelancer.seriesguide.util.tasks;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.NUMBER;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.RATING_USER;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.SEASON;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.buildEpisodeUri;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.buildEpisodeWithShowUri;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ShowsColumns.REF_SHOW_ID;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import com.battlelancer.seriesguide.provider.SeriesGuideContract;
 import com.uwetrottmann.trakt5.entities.ShowIds;
 import com.uwetrottmann.trakt5.entities.SyncEpisode;
 import com.uwetrottmann.trakt5.entities.SyncItems;
@@ -38,11 +44,11 @@ public class RateEpisodeTask extends BaseRateItemTask {
         int episode = -1;
         int showTvdbId = -1;
         Cursor query = getContext().getContentResolver()
-                .query(SeriesGuideContract.Episodes.buildEpisodeUri(episodeTvdbId),
+                .query(buildEpisodeUri(episodeTvdbId),
                         new String[] {
-                                SeriesGuideContract.Episodes.SEASON,
-                                SeriesGuideContract.Episodes.NUMBER,
-                                SeriesGuideContract.Shows.REF_SHOW_ID }, null, null, null);
+                                SEASON,
+                                NUMBER,
+                                REF_SHOW_ID }, null, null, null);
         if (query != null) {
             if (query.moveToFirst()) {
                 season = query.getInt(0);
@@ -66,15 +72,15 @@ public class RateEpisodeTask extends BaseRateItemTask {
     @Override
     protected boolean doDatabaseUpdate() {
         ContentValues values = new ContentValues();
-        values.put(SeriesGuideContract.Episodes.RATING_USER, getRating().value);
+        values.put(RATING_USER, getRating().value);
 
         int rowsUpdated = getContext().getContentResolver()
-                .update(SeriesGuideContract.Episodes.buildEpisodeUri(episodeTvdbId), values, null,
+                .update(buildEpisodeUri(episodeTvdbId), values, null,
                         null);
 
         // notify withshow uri as well (used by episode details view)
         getContext().getContentResolver()
-                .notifyChange(SeriesGuideContract.Episodes.buildEpisodeWithShowUri(episodeTvdbId),
+                .notifyChange(buildEpisodeWithShowUri(episodeTvdbId),
                         null);
 
         return rowsUpdated > 0;

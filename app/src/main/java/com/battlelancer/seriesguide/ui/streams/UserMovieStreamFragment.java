@@ -1,5 +1,7 @@
 package com.battlelancer.seriesguide.ui.streams;
 
+import static com.battlelancer.seriesguide.ui.streams.TraktMovieHistoryLoader.Result;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ListAdapter;
@@ -9,6 +11,7 @@ import androidx.core.app.ActivityOptionsCompat;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 import com.battlelancer.seriesguide.ui.movies.MovieDetailsActivity;
+import com.battlelancer.seriesguide.ui.streams.SectionedHistoryAdapter.OnItemClickListener;
 
 /**
  * Displays a stream of movies the user has recently watched on trakt.
@@ -38,7 +41,7 @@ public class UserMovieStreamFragment extends StreamFragment {
                 activityLoaderCallbacks);
     }
 
-    private MovieHistoryAdapter.OnItemClickListener itemClickListener = (view, item) -> {
+    private OnItemClickListener itemClickListener = (view, item) -> {
         if (item == null) {
             return;
         }
@@ -55,17 +58,17 @@ public class UserMovieStreamFragment extends StreamFragment {
         );
     };
 
-    private LoaderManager.LoaderCallbacks<TraktMovieHistoryLoader.Result> activityLoaderCallbacks =
-            new LoaderManager.LoaderCallbacks<TraktMovieHistoryLoader.Result>() {
+    private LoaderManager.LoaderCallbacks<Result> activityLoaderCallbacks =
+            new LoaderManager.LoaderCallbacks<Result>() {
                 @Override
-                public Loader<TraktMovieHistoryLoader.Result> onCreateLoader(int id, Bundle args) {
+                public Loader<Result> onCreateLoader(int id, Bundle args) {
                     showProgressBar(true);
                     return new TraktMovieHistoryLoader(getActivity());
                 }
 
                 @Override
-                public void onLoadFinished(@NonNull Loader<TraktMovieHistoryLoader.Result> loader,
-                        TraktMovieHistoryLoader.Result data) {
+                public void onLoadFinished(@NonNull Loader<Result> loader,
+                        Result data) {
                     if (!isAdded()) {
                         return;
                     }
@@ -75,7 +78,7 @@ public class UserMovieStreamFragment extends StreamFragment {
                 }
 
                 @Override
-                public void onLoaderReset(@NonNull Loader<TraktMovieHistoryLoader.Result> loader) {
+                public void onLoaderReset(@NonNull Loader<Result> loader) {
                     // keep current data
                 }
             };

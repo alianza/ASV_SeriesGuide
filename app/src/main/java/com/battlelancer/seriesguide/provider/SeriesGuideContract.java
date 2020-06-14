@@ -232,6 +232,7 @@ public class SeriesGuideContract {
          *
          * @deprecated Use {@link #NEXTAIRDATEMS} and format.
          */
+        @Deprecated
         String NEXTAIRDATETEXT = "series_nextairdatetext";
 
         /**
@@ -250,6 +251,7 @@ public class SeriesGuideContract {
          * @deprecated Removed after tvtag (formerly GetGlue) shutdown end of 2014. Not added on new
          * installs.
          */
+        @Deprecated
         String GETGLUEID = "series_getglueid";
 
         /**
@@ -367,6 +369,7 @@ public class SeriesGuideContract {
          * @deprecated Previously first release date in text as given by TVDb.com. Not created on
          * new installs.
          */
+        @Deprecated
         String FIRSTAIRED = "epfirstaired";
 
         /**
@@ -615,6 +618,10 @@ public class SeriesGuideContract {
 
     public static class Shows implements ShowsColumns, BaseColumns {
 
+        private Shows() {
+            throw new IllegalStateException("Utility class");
+        }
+
         /**
          * Shows table.
          * See {@link SeriesGuideProvider#SHOWS} and {@link SeriesGuideProvider#SHOWS_ID}.
@@ -712,6 +719,10 @@ public class SeriesGuideContract {
     }
 
     public static class Episodes implements EpisodesColumns, BaseColumns {
+
+        private Episodes() {
+            throw new IllegalStateException("Utility class");
+        }
 
         /**
          * Episodes table.
@@ -831,6 +842,10 @@ public class SeriesGuideContract {
 
     public static class Seasons implements SeasonsColumns, BaseColumns {
 
+        private Seasons() {
+            throw new IllegalStateException("Utility class");
+        }
+
         /**
          * Seasons table.
          * See {@link SeriesGuideProvider#SEASONS} and {@link SeriesGuideProvider#SEASONS_ID}.
@@ -875,6 +890,10 @@ public class SeriesGuideContract {
 
     public static class EpisodeSearch implements EpisodeSearchColumns {
 
+        private EpisodeSearch() {
+            throw new IllegalStateException("Utility class");
+        }
+
         /**
          * Search table.
          * See {@link SeriesGuideProvider#EPISODESEARCH_ID}.
@@ -906,6 +925,10 @@ public class SeriesGuideContract {
     }
 
     public static class Lists implements ListsColumns, BaseColumns {
+
+        private Lists() {
+            throw new IllegalStateException("Utility class");
+        }
 
         /**
          * Lists table.
@@ -956,6 +979,10 @@ public class SeriesGuideContract {
     }
 
     public static class ListItems implements ListItemsColumns, BaseColumns {
+
+        private ListItems() {
+            throw new IllegalStateException("Utility class");
+        }
 
         /**
          * List items table.
@@ -1018,7 +1045,7 @@ public class SeriesGuideContract {
         public static String[] splitListItemId(@NonNull String listItemId) {
             String[] brokenUpId = listItemId.split("-", 3);
             if (brokenUpId.length != 3) {
-                return null;
+                return new String[0];
             }
             return brokenUpId;
         }
@@ -1034,6 +1061,10 @@ public class SeriesGuideContract {
     }
 
     public static class Movies implements MoviesColumns, BaseColumns {
+
+        private Movies() {
+            throw new IllegalStateException("Utility class");
+        }
 
         /**
          * Movies table.
@@ -1097,6 +1128,10 @@ public class SeriesGuideContract {
 
     public static class Activity implements ActivityColumns, BaseColumns {
 
+        private Activity() {
+            throw new IllegalStateException("Utility class");
+        }
+
         /**
          * Activity table.
          * See {@link SeriesGuideProvider#ACTIVITY}.
@@ -1118,6 +1153,11 @@ public class SeriesGuideContract {
     }
 
     public static class Jobs implements JobsColumns, BaseColumns {
+
+        private Jobs() {
+            throw new IllegalStateException("Utility class");
+        }
+
         /**
          * Jobs table.
          * See {@link SeriesGuideProvider#JOBS}.

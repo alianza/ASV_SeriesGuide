@@ -7,6 +7,10 @@ import android.content.Context;
  */
 public class AmazonSettings {
 
+    private AmazonSettings() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static final String SETTINGS_FILE = "extension_amazon";
 
     public static final String KEY_COUNTRY = "extension_amazon";

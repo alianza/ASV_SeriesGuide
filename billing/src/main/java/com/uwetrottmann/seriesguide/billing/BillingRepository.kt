@@ -176,10 +176,8 @@ class BillingRepository(private val applicationContext: Context) {
             Timber.d("processPurchases newBatch content $purchasesResult")
 
             purchasesResult.forEach { purchase ->
-                if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
-                    if (isSignatureValid(purchase)) {
-                        validPurchasesSet.add(purchase)
-                    }
+                if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED && isSignatureValid(purchase)) {
+                    validPurchasesSet.add(purchase)
                 }
             }
 

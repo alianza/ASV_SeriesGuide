@@ -1,5 +1,7 @@
 package com.battlelancer.seriesguide.util.tasks;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Lists.NAME;
+
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -38,7 +40,7 @@ public class RenameListTask extends AddListTask {
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     public boolean doDatabaseUpdate(ContentResolver contentResolver, String listId) {
         ContentValues values = new ContentValues();
-        values.put(SeriesGuideContract.Lists.NAME, listName);
+        values.put(NAME, listName);
         int updated = contentResolver
                 .update(SeriesGuideContract.Lists.buildListUri(listId), values, null, null);
         if (updated == 0) {

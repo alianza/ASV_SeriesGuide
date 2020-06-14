@@ -136,15 +136,15 @@ public class ShowsFragment extends Fragment {
 
         // watch for sort order changes
         ShowsDistillationSettings.sortOrderLiveData
-                .observe(getViewLifecycleOwner(), showSortOrder -> {
-                    this.showSortOrder = showSortOrder;
+                .observe(getViewLifecycleOwner(), showSortOrderLive -> {
+                    this.showSortOrder = showSortOrderLive;
                     // re-run query
                     updateShowsQuery();
                 });
 
         // watch for filter changes
-        ShowsDistillationSettings.filterLiveData.observe(getViewLifecycleOwner(), showFilter -> {
-            this.showFilter = showFilter;
+        ShowsDistillationSettings.filterLiveData.observe(getViewLifecycleOwner(), showFilterLive -> {
+            this.showFilter = showFilterLive;
             // re-run query
             updateShowsQuery();
             // refresh filter menu icon state
@@ -250,27 +250,25 @@ public class ShowsFragment extends Fragment {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventFirstRunButton(FirstRunView.ButtonEvent event) {
         switch (event.getType()) {
-            case ADD_SHOW: {
+            case ADD_SHOW:
                 startActivity(new Intent(getActivity(), SearchActivity.class).putExtra(
                         SearchActivity.EXTRA_DEFAULT_TAB, SearchActivity.TAB_POSITION_SEARCH));
                 break;
-            }
-            case SIGN_IN: {
+            case SIGN_IN:
                 startActivity(new Intent(getActivity(), MoreOptionsActivity.class));
                 // Launching a top activity, adjust animation to match.
                 requireActivity().overridePendingTransition(
                         R.anim.activity_fade_enter_sg, R.anim.activity_fade_exit_sg);
                 break;
-            }
-            case RESTORE_BACKUP: {
+            case RESTORE_BACKUP:
                 startActivity(new Intent(getActivity(), DataLiberationActivity.class));
                 break;
-            }
-            case DISMISS: {
+            case DISMISS:
                 adapter.setDisplayFirstRunHeader(false);
                 model.reRunQuery();
                 break;
-            }
+            default:
+                throw new IllegalStateException("Unexpected value: " + event.getType());
         }
     }
 

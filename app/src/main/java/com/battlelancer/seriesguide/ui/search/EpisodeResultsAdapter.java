@@ -2,7 +2,6 @@
 package com.battlelancer.seriesguide.ui.search;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -50,7 +49,6 @@ class EpisodeResultsAdapter extends CursorAdapter {
         viewHolder.episodeTvdbId = cursor.getInt(EpisodeSearchQuery._ID);
 
         viewHolder.showTitle.setText(cursor.getString(EpisodeSearchQuery.SHOW_TITLE));
-        Resources.Theme theme = context.getTheme();
         int episodeFlag = cursor.getInt(EpisodeSearchQuery.WATCHED);
         if (EpisodeTools.isWatched(episodeFlag)) {
             viewHolder.watchedStatus.setImageResource(R.drawable.ic_watched_24dp);

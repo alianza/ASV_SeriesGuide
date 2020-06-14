@@ -58,11 +58,11 @@ public class ConnectTraktCredentialsFragment extends Fragment {
         textViewHexagonWarning.setVisibility(hexagonEnabled ? View.VISIBLE : View.GONE);
 
         // library button
-        buttonLibrary.setOnClickListener(v -> {
+        buttonLibrary.setOnClickListener(v ->
             // open search tab, will now have links to trakt lists
             startActivity(new Intent(getActivity(), SearchActivity.class).putExtra(
-                    SearchActivity.EXTRA_DEFAULT_TAB, SearchActivity.TAB_POSITION_SEARCH));
-        });
+                    SearchActivity.EXTRA_DEFAULT_TAB, SearchActivity.TAB_POSITION_SEARCH))
+        );
 
         syncStatusView.setVisibility(View.GONE);
 

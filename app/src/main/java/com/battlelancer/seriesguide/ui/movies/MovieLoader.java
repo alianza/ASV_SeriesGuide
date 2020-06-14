@@ -1,6 +1,7 @@
 package com.battlelancer.seriesguide.ui.movies;
 
 import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.buildMovieUri;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -34,7 +35,7 @@ class MovieLoader extends GenericSimpleLoader<MovieDetails> {
 
         // fill in details from local database
         Cursor movieQuery = getContext().getContentResolver()
-                .query(Movies.buildMovieUri(tmdbId), MovieQuery.PROJECTION, null, null, null);
+                .query(buildMovieUri(tmdbId), MovieQuery.PROJECTION, null, null, null);
         if (movieQuery == null || !movieQuery.moveToFirst() || movieQuery.getCount() < 1) {
             if (movieQuery != null) {
                 movieQuery.close();

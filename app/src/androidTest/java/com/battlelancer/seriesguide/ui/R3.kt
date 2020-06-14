@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.battlelancer.seriesguide.ui
 
 import androidx.recyclerview.widget.RecyclerView

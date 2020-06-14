@@ -1,13 +1,16 @@
 package com.battlelancer.seriesguide.model;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ListItems.LIST_ITEM_ID;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ListItems.TYPE;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ListItems._ID;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Lists.LIST_ID;
+
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
-import com.battlelancer.seriesguide.provider.SeriesGuideContract.ListItems;
-import com.battlelancer.seriesguide.provider.SeriesGuideContract.Lists;
 import com.battlelancer.seriesguide.provider.SeriesGuideDatabase.Tables;
 
 /**
@@ -15,32 +18,28 @@ import com.battlelancer.seriesguide.provider.SeriesGuideDatabase.Tables;
  */
 @Entity(tableName = Tables.LIST_ITEMS,
         foreignKeys = @ForeignKey(entity = SgList.class,
-                parentColumns = Lists.LIST_ID, childColumns = Lists.LIST_ID),
+                parentColumns = LIST_ID, childColumns = LIST_ID),
         indices = {
-                @Index(value = ListItems.LIST_ITEM_ID, unique = true),
-                @Index(Lists.LIST_ID)
+                @Index(value = LIST_ITEM_ID, unique = true),
+                @Index(LIST_ID)
         }
 )
 public class SgListItem {
 
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = ListItems._ID)
+    @ColumnInfo(name = _ID)
     public Integer id;
 
-    @ColumnInfo(name = ListItems.LIST_ITEM_ID)
+    @ColumnInfo(name = LIST_ITEM_ID)
     @NonNull
     public String listItemId;
 
-    @ColumnInfo(name = ListItems.ITEM_REF_ID)
-    @NonNull
-    public String itemRefId;
-
-    @ColumnInfo(name = ListItems.TYPE)
+    @ColumnInfo(name = TYPE)
     public int type;
 
     /**
      * Unique string identifier.
      */
-    @ColumnInfo(name = Lists.LIST_ID)
+    @ColumnInfo(name = LIST_ID)
     public String listId;
 }

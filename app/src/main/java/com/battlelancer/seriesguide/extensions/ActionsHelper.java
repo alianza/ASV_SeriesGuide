@@ -2,7 +2,6 @@ package com.battlelancer.seriesguide.extensions;
 
 import android.app.ActivityOptions;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -17,14 +16,17 @@ import timber.log.Timber;
 
 public class ActionsHelper {
 
+    private ActionsHelper() {
+        throw new IllegalStateException("Utility class");
+    }
+
     /**
      * Replaces all child views of the given {@link android.view.ViewGroup} with a {@link
      * android.widget.Button} per action plus one linking to {@link com.battlelancer.seriesguide.extensions.ExtensionsConfigurationActivity}.
      * Sets up {@link android.view.View.OnClickListener} if {@link com.battlelancer.seriesguide.api.Action#getViewIntent()}
      * of an  {@link com.battlelancer.seriesguide.api.Action} is not null.
      */
-    public static void populateActions(@NonNull LayoutInflater layoutInflater,
-            @NonNull Resources.Theme theme, @Nullable ViewGroup actionsContainer,
+    public static void populateActions(@NonNull LayoutInflater layoutInflater, @Nullable ViewGroup actionsContainer,
             @Nullable List<Action> data) {
         if (actionsContainer == null) {
             // nothing we can do, view is already gone

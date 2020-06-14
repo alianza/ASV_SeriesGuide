@@ -13,6 +13,7 @@ import com.battlelancer.seriesguide.settings.DisplaySettings;
 public class MoviesDistillationSettings {
 
     public static class MoviesSortOrderChangedEvent {
+        // Empty
     }
 
     static final String KEY_SORT_ORDER = "com.battlelancer.seriesguide.movies.sort.order";

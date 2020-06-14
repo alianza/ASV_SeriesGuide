@@ -113,7 +113,7 @@ class TvdbEpisodeTools constructor(
                 }
 
                 // calculate release time
-                val releaseDateTime = TimeTools.parseEpisodeReleaseDate(context, showTimeZone,
+                val releaseDateTime = TimeTools.parseEpisodeReleaseDate(showTimeZone,
                         episode.firstAired, showReleaseTime, show.country, show.network,
                         deviceTimeZone)
                 // if name or overview are empty use fallback

@@ -1,5 +1,9 @@
 package com.battlelancer.seriesguide.thetvdbapi;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ShowsColumns.HEXAGON_MERGE_COMPLETE;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ShowsColumns.LANGUAGE;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ShowsColumns.LASTUPDATED;
+
 import android.content.ContentProviderOperation;
 import android.content.ContentValues;
 import android.content.Context;
@@ -53,7 +57,7 @@ import timber.log.Timber;
  */
 public class TvdbTools {
 
-    private static final String[] LANGUAGE_QUERY_PROJECTION = new String[]{Shows.LANGUAGE};
+    private static final String[] LANGUAGE_QUERY_PROJECTION = new String[]{LANGUAGE};
 
     private final Context context;
     private Lazy<HexagonTools> hexagonTools;
@@ -88,7 +92,7 @@ public class TvdbTools {
     public static boolean isUpdateShow(Context context, int showTvdbId) {
         final Cursor show = context.getContentResolver().query(Shows.buildShowUri(showTvdbId),
                 new String[]{
-                        Shows._ID, Shows.LASTUPDATED
+                        Shows._ID, LASTUPDATED
                 }, null, null, null
         );
         boolean isUpdate = false;
@@ -142,7 +146,7 @@ public class TvdbTools {
                 // failed to download episode flags
                 // flag show as needing an episode merge
                 ContentValues values = new ContentValues();
-                values.put(Shows.HEXAGON_MERGE_COMPLETE, 0);
+                values.put(HEXAGON_MERGE_COMPLETE, 0);
                 context.getContentResolver()
                         .update(Shows.buildShowUri(showTvdbId), values, null, null);
             }
@@ -228,14 +232,14 @@ public class TvdbTools {
         }
 
         if (response.code() == 404) {
-            return null; // API returns 404 if there are no search results
+            return new ArrayList<>(); // API returns 404 if there are no search results
         }
 
         Errors.throwAndReportIfNotSuccessfulTvdb("searchSeries", response.raw());
 
         List<Series> tvdbResults = response.body().data;
-        if (tvdbResults == null || tvdbResults.size() == 0) {
-            return null; // no results from tvdb
+        if (tvdbResults == null || tvdbResults.isEmpty()) {
+            return new ArrayList<>(); // no results from tvdb
         }
 
         // parse into our data format
@@ -319,7 +323,7 @@ public class TvdbTools {
                 show.favorite = hexagonShow.getIsFavorite();
             }
             if (hexagonShow.getNotify() != null) {
-                show.notify = hexagonShow.getNotify();
+                show.notifySg = hexagonShow.getNotify();
             }
             if (hexagonShow.getIsHidden() != null) {
                 show.hidden = hexagonShow.getIsHidden();

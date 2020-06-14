@@ -1,8 +1,10 @@
 package com.battlelancer.seriesguide.ui.lists;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Lists;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Lists.LIST_ID;
+
 import android.content.Context;
 import android.database.Cursor;
-import com.battlelancer.seriesguide.provider.SeriesGuideContract;
 import com.uwetrottmann.androidutils.GenericSimpleLoader;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,9 +34,9 @@ class OrderedListsLoader extends GenericSimpleLoader<List<OrderedListsLoader.Ord
         List<OrderedList> items = new ArrayList<>();
 
         Cursor query = getContext().getContentResolver()
-                .query(SeriesGuideContract.Lists.CONTENT_URI,
+                .query(Lists.CONTENT_URI,
                         ListsQuery.PROJECTION, null, null,
-                        SeriesGuideContract.Lists.SORT_ORDER_THEN_NAME);
+                        Lists.SORT_ORDER_THEN_NAME);
         if (query == null) {
             return items;
         }
@@ -53,9 +55,9 @@ class OrderedListsLoader extends GenericSimpleLoader<List<OrderedListsLoader.Ord
 
     private interface ListsQuery {
         String[] PROJECTION = new String[] {
-                SeriesGuideContract.Lists._ID,
-                SeriesGuideContract.Lists.LIST_ID,
-                SeriesGuideContract.Lists.NAME
+                Lists._ID,
+                LIST_ID,
+                Lists.NAME
         };
 
         int ID = 1;

@@ -1,12 +1,14 @@
 package com.battlelancer.seriesguide.traktapi;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.buildEpisodeWithShowUri;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ShowsColumns.TITLE;
+
 import android.content.Context;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import androidx.fragment.app.FragmentManager;
 import com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes;
-import com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows;
 import com.battlelancer.seriesguide.util.DialogTools;
 import com.battlelancer.seriesguide.util.TextTools;
 
@@ -25,7 +27,7 @@ public class CheckInDialogFragment extends GenericCheckInDialogFragment {
     public static boolean show(Context context, FragmentManager fragmentManager,
             int episodeTvdbId) {
         final Cursor episode = context.getContentResolver().query(
-                Episodes.buildEpisodeWithShowUri(episodeTvdbId),
+                buildEpisodeWithShowUri(episodeTvdbId),
                 CheckInQuery.PROJECTION, null, null, null);
         if (episode == null) {
             return false;
@@ -59,7 +61,7 @@ public class CheckInDialogFragment extends GenericCheckInDialogFragment {
                 Episodes.SEASON,
                 Episodes.NUMBER,
                 Episodes.TITLE,
-                Shows.TITLE
+                TITLE
         };
 
         int SEASON = 0;

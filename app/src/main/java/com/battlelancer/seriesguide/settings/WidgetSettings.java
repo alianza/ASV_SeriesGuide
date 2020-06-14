@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import androidx.core.content.ContextCompat;
 import com.battlelancer.seriesguide.R;
 import com.battlelancer.seriesguide.ui.shows.ShowsDistillationSettings;
+import timber.log.Timber;
 
 /**
  * Access some widget related settings values.
@@ -53,6 +54,7 @@ public class WidgetSettings {
             type = Integer.parseInt(context.getSharedPreferences(SETTINGS_FILE, 0)
                     .getString(KEY_PREFIX_WIDGET_LISTTYPE + appWidgetId, "0"));
         } catch (NumberFormatException ignored) {
+            Timber.e(ignored, "Error");
         }
 
         return type;
@@ -71,6 +73,7 @@ public class WidgetSettings {
                     .getString(KEY_PREFIX_WIDGET_SHOWS_SORT_ORDER + appWidgetId,
                             context.getString(R.string.widget_default_show_sort_order)));
         } catch (NumberFormatException ignored) {
+            Timber.e(ignored, "Error");
         }
 
         switch (sortOrder) {
@@ -158,6 +161,7 @@ public class WidgetSettings {
                     .getString(KEY_PREFIX_WIDGET_BACKGROUND_OPACITY + appWidgetId,
                             DEFAULT_WIDGET_BACKGROUND_OPACITY));
         } catch (NumberFormatException ignored) {
+            Timber.e(ignored, "Error");
         }
 
         int baseColor = ContextCompat.getColor(context, lightBackground

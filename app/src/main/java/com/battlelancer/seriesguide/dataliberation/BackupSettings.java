@@ -13,6 +13,10 @@ import androidx.preference.PreferenceManager;
  */
 public class BackupSettings {
 
+    private BackupSettings() {
+        throw new IllegalStateException("Utility class");
+    }
+
     // manual backup
     private static final String KEY_SHOWS_EXPORT_URI
             = "com.battlelancer.seriesguide.backup.showsExport";
@@ -27,13 +31,8 @@ public class BackupSettings {
     private static final String KEY_MOVIES_IMPORT_URI
             = "com.battlelancer.seriesguide.backup.moviesImport";
 
-    // auto backup
-    // Previous auto backup preference key.
-    // Renamed (= reset) so on upgrade the new auto backup is turned on,
-    // as users might have dismissed the setup notification which
-    // turned off the old auto backup.
-//    private static final String KEY_AUTOBACKUP
-//            = "com.battlelancer.seriesguide.autobackup";
+    private static final String backupUnknown = "Unknown backup type ";
+
     private static final String KEY_AUTOBACKUP
             = "autobackup";
     private static final String KEY_AUTO_BACKUP_USE_DEFAULT_FILES
@@ -232,7 +231,7 @@ public class BackupSettings {
             case JsonExportTask.BACKUP_MOVIES:
                 return KEY_AUTOBACKUP_MOVIES_EXPORT_URI;
             default:
-                throw new IllegalArgumentException("Unknown backup type " + type);
+                throw new IllegalArgumentException(backupUnknown + type);
         }
     }
 
@@ -245,7 +244,7 @@ public class BackupSettings {
             case JsonExportTask.BACKUP_MOVIES:
                 return KEY_MOVIES_EXPORT_URI;
             default:
-                throw new IllegalArgumentException("Unknown backup type " + type);
+                throw new IllegalArgumentException(backupUnknown + type);
         }
     }
 
@@ -258,7 +257,7 @@ public class BackupSettings {
             case JsonExportTask.BACKUP_MOVIES:
                 return KEY_MOVIES_IMPORT_URI;
             default:
-                throw new IllegalArgumentException("Unknown backup type " + type);
+                throw new IllegalArgumentException(backupUnknown + type);
         }
     }
 
@@ -270,11 +269,9 @@ public class BackupSettings {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         boolean isMissingBackupFile = false;
-        if (prefs.getString(KEY_AUTOBACKUP_SHOWS_EXPORT_URI, null) == null) {
-            isMissingBackupFile = true;
-        } else if (prefs.getString(KEY_AUTOBACKUP_LISTS_EXPORT_URI, null) == null) {
-            isMissingBackupFile = true;
-        } else if (prefs.getString(KEY_AUTOBACKUP_MOVIES_EXPORT_URI, null) == null) {
+        if (prefs.getString(KEY_AUTOBACKUP_SHOWS_EXPORT_URI, null) == null
+                || prefs.getString(KEY_AUTOBACKUP_LISTS_EXPORT_URI, null) == null
+                || prefs.getString(KEY_AUTOBACKUP_MOVIES_EXPORT_URI, null) == null) {
             isMissingBackupFile = true;
         }
         return isMissingBackupFile;

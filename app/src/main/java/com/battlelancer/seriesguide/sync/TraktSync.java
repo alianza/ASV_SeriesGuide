@@ -22,13 +22,13 @@ public class TraktSync {
 
     private Context context;
     private MovieTools movieTools;
-    private Sync traktSync;
+    private Sync traktSyncProp;
     private SyncProgress progress;
 
-    TraktSync(Context context, MovieTools movieTools, Sync traktSync, SyncProgress progress) {
+    TraktSync(Context context, MovieTools movieTools, Sync traktSyncProp, SyncProgress progress) {
         this.context = context;
         this.movieTools = movieTools;
-        this.traktSync = traktSync;
+        this.traktSyncProp = traktSyncProp;
         this.progress = progress;
     }
 
@@ -55,8 +55,8 @@ public class TraktSync {
             return SgSyncAdapter.UpdateResult.INCOMPLETE;
         }
 
-        TraktRatingsSync ratingsSync = new TraktRatingsSync(context, traktSync);
-        if (localShows.size() == 0) {
+        TraktRatingsSync ratingsSync = new TraktRatingsSync(context, traktSyncProp);
+        if (localShows.isEmpty()) {
             Timber.d("performTraktSync: no local shows, skip shows");
         } else {
             if (!onlyRatings) {
@@ -98,7 +98,7 @@ public class TraktSync {
 
         // MOVIES
         progress.publish(SyncProgress.Step.TRAKT_MOVIES);
-        TraktMovieSync movieSync = new TraktMovieSync(context, movieTools, traktSync);
+        TraktMovieSync movieSync = new TraktMovieSync(context, movieTools, traktSyncProp);
 
         // sync watchlist, collection and watched movies with trakt
         if (!onlyRatings) {
@@ -145,7 +145,7 @@ public class TraktSync {
         boolean isInitialSync = !TraktSettings.hasMergedEpisodes(context);
 
         // watched episodes
-        TraktEpisodeSync episodeSync = new TraktEpisodeSync(context, traktSync);
+        TraktEpisodeSync episodeSync = new TraktEpisodeSync(context, traktSyncProp);
         if (!episodeSync.syncWatched(localShows, lastActivity.watched_at, isInitialSync)) {
             return false; // failed, give up.
         }
@@ -171,7 +171,7 @@ public class TraktSync {
     @Nullable
     private LastActivities getLastActivity() {
         try {
-            Response<LastActivities> response = traktSync
+            Response<LastActivities> response = traktSyncProp
                     .lastActivities()
                     .execute();
             if (response.isSuccessful()) {

@@ -17,6 +17,12 @@ public abstract class MultiPagerAdapter extends FragmentPagerAdapter {
     private FragmentManager fragmentManager;
     private FragmentTransaction currentTransaction;
 
+    /**
+     * @deprecated
+     * @param fm FragmentManager
+     */
+    @SuppressWarnings("deprecation")
+    @Deprecated
     public MultiPagerAdapter(FragmentManager fm) {
         super(fm);
         fragmentManager = fm;

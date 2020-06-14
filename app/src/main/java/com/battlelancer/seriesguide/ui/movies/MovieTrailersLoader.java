@@ -59,7 +59,7 @@ class MovieTrailersLoader extends GenericSimpleLoader<Videos.Video> {
 
     @Nullable
     private Videos.Video extractTrailer(@Nullable Videos videos) {
-        if (videos == null || videos.results == null || videos.results.size() == 0) {
+        if (videos == null || videos.results == null || videos.results.isEmpty()) {
             return null;
         }
 

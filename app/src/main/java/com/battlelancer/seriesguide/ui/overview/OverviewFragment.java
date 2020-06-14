@@ -78,6 +78,7 @@ import com.squareup.picasso.Picasso;
 import com.uwetrottmann.androidutils.CheatSheet;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -549,34 +550,34 @@ public class OverviewFragment extends Fragment implements
         if (!isAdded()) {
             return;
         }
-        switch (loader.getId()) {
-            case OverviewActivity.OVERVIEW_EPISODE_LOADER_ID:
-                isEpisodeDataAvailable = data != null && data.moveToFirst();
-                currentEpisodeCursor = data;
-                maybeAddFeedbackView();
-                updateEpisodeViews(data);
-                break;
-            case OverviewActivity.OVERVIEW_SHOW_LOADER_ID:
-                isShowDataAvailable = data != null && data.moveToFirst();
-                showCursor = data;
-                if (isShowDataAvailable) {
-                    populateShowViews(data);
-                }
-                break;
+        int id = loader.getId();
+        if (id == OverviewActivity.OVERVIEW_EPISODE_LOADER_ID) {
+            isEpisodeDataAvailable = data != null && data.moveToFirst();
+            currentEpisodeCursor = data;
+            maybeAddFeedbackView();
+            updateEpisodeViews(Objects.requireNonNull(data));
+        } else if (id == OverviewActivity.OVERVIEW_SHOW_LOADER_ID) {
+            isShowDataAvailable = data != null && data.moveToFirst();
+            showCursor = data;
+            if (isShowDataAvailable) {
+                populateShowViews(data);
+            }
+        } else {
+            throw new IllegalStateException("Unexpected value: " + loader.getId());
         }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        switch (loader.getId()) {
-            case OverviewActivity.OVERVIEW_EPISODE_LOADER_ID:
-                isEpisodeDataAvailable = false;
-                currentEpisodeCursor = null;
-                break;
-            case OverviewActivity.OVERVIEW_SHOW_LOADER_ID:
-                isShowDataAvailable = false;
-                showCursor = null;
-                break;
+        int id = loader.getId();
+        if (id == OverviewActivity.OVERVIEW_EPISODE_LOADER_ID) {
+            isEpisodeDataAvailable = false;
+            currentEpisodeCursor = null;
+        } else if (id == OverviewActivity.OVERVIEW_SHOW_LOADER_ID) {
+            isShowDataAvailable = false;
+            showCursor = null;
+        } else {
+            throw new IllegalStateException("Unexpected value: " + loader.getId());
         }
     }
 
@@ -610,7 +611,7 @@ public class OverviewFragment extends Fragment implements
         buttonStreamingSearch.setEnabled(enabled);
     }
 
-    private void updateEpisodeViews(Cursor episode) {
+    private void updateEpisodeViews(@NonNull Cursor episode) {
         if (isEpisodeDataAvailable) {
             // some episode properties
             currentEpisodeTvdbId = episode.getInt(EpisodeQuery._ID);
@@ -882,7 +883,8 @@ public class OverviewFragment extends Fragment implements
                     show.getString(ShowQuery.SHOW_RELEASE_TIMEZONE),
                     show.getString(ShowQuery.SHOW_RELEASE_COUNTRY),
                     network);
-            String dayString = TimeTools.formatToLocalDayOrDaily(requireContext(), release, weekDay);
+            String dayString = TimeTools
+                    .formatToLocalDayOrDaily(requireContext(), release, weekDay);
             String timeString = TimeTools.formatToLocalTime(requireContext(), release);
             // "Mon 08:30"
             time = dayString + " " + timeString;
@@ -945,7 +947,8 @@ public class OverviewFragment extends Fragment implements
                 }
 
                 @Override
-                public void onLoadFinished(@NonNull Loader<List<Action>> loader, List<Action> data) {
+                public void onLoadFinished(@NonNull Loader<List<Action>> loader,
+                        List<Action> data) {
                     if (!isAdded()) {
                         return;
                     }
@@ -955,13 +958,13 @@ public class OverviewFragment extends Fragment implements
                         Timber.d("onLoadFinished: received %s actions", data.size());
                     }
                     ActionsHelper.populateActions(requireActivity().getLayoutInflater(),
-                            requireActivity().getTheme(), containerActions, data);
+                            containerActions, data);
                 }
 
                 @Override
                 public void onLoaderReset(@NonNull Loader<List<Action>> loader) {
                     ActionsHelper.populateActions(requireActivity().getLayoutInflater(),
-                            requireActivity().getTheme(), containerActions, null);
+                            containerActions, null);
                 }
             };
 }

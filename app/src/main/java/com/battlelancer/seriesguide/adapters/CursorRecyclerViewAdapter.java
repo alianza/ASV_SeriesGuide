@@ -61,10 +61,8 @@ public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHold
             return null;
         }
         final Cursor oldCursor = cursor;
-        if (oldCursor != null) {
-            if (dataSetObserver != null) {
-                oldCursor.unregisterDataSetObserver(dataSetObserver);
-            }
+        if (oldCursor != null && dataSetObserver != null) {
+            oldCursor.unregisterDataSetObserver(dataSetObserver);
         }
         cursor = newCursor;
         if (cursor != null) {

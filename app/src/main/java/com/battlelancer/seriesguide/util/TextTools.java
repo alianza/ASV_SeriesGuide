@@ -117,7 +117,7 @@ public class TextTools {
      */
     @NonNull
     public static String mendTvdbStrings(@Nullable List<String> strings) {
-        if (strings == null || strings.size() == 0) {
+        if (strings == null || strings.isEmpty()) {
             return "";
         }
         // pre-size builder based on reasonable average length of a string

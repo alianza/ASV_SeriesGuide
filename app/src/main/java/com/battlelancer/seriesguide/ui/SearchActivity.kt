@@ -104,7 +104,7 @@ class SearchActivity : BaseMessageActivity(), AddShowDialogFragment.OnAddShowLis
         // setup search history (only used by TVDb search)
         searchHistory = SearchHistory(this, SearchSettings.KEY_SUFFIX_THETVDB)
         searchHistoryAdapter = ArrayAdapter(
-            this, R.layout.item_dropdown, searchHistory.searchHistory
+            this, R.layout.item_dropdown, searchHistory.searchHistoryProp
         )
         searchAutoCompleteView.apply {
             threshold = 1
@@ -154,6 +154,7 @@ class SearchActivity : BaseMessageActivity(), AddShowDialogFragment.OnAddShowLis
             positionOffset: Float,
             positionOffsetPixels: Int
         ) {
+            // Empty
         }
 
         override fun onPageSelected(position: Int) {
@@ -168,7 +169,9 @@ class SearchActivity : BaseMessageActivity(), AddShowDialogFragment.OnAddShowLis
             }
         }
 
-        override fun onPageScrollStateChanged(state: Int) {}
+        override fun onPageScrollStateChanged(state: Int) {
+            // Empty
+        }
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -207,11 +210,8 @@ class SearchActivity : BaseMessageActivity(), AddShowDialogFragment.OnAddShowLis
                 displayEpisode(it)
             }
             finish()
-        } else if (Intent.ACTION_SEND == action) {
-            // text share intents from other apps
-            if ("text/plain" == intent.type) {
-                handleSharedText(intent.getStringExtra(Intent.EXTRA_TEXT))
-            }
+        } else if (Intent.ACTION_SEND == action && "text/plain" == intent.type) {
+            handleSharedText(intent.getStringExtra(Intent.EXTRA_TEXT))
         }
     }
 
@@ -250,13 +250,17 @@ class SearchActivity : BaseMessageActivity(), AddShowDialogFragment.OnAddShowLis
     }
 
     private val textWatcher = object : TextWatcher {
-        override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+        override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
+            // Empty
+        }
 
         override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
             triggerLocalSearch(s)
         }
 
-        override fun afterTextChanged(s: Editable) {}
+        override fun afterTextChanged(s: Editable) {
+            // Empty
+        }
     }
 
     private fun triggerLocalSearch(queryRaw: CharSequence?) {
@@ -283,11 +287,9 @@ class SearchActivity : BaseMessageActivity(), AddShowDialogFragment.OnAddShowLis
             val query = searchAutoCompleteView.text.toString().trim()
             EventBus.getDefault().postSticky(SearchQuerySubmitEvent(query))
             // update history
-            if (query.isNotEmpty()) {
-                if (searchHistory.saveRecentSearch(query)) {
-                    searchHistoryAdapter.clear()
-                    searchHistoryAdapter.addAll(searchHistory.searchHistory)
-                }
+            if (query.isNotEmpty() && searchHistory.saveRecentSearch(query)) {
+                searchHistoryAdapter.clear()
+                searchHistoryAdapter.addAll(searchHistory.searchHistoryProp)
             }
         }
     }

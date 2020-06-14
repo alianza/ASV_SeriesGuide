@@ -15,6 +15,10 @@ import com.battlelancer.seriesguide.util.TimeTools;
 
 public class EpisodeTools {
 
+    private EpisodeTools() {
+        throw new IllegalStateException("Utility class");
+    }
+
     /**
      * Checks the database whether there is an entry for this episode.
      */

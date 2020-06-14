@@ -4,6 +4,7 @@ import android.content.Context
 import com.battlelancer.seriesguide.SgApp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.util.regex.Pattern
 
 class TvdbIdExtractor(val context: Context, val text: String) {
@@ -44,6 +45,7 @@ class TvdbIdExtractor(val context: Context, val text: String) {
                 }
             }
         } catch (e: Exception) {
+            Timber.e(e, "Error")
         }
         return -1
     }
@@ -81,6 +83,7 @@ class TvdbIdExtractor(val context: Context, val text: String) {
                 try {
                     return Integer.parseInt(match)
                 } catch (ignored: NumberFormatException) {
+                    Timber.e(ignored, "Error")
                 }
             }
         }

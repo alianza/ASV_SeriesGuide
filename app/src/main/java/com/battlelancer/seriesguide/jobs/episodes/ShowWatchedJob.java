@@ -1,5 +1,8 @@
 package com.battlelancer.seriesguide.jobs.episodes;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.FIRSTAIREDMS;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.WATCHED;
+
 import android.content.Context;
 import android.text.format.DateUtils;
 import androidx.annotation.NonNull;
@@ -28,7 +31,7 @@ public class ShowWatchedJob extends ShowBaseJob {
             // set watched or skipped
             // do NOT mark watched episodes again to avoid trakt adding a new watch
             // only mark episodes that have been released until within the hour
-            return SeriesGuideContract.Episodes.FIRSTAIREDMS + "<=" + (currentTime
+            return FIRSTAIREDMS + "<=" + (currentTime
                     + DateUtils.HOUR_IN_MILLIS)
                     + " AND " + SeriesGuideContract.Episodes.SELECTION_HAS_RELEASE_DATE
                     + " AND " + SeriesGuideContract.Episodes.SELECTION_UNWATCHED_OR_SKIPPED
@@ -38,7 +41,7 @@ public class ShowWatchedJob extends ShowBaseJob {
 
     @Override
     protected String getDatabaseColumnToUpdate() {
-        return SeriesGuideContract.Episodes.WATCHED;
+        return WATCHED;
     }
 
     @Override

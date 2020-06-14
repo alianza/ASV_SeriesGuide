@@ -28,6 +28,8 @@ import org.greenrobot.eventbus.EventBus;
  */
 public class RemoveCloudAccountDialogFragment extends AppCompatDialogFragment {
 
+    public static final String REMOVEACCOUNT = "remove account";
+
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -71,7 +73,7 @@ public class RemoveCloudAccountDialogFragment extends AppCompatDialogFragment {
                 }
                 accountService.deleteData().execute();
             } catch (IOException e) {
-                Errors.logAndReportHexagon("remove account", e);
+                Errors.logAndReportHexagon(REMOVEACCOUNT, e);
                 return false;
             }
 
@@ -82,7 +84,7 @@ public class RemoveCloudAccountDialogFragment extends AppCompatDialogFragment {
             try {
                 Tasks.await(task);
             } catch (Exception e) {
-                Errors.logAndReport("remove account", HexagonAuthError.build("remove account", e));
+                Errors.logAndReport(REMOVEACCOUNT, HexagonAuthError.build(REMOVEACCOUNT, e));
                 return false;
             }
 
@@ -99,6 +101,7 @@ public class RemoveCloudAccountDialogFragment extends AppCompatDialogFragment {
     }
 
     public static class CanceledEvent {
+        // Empty
     }
 
     public static class AccountRemovedEvent {

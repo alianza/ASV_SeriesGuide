@@ -14,19 +14,19 @@ import org.greenrobot.eventbus.EventBus;
 public abstract class BaseActionTask extends AsyncTask<Void, Void, Integer> {
 
     public static final int SUCCESS = 0;
-    public static final int ERROR_NETWORK = -1;
-    public static final int ERROR_DATABASE = -2;
-    public static final int ERROR_TRAKT_AUTH = -3;
-    public static final int ERROR_TRAKT_API = -4;
-    public static final int ERROR_TRAKT_API_NOT_FOUND = -5;
-    public static final int ERROR_HEXAGON_API = -6;
+    private static final int ERROR_NETWORK = -1;
+    static final int ERROR_DATABASE = -2;
+    static final int ERROR_TRAKT_AUTH = -3;
+    static final int ERROR_TRAKT_API = -4;
+    static final int ERROR_TRAKT_API_NOT_FOUND = -5;
+    static final int ERROR_HEXAGON_API = -6;
 
     @SuppressLint("StaticFieldLeak") // using application context
     private final Context context;
     private boolean isSendingToHexagon;
     private boolean isSendingToTrakt;
 
-    public BaseActionTask(Context context) {
+    BaseActionTask(Context context) {
         this.context = context.getApplicationContext();
     }
 
@@ -47,10 +47,9 @@ public abstract class BaseActionTask extends AsyncTask<Void, Void, Integer> {
         }
 
         // if sending to service, check for connection
-        if (isSendingToHexagon() || isSendingToTrakt()) {
-            if (!AndroidUtils.isNetworkConnected(getContext())) {
-                return ERROR_NETWORK;
-            }
+        if ((isSendingToHexagon() || isSendingToTrakt()) && !AndroidUtils
+                .isNetworkConnected(getContext())) {
+            return ERROR_NETWORK;
         }
 
         return doBackgroundAction(params);

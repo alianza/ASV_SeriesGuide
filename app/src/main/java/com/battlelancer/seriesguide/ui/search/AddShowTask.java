@@ -57,7 +57,7 @@ public class AddShowTask extends AsyncTask<Void, String, Void> {
             }
         }
 
-        public static OnShowAddedEvent successful(int showTvdbId) {
+        public static OnShowAddedEvent onSuccessful(int showTvdbId) {
             return new OnShowAddedEvent(showTvdbId, null, true);
         }
 
@@ -289,7 +289,7 @@ public class AddShowTask extends AsyncTask<Void, String, Void> {
         switch (result) {
             case PROGRESS_SUCCESS:
                 // do nothing, user will see show added to show list
-                event = OnShowAddedEvent.successful(currentShowTvdbId);
+                event = OnShowAddedEvent.onSuccessful(currentShowTvdbId);
                 break;
             case PROGRESS_EXISTS:
                 event = OnShowAddedEvent.exists(context, currentShowTvdbId, currentShowName);
@@ -332,6 +332,8 @@ public class AddShowTask extends AsyncTask<Void, String, Void> {
                 event = OnShowAddedEvent
                         .aborted(context.getString(R.string.trakt_error_credentials));
                 break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + result);
         }
 
         if (event != null) {

@@ -38,19 +38,16 @@ public class WatchedBox extends AppCompatImageView {
 
     private void updateStateImage() {
         switch (episodeFlag) {
-            case EpisodeFlags.WATCHED: {
+            case EpisodeFlags.WATCHED:
                 setImageResource(R.drawable.ic_watched_24dp);
                 break;
-            }
-            case EpisodeFlags.SKIPPED: {
+            case EpisodeFlags.SKIPPED:
                 setImageResource(R.drawable.ic_skipped_24dp);
                 break;
-            }
             case EpisodeFlags.UNWATCHED:
-            default: {
+            default:
                 setImageResource(R.drawable.ic_watch_black_24dp);
                 break;
-            }
         }
     }
 }

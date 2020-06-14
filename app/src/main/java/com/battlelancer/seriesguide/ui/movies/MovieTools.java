@@ -1,5 +1,10 @@
 package com.battlelancer.seriesguide.ui.movies;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.IN_COLLECTION;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.IN_WATCHLIST;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.LAST_UPDATED;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.TMDB_ID;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -53,8 +58,8 @@ public class MovieTools {
     }
 
     public enum Lists {
-        COLLECTION(SeriesGuideContract.Movies.IN_COLLECTION),
-        WATCHLIST(SeriesGuideContract.Movies.IN_WATCHLIST),
+        COLLECTION(IN_COLLECTION),
+        WATCHLIST(IN_WATCHLIST),
         WATCHED(SeriesGuideContract.Movies.WATCHED);
 
         public final String databaseColumn;
@@ -131,10 +136,7 @@ public class MovieTools {
     public boolean addToList(int movieTmdbId, Lists list) {
         // do we have this movie in the database already?
         Boolean movieExists = isMovieInDatabase(context, movieTmdbId);
-        if (movieExists == null) {
-            return false; // query failed
-        }
-        if (movieExists) {
+        if (movieExists.booleanValue()) {
             return updateMovie(context, movieTmdbId, list.databaseColumn, true);
         } else {
             return addMovie(movieTmdbId, list);
@@ -213,7 +215,7 @@ public class MovieTools {
         HashSet<Integer> localMoviesIds = new HashSet<>();
 
         Cursor movies = context.getContentResolver().query(SeriesGuideContract.Movies.CONTENT_URI,
-                new String[]{SeriesGuideContract.Movies.TMDB_ID},
+                new String[]{TMDB_ID},
                 null, null, null);
         if (movies == null) {
             return null;
@@ -232,9 +234,9 @@ public class MovieTools {
         Cursor movie = context.getContentResolver()
                 .query(SeriesGuideContract.Movies.CONTENT_URI, new String[]{
                                 SeriesGuideContract.Movies._ID},
-                        SeriesGuideContract.Movies.TMDB_ID + "=" + movieTmdbId, null, null);
+                        TMDB_ID + "=" + movieTmdbId, null, null);
         if (movie == null) {
-            return null;
+            return false;
         }
 
         boolean movieExists = movie.getCount() > 0;
@@ -287,7 +289,7 @@ public class MovieTools {
             return; // nothing to update, downloading probably failed :(
         }
 
-        values.put(SeriesGuideContract.Movies.LAST_UPDATED, System.currentTimeMillis());
+        values.put(LAST_UPDATED, System.currentTimeMillis());
 
         // if movie does not exist in database, will do nothing
         context.getContentResolver().update(SeriesGuideContract.Movies.buildMovieUri(tmdbId),

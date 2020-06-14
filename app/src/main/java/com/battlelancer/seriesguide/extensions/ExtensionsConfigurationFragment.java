@@ -144,19 +144,19 @@ public class ExtensionsConfigurationFragment extends Fragment {
         @Override
         public void onLoadFinished(@NonNull Loader<List<Extension>> loader,
                 @NonNull List<Extension> all) {
-            if (all.size() == 0) {
+            if (all.isEmpty()) {
                 Timber.d("Did not find any extension");
             } else {
                 Timber.d("Found %d extensions", all.size());
             }
 
             // find all disabled extensions
-            List<ComponentName> enabledNames = ExtensionManager.get(getContext())
+            List<ComponentName> enabledNames1 = ExtensionManager.get(getContext())
                     .getEnabledExtensions(getContext());
             List<Extension> disabled = new ArrayList<>();
             Map<ComponentName, Extension> enabledByComponent = new HashMap<>();
             for (Extension extension : all) {
-                if (enabledNames.contains(extension.componentName)) {
+                if (enabledNames1.contains(extension.componentName)) {
                     enabledByComponent.put(extension.componentName, extension);
                 } else {
                     disabled.add(extension);
@@ -165,11 +165,11 @@ public class ExtensionsConfigurationFragment extends Fragment {
 
             // list enabled extensions in order dictated by extension manager
             List<Extension> enabled = new ArrayList<>();
-            for (ComponentName component : enabledNames) {
+            for (ComponentName component : enabledNames1) {
                 enabled.add(enabledByComponent.get(component));
             }
 
-            ExtensionsConfigurationFragment.this.enabledNames = enabledNames;
+            ExtensionsConfigurationFragment.this.enabledNames = enabledNames1;
             disabledExtensions = disabled;
 
             // force re-creation of extension add menu
@@ -201,6 +201,46 @@ public class ExtensionsConfigurationFragment extends Fragment {
                 public void onAddExtensionClick(View anchor) {
                     showAddExtensionPopupMenu(anchor);
                 }
+
+                private void showAddExtensionPopupMenu(View anchorView) {
+                    if (addExtensionPopupMenu != null) {
+                        addExtensionPopupMenu.dismiss();
+                    }
+
+                    addExtensionPopupMenu = new PopupMenu(getActivity(), anchorView);
+                    Menu menu = addExtensionPopupMenu.getMenu();
+
+                    // sort disabled extensions alphabetically
+                    Collections.sort(disabledExtensions, alphabeticalComparator);
+                    // list of installed, but disabled extensions
+                    for (int i = 0; i < disabledExtensions.size(); i++) {
+                        Extension extension = disabledExtensions.get(i);
+                        menu.add(Menu.NONE, i + 1, Menu.NONE, extension.label);
+                    }
+                    // no third-party extensions supported on Amazon app store for now
+                    if (!Utils.isAmazonVersion()) {
+                        // link to get more extensions
+                        menu.add(Menu.NONE, 0, Menu.NONE, R.string.action_extensions_search);
+                    }
+                    addExtensionPopupMenu.setOnMenuItemClickListener(item -> {
+                        if (item.getItemId() == 0) {
+                            // special item: search for more extensions
+                            onGetMoreExtensions();
+                            return true;
+                        }
+
+                        // add to enabled extensions
+                        Extension extension = disabledExtensions.get(item.getItemId() - 1);
+                        enabledNames.add(extension.componentName);
+                        saveExtensions();
+                        // scroll to end of list
+                        listView.smoothScrollToPosition(adapter.getCount() - 1);
+                        return true;
+                    });
+
+                    addExtensionPopupMenu.show();
+                }
+
             };
 
     private void showExtensionPopupMenu(View anchor, Extension extension,
@@ -245,48 +285,10 @@ public class ExtensionsConfigurationFragment extends Fragment {
                     enabledNames.remove(position);
                     saveExtensions();
                     return true;
+                default:
+                    return false;
             }
-            return false;
         }
-    }
-
-    private void showAddExtensionPopupMenu(View anchorView) {
-        if (addExtensionPopupMenu != null) {
-            addExtensionPopupMenu.dismiss();
-        }
-
-        addExtensionPopupMenu = new PopupMenu(getActivity(), anchorView);
-        Menu menu = addExtensionPopupMenu.getMenu();
-
-        // sort disabled extensions alphabetically
-        Collections.sort(disabledExtensions, alphabeticalComparator);
-        // list of installed, but disabled extensions
-        for (int i = 0; i < disabledExtensions.size(); i++) {
-            Extension extension = disabledExtensions.get(i);
-            menu.add(Menu.NONE, i + 1, Menu.NONE, extension.label);
-        }
-        // no third-party extensions supported on Amazon app store for now
-        if (!Utils.isAmazonVersion()) {
-            // link to get more extensions
-            menu.add(Menu.NONE, 0, Menu.NONE, R.string.action_extensions_search);
-        }
-        addExtensionPopupMenu.setOnMenuItemClickListener(item -> {
-            if (item.getItemId() == 0) {
-                // special item: search for more extensions
-                onGetMoreExtensions();
-                return true;
-            }
-
-            // add to enabled extensions
-            Extension extension = disabledExtensions.get(item.getItemId() - 1);
-            enabledNames.add(extension.componentName);
-            saveExtensions();
-            // scroll to end of list
-            listView.smoothScrollToPosition(adapter.getCount() - 1);
-            return true;
-        });
-
-        addExtensionPopupMenu.show();
     }
 
     private void onGetMoreExtensions() {

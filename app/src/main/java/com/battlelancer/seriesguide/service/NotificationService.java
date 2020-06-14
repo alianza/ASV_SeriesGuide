@@ -1,5 +1,19 @@
 package com.battlelancer.seriesguide.service;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.CONTENT_URI_WITHSHOW;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.FIRSTAIREDMS;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.NUMBER;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.OVERVIEW;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.SEASON;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.SELECTION_NO_SPECIALS;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.SELECTION_UNWATCHED;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.TITLE;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes._ID;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ShowsColumns.NETWORK;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ShowsColumns.NEXTEPISODE;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ShowsColumns.POSTER_SMALL;
+import static com.battlelancer.seriesguide.provider.SeriesGuideDatabase.Tables.EPISODES;
+
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -23,10 +37,8 @@ import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 import com.battlelancer.seriesguide.R;
 import com.battlelancer.seriesguide.SgApp;
-import com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes;
 import com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows;
 import com.battlelancer.seriesguide.provider.SeriesGuideDatabase.Qualified;
-import com.battlelancer.seriesguide.provider.SeriesGuideDatabase.Tables;
 import com.battlelancer.seriesguide.settings.DisplaySettings;
 import com.battlelancer.seriesguide.settings.NotificationSettings;
 import com.battlelancer.seriesguide.thetvdbapi.TvdbImageTools;
@@ -95,26 +107,26 @@ public class NotificationService {
     };
 
     private static final String[] PROJECTION = new String[] {
-            Tables.EPISODES + "." + Episodes._ID,
-            Episodes.TITLE,
-            Episodes.FIRSTAIREDMS,
+            EPISODES + "." + _ID,
+            TITLE,
+            FIRSTAIREDMS,
             Shows.TITLE,
-            Shows.NETWORK,
-            Episodes.NUMBER,
-            Episodes.SEASON,
-            Shows.POSTER_SMALL,
-            Episodes.OVERVIEW
+            NETWORK,
+            NUMBER,
+            SEASON,
+            POSTER_SMALL,
+            OVERVIEW
     };
 
     // by airdate, then by show, then lowest number first
-    private static final String SORTING = Episodes.FIRSTAIREDMS + " ASC,"
+    private static final String SORTING = FIRSTAIREDMS + " ASC,"
             + Shows.SORT_TITLE + ","
-            + Episodes.NUMBER + " ASC";
+            + NUMBER + " ASC";
 
     // only if notifications are on: unwatched episodes released on or after arg
     private static final String SELECTION = Shows.SELECTION_NOTIFY + " AND "
-            + Episodes.SELECTION_UNWATCHED + " AND "
-            + Episodes.FIRSTAIREDMS + ">=?";
+            + SELECTION_UNWATCHED + " AND "
+            + FIRSTAIREDMS + ">=?";
 
     interface NotificationQuery {
         int _ID = 0;
@@ -312,20 +324,20 @@ public class NotificationService {
         boolean isNoSpecials = DisplaySettings.isHidingSpecials(context);
         Timber.d("Settings: specials: %s", isNoSpecials ? "YES" : "NO");
         if (isNoSpecials) {
-            selection.append(" AND ").append(Episodes.SELECTION_NO_SPECIALS);
+            selection.append(" AND ").append(SELECTION_NO_SPECIALS);
         }
         if (NotificationSettings.isIgnoreHiddenShows(context)) {
             selection.append(" AND ").append(Shows.SELECTION_NO_HIDDEN);
         }
         if (NotificationSettings.isOnlyNextEpisodes(context)) {
             selection.append(" AND (")
-                    .append(Shows.NEXTEPISODE + "=''")
+                    .append(NEXTEPISODE + "=''")
                     .append(" OR ")
-                    .append(Shows.NEXTEPISODE + "=" + Qualified.EPISODES_ID)
+                    .append(NEXTEPISODE + "=" + Qualified.EPISODES_ID)
                     .append(")");
         }
 
-        return context.getContentResolver().query(Episodes.CONTENT_URI_WITHSHOW,
+        return context.getContentResolver().query(CONTENT_URI_WITHSHOW,
                 PROJECTION, selection.toString(), new String[] {
                         String.valueOf(customCurrentTime - 12 * DateUtils.HOUR_IN_MILLIS)
                 }, SORTING
@@ -357,7 +369,7 @@ public class NotificationService {
         }
 
         // Notify if we found any episodes, store latest release time we notify about
-        if (notifyPositions.size() > 0) {
+        if (notifyPositions.isEmpty()) {
             upcomingEpisodes.moveToPosition(notifyPositions.get(notifyPositions.size() - 1));
             long latestAirtime = upcomingEpisodes.getLong(
                     NotificationQuery.EPISODE_FIRST_RELEASE_MS);

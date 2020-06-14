@@ -51,10 +51,8 @@ class AutoBackupTask(
 
         val backupDirectory = AutoBackupTools.getBackupDirectory(context)
 
-        if (!backupDirectory.exists()) {
-            if (!backupDirectory.mkdirs()) {
-                throw AutoBackupException("Unable to create backup directory.")
-            }
+        if (!backupDirectory.exists() && !backupDirectory.mkdirs()) {
+            throw AutoBackupException("Unable to create backup directory.")
         }
 
         val timestamp = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.US).format(Date())

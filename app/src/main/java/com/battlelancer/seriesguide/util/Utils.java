@@ -1,5 +1,7 @@
 package com.battlelancer.seriesguide.util;
 
+import static androidx.core.app.ActivityCompat.startActivity;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityOptions;
@@ -24,7 +26,6 @@ import androidx.annotation.AttrRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
-import androidx.core.app.ActivityCompat;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.fragment.app.Fragment;
 import com.battlelancer.seriesguide.BuildConfig;
@@ -276,7 +277,7 @@ public class Utils {
     }
 
     public static void startActivityWithAnimation(Context context, Intent intent, View view) {
-        ActivityCompat.startActivity(context, intent,
+        startActivity(context, intent,
                 ActivityOptionsCompat
                         .makeScaleUpAnimation(view, 0, 0, view.getWidth(), view.getHeight())
                         .toBundle()
@@ -288,7 +289,7 @@ public class Utils {
         // shared element transition on L+
         Bundle activityOptions = ActivityOptions.makeSceneTransitionAnimation(activity, view,
                 activity.getString(sharedElementNameRes)).toBundle();
-        ActivityCompat.startActivity(activity, intent, activityOptions);
+        startActivity(activity, intent, activityOptions);
     }
 
     /**

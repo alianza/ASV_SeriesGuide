@@ -1,5 +1,7 @@
 package com.battlelancer.seriesguide.traktapi;
 
+import static com.battlelancer.seriesguide.enums.NetworkResult.OFFLINE;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -52,7 +54,7 @@ public class ConnectTraktTask extends AsyncTask<String, Void, Integer> {
     protected Integer doInBackground(String... params) {
         // check for connectivity
         if (!AndroidUtils.isNetworkConnected(context)) {
-            return TraktResult.OFFLINE;
+            return OFFLINE;
         }
 
         // get account data
@@ -137,7 +139,7 @@ public class ConnectTraktTask extends AsyncTask<String, Void, Integer> {
         } catch (Exception e) {
             Errors.logAndReport("get user settings", e);
             return AndroidUtils.isNetworkConnected(context)
-                    ? TraktResult.API_ERROR : TraktResult.OFFLINE;
+                    ? TraktResult.API_ERROR : OFFLINE;
         }
 
         // did we obtain a username (display name is not required)?

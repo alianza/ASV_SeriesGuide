@@ -161,14 +161,6 @@ class BillingActivity : BaseActivity() {
         textViewHasUpgrade.isGone = !hasUpgrade
     }
 
-    /**
-     * Disables the purchase button and hides the subscribed message.
-     */
-    private fun enableFallBackMode() {
-        buttonPass.isEnabled = true
-        textViewHasUpgrade.visibility = View.GONE
-    }
-
     private fun setWaitMode(isActive: Boolean) {
         progressScreen.isGone = !isActive
         contentContainer.isGone = isActive

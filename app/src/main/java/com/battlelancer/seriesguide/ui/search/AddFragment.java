@@ -1,5 +1,7 @@
 package com.battlelancer.seriesguide.ui.search;
 
+import static com.battlelancer.seriesguide.enums.Result.SUCCESS;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -18,7 +20,6 @@ import androidx.fragment.app.Fragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.battlelancer.seriesguide.R;
-import com.battlelancer.seriesguide.enums.NetworkResult;
 import com.battlelancer.seriesguide.thetvdbapi.TvdbImageTools;
 import com.battlelancer.seriesguide.util.tasks.RemoveShowTask;
 import com.battlelancer.seriesguide.widgets.EmptyView;
@@ -156,7 +157,7 @@ public abstract class AddFragment extends Fragment {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(RemoveShowTask.OnShowRemovedEvent event) {
-        if (event.resultCode == NetworkResult.SUCCESS) {
+        if (event.resultCode == SUCCESS) {
             setShowNotAdded(event.showTvdbId);
         }
     }
@@ -236,7 +237,6 @@ public abstract class AddFragment extends Fragment {
             if (item == null) {
                 return convertView; // all bets are off!
             }
-            holder.item = item;
 
             // hide watchlist menu if not useful
             holder.buttonContextMenu.setVisibility(showMenuWatchlist ? View.VISIBLE : View.GONE);
@@ -262,7 +262,7 @@ public abstract class AddFragment extends Fragment {
 
         static class ViewHolder {
 
-            public SearchResult item;
+            private static SearchResult item;
 
             @BindView(R.id.textViewAddTitle) public TextView title;
             @BindView(R.id.textViewAddDescription) public TextView description;

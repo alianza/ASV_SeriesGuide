@@ -1,12 +1,14 @@
 package com.battlelancer.seriesguide.util.tasks;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Lists.ORDER;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Lists.buildListUri;
+
 import android.content.ContentProviderOperation;
 import android.content.Context;
 import android.content.OperationApplicationException;
 import androidx.annotation.NonNull;
 import com.battlelancer.seriesguide.SgApp;
 import com.battlelancer.seriesguide.backend.HexagonTools;
-import com.battlelancer.seriesguide.provider.SeriesGuideContract;
 import com.battlelancer.seriesguide.ui.ListsActivity;
 import com.battlelancer.seriesguide.util.DBUtils;
 import com.battlelancer.seriesguide.util.Errors;
@@ -86,8 +88,8 @@ public class ReorderListsTask extends BaseActionTask {
         for (int position = 0; position < listIdsInOrder.size(); position++) {
             String listId = listIdsInOrder.get(position);
             batch.add(ContentProviderOperation.newUpdate(
-                    SeriesGuideContract.Lists.buildListUri(listId))
-                    .withValue(SeriesGuideContract.Lists.ORDER, position)
+                    buildListUri(listId))
+                    .withValue(ORDER, position)
                     .build());
         }
 

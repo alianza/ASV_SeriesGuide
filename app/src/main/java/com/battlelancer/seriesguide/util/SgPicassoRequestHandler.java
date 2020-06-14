@@ -23,6 +23,7 @@ import java.io.IOException;
 import okhttp3.CacheControl;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import timber.log.Timber;
 
 /**
  * This is mostly a copy of {@code com.squareup.picasso.NetworkRequestHandler} that is not visible.
@@ -53,7 +54,7 @@ public class SgPicassoRequestHandler extends RequestHandler {
         String scheme = request.uri.getScheme();
 
         if (SCHEME_SHOW_TVDB.equals(scheme)) {
-            int showTvdbId = Integer.valueOf(request.uri.getHost());
+            int showTvdbId = Integer.parseInt(request.uri.getHost());
 
             String language = request.uri.getQueryParameter(QUERY_LANGUAGE);
             if (TextUtils.isEmpty(language)) {
@@ -74,33 +75,35 @@ public class SgPicassoRequestHandler extends RequestHandler {
                     ).smallSize;
                     String imageUrl = TvdbImageTools.artworkUrl(imagePath);
                     if (imageUrl != null) {
-                        return loadFromNetwork(Uri.parse(imageUrl), networkPolicy);
+                        return loadFromNetwork(Uri.parse(imageUrl));
                     }
                 }
             } catch (TvdbException ignored) {
+                Timber.e(ignored, "Error");
             }
         }
 
         if (SCHEME_MOVIE_TMDB.equals(scheme)) {
-            int movieTmdbId = Integer.valueOf(request.uri.getHost());
+            int movieTmdbId = Integer.parseInt(request.uri.getHost());
 
             MovieTools movieTools = SgApp.getServicesComponent(context).movieTools();
             Movie movieSummary = movieTools.getMovieSummary(movieTmdbId);
             if (movieSummary != null && movieSummary.poster_path != null) {
                 final String imageUrl = TmdbSettings.getImageBaseUrl(context)
                         + TmdbSettings.POSTER_SIZE_SPEC_W342 + movieSummary.poster_path;
-                return loadFromNetwork(Uri.parse(imageUrl), networkPolicy);
+                return loadFromNetwork(Uri.parse(imageUrl));
             }
         }
 
         return null;
     }
 
-    private Result loadFromNetwork(Uri uri, int networkPolicy) throws IOException {
+    private Result loadFromNetwork(Uri uri) throws IOException {
         // because retry-count is fixed to 0 for custom request handlers
         // BitmapHunter forces the network policy to OFFLINE
         // https://github.com/square/picasso/issues/2038
         // until fixed, re-set the network policy here also (like ServiceUtils.loadWithPicasso)
+        int networkPolicy;
         if (Utils.isAllowedLargeDataConnection(context)) {
             networkPolicy = 0; // no policy
         } else {

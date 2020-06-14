@@ -101,7 +101,7 @@ public class MoviesSearchActivity extends BaseMessageActivity implements
         // setup search history
         searchHistory = new SearchHistory(this, SearchSettings.KEY_SUFFIX_TMDB);
         searchHistoryAdapter = new ArrayAdapter<>(this, R.layout.item_dropdown,
-                searchHistory.getSearchHistory());
+                searchHistory.getSearchHistoryProp());
         searchView.setAdapter(searchHistoryAdapter);
         // drop-down is auto-shown on config change, ensure it is hidden when recreating views
         searchView.dismissDropDown();
@@ -175,7 +175,7 @@ public class MoviesSearchActivity extends BaseMessageActivity implements
         // update history
         if (searchHistory.saveRecentSearch(query)) {
             searchHistoryAdapter.clear();
-            searchHistoryAdapter.addAll(searchHistory.getSearchHistory());
+            searchHistoryAdapter.addAll(searchHistory.getSearchHistoryProp());
         }
     }
 

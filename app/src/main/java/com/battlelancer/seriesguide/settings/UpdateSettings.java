@@ -7,6 +7,10 @@ import androidx.preference.PreferenceManager;
 
 public class UpdateSettings {
 
+    private UpdateSettings() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static final String KEY_AUTOUPDATE = "com.battlelancer.seriesguide.autoupdate";
 
     public static final String KEY_ONLYWIFI = "com.battlelancer.seriesguide.autoupdatewlanonly";

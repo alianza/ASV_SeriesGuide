@@ -5,6 +5,10 @@ import androidx.preference.PreferenceManager;
 
 public class TmdbSettings {
 
+    private TmdbSettings() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static final String KEY_TMDB_BASE_URL = "com.battlelancer.seriesguide.tmdb.baseurl";
 
     public static final String POSTER_SIZE_SPEC_W154 = "w154";

@@ -15,9 +15,17 @@ import java.util.Locale;
  */
 public class DisplaySettings {
 
+    private DisplaySettings() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static final String LANGUAGE_EN = "en";
 
     public static final String KEY_THEME = "com.uwetrottmann.seriesguide.theme";
+
+    /**
+     * @deprecated ASV
+     */
 
     @Deprecated // language is stored per show or defined by place of usage
     public static final String KEY_LANGUAGE_PREFERRED = "language";

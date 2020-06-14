@@ -28,7 +28,7 @@ public class SearchHistory {
     private final Context context;
     private final String settingsKey;
     // timestamp+query -> query
-    private final TreeMap<String, String> searchHistory;
+    private final TreeMap<String, String> searchHistoryProp;
     // query -> timestamp+query
     private final HashMap<String, String> queryMap;
 
@@ -46,23 +46,23 @@ public class SearchHistory {
         Set<String> storedSearchHistory = PreferenceManager.getDefaultSharedPreferences(context)
                 .getStringSet(settingsKey, null);
         if (storedSearchHistory == null) {
-            this.searchHistory = new TreeMap<>(NATURAL_ORDER_REVERSE);
+            this.searchHistoryProp = new TreeMap<>(NATURAL_ORDER_REVERSE);
             this.queryMap = new HashMap<>();
         } else {
             TreeMap<String, String> map = new TreeMap<>(NATURAL_ORDER_REVERSE);
-            HashMap<String, String> queryMap = new HashMap<>();
+            HashMap<String, String> queryMap1 = new HashMap<>();
             for (String historyEntry : storedSearchHistory) {
                 String query = historyEntry.substring(DATETIME_PREFIX_LENGTH);
                 map.put(historyEntry, query);
-                queryMap.put(query, historyEntry);
+                queryMap1.put(query, historyEntry);
             }
-            this.searchHistory = map;
-            this.queryMap = queryMap;
+            this.searchHistoryProp = map;
+            this.queryMap = queryMap1;
         }
     }
 
-    public synchronized List<String> getSearchHistory() {
-        return new ArrayList<>(searchHistory.values());
+    public synchronized List<String> getSearchHistoryProp() {
+        return new ArrayList<>(searchHistoryProp.values());
     }
 
     /**
@@ -74,26 +74,26 @@ public class SearchHistory {
         // prevent duplicate entries
         String historyEntry = queryMap.get(query);
         if (historyEntry != null) {
-            searchHistory.remove(historyEntry);
+            searchHistoryProp.remove(historyEntry);
         }
 
         // add new entry
         String now = Instant.now().with(ChronoField.NANO_OF_SECOND, 0).toString();
         String newHistoryEntry = now + " " + query;
-        searchHistory.put(now + " " + query, query);
+        searchHistoryProp.put(now + " " + query, query);
         queryMap.put(query, newHistoryEntry);
 
         // trim to size
-        if (searchHistory.size() > MAX_HISTORY_SIZE) {
-            while (searchHistory.size() > MAX_HISTORY_SIZE) {
+        if (searchHistoryProp.size() > MAX_HISTORY_SIZE) {
+            while (searchHistoryProp.size() > MAX_HISTORY_SIZE) {
                 // remove oldest entry (= lowest date value, sorted first)
-                String removedQuery = searchHistory.remove(searchHistory.lastKey());
+                String removedQuery = searchHistoryProp.remove(searchHistoryProp.lastKey());
                 queryMap.remove(removedQuery);
             }
         }
 
         // save history
-        Set<String> historySet = new HashSet<>(searchHistory.keySet());
+        Set<String> historySet = new HashSet<>(searchHistoryProp.keySet());
         PreferenceManager.getDefaultSharedPreferences(context)
                 .edit()
                 .putStringSet(settingsKey, historySet)
@@ -107,6 +107,6 @@ public class SearchHistory {
      */
     public synchronized void clearHistory() {
         PreferenceManager.getDefaultSharedPreferences(context).edit().remove(settingsKey).apply();
-        searchHistory.clear();
+        searchHistoryProp.clear();
     }
 }

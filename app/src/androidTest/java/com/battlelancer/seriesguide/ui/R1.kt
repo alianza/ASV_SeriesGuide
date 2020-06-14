@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.battlelancer.seriesguide.ui
 
 import androidx.test.espresso.Espresso.onView
@@ -12,9 +14,9 @@ import androidx.test.rule.ActivityTestRule
 import androidx.test.runner.AndroidJUnit4
 import com.battlelancer.seriesguide.R
 import com.battlelancer.seriesguide.utils.ChildAtPosition.Companion.childAtPosition
+import com.battlelancer.seriesguide.utils.GlobalUtils
 import com.battlelancer.seriesguide.utils.RecyclerViewItemCountAssertion.Companion.withItemCount
 import com.battlelancer.seriesguide.utils.SleepIdlingHelper.Companion.sleep
-import com.battlelancer.seriesguide.utils.GlobalUtils
 import org.hamcrest.Matchers
 import org.hamcrest.Matchers.allOf
 import org.junit.Before

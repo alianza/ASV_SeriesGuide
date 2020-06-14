@@ -15,7 +15,11 @@ import timber.log.Timber;
 
 public class AccountUtils {
 
-    public static final int SYNC_FREQUENCY = 24 * 60 * 60; // 1 day (in seconds)
+    private AccountUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
+    private static final int SYNC_FREQUENCY = 24 * 60 * 60; // 1 day (in seconds)
 
     private static final String ACCOUNT_NAME = "SeriesGuide Sync";
 

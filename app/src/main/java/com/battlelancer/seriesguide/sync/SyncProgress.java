@@ -80,7 +80,7 @@ public class SyncProgress {
         private Step getStepToDisplay() {
             if (step != null) {
                 return step;
-            } else if (stepsWithError.size() > 0) {
+            } else if (stepsWithError.isEmpty()) {
                 // display first step that had error
                 return stepsWithError.get(0);
             } else {

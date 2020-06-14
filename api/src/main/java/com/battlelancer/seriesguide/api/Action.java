@@ -125,6 +125,7 @@ public class Action {
                 builder.viewIntent(Intent.parseUri(viewIntent, Intent.URI_INTENT_SCHEME));
             }
         } catch (URISyntaxException ignored) {
+            // Empty
         }
 
         return builder.build();
@@ -162,6 +163,7 @@ public class Action {
                 builder.viewIntent(Intent.parseUri(viewIntent, Intent.URI_INTENT_SCHEME));
             }
         } catch (URISyntaxException ignored) {
+            // Empty
         }
 
         return builder.build();

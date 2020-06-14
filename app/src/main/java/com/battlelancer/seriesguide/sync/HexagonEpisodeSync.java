@@ -1,5 +1,11 @@
 package com.battlelancer.seriesguide.sync;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.COLLECTED;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.NUMBER;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.SEASON;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.WATCHED;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ShowsColumns.REF_SHOW_ID;
+
 import android.content.ContentProviderOperation;
 import android.content.ContentValues;
 import android.content.Context;
@@ -94,7 +100,7 @@ public class HexagonEpisodeSync {
                 return false;
             }
 
-            if (episodes == null || episodes.size() == 0) {
+            if (episodes == null || episodes.isEmpty()) {
                 // nothing to do here
                 break;
             }
@@ -110,7 +116,7 @@ public class HexagonEpisodeSync {
                 ContentValues values = new ContentValues();
                 Integer watchedFlag = episode.getWatchedFlag();
                 if (watchedFlag != null) {
-                    values.put(SeriesGuideContract.Episodes.WATCHED, watchedFlag);
+                    values.put(WATCHED, watchedFlag);
                     // record the latest last watched time for a show
                     if (!EpisodeTools.isUnwatched(watchedFlag)) {
                         Long lastWatchedMs = showsLastWatchedMs.get(showTvdbId);
@@ -122,17 +128,17 @@ public class HexagonEpisodeSync {
                     }
                 }
                 if (episode.getIsInCollection() != null) {
-                    values.put(SeriesGuideContract.Episodes.COLLECTED,
+                    values.put(COLLECTED,
                             episode.getIsInCollection() ? 1 : 0);
                 }
 
                 ContentProviderOperation op = ContentProviderOperation
                         .newUpdate(SeriesGuideContract.Episodes.CONTENT_URI)
-                        .withSelection(SeriesGuideContract.Shows.REF_SHOW_ID + "="
+                        .withSelection(REF_SHOW_ID + "="
                                 + showTvdbId + " AND "
-                                + SeriesGuideContract.Episodes.SEASON + "="
+                                + SEASON + "="
                                 + episode.getSeasonNumber() + " AND "
-                                + SeriesGuideContract.Episodes.NUMBER + "="
+                                + NUMBER + "="
                                 + episode.getEpisodeNumber(), null)
                         .withValues(values)
                         .build();
@@ -216,7 +222,7 @@ public class HexagonEpisodeSync {
                 return false;
             }
 
-            if (episodes == null || episodes.size() == 0) {
+            if (episodes == null || episodes.isEmpty()) {
                 // nothing to do here
                 break;
             }
@@ -227,7 +233,7 @@ public class HexagonEpisodeSync {
                 ContentValues values = new ContentValues();
                 if (episode.getWatchedFlag() != null
                         && episode.getWatchedFlag() != EpisodeFlags.UNWATCHED) {
-                    values.put(SeriesGuideContract.Episodes.WATCHED, episode.getWatchedFlag());
+                    values.put(WATCHED, episode.getWatchedFlag());
                     // record last watched time by taking latest updatedAt of watched/skipped
                     DateTime updatedAt = episode.getUpdatedAt();
                     if (updatedAt != null) {
@@ -239,7 +245,7 @@ public class HexagonEpisodeSync {
                 }
                 if (episode.getIsInCollection() != null
                         && episode.getIsInCollection()) {
-                    values.put(SeriesGuideContract.Episodes.COLLECTED, 1);
+                    values.put(COLLECTED, 1);
                 }
 
                 if (values.size() == 0) {
@@ -249,9 +255,9 @@ public class HexagonEpisodeSync {
 
                 ContentProviderOperation op = ContentProviderOperation
                         .newUpdate(episodesOfShowUri)
-                        .withSelection(SeriesGuideContract.Episodes.SEASON + "="
+                        .withSelection(SEASON + "="
                                 + episode.getSeasonNumber() + " AND "
-                                + SeriesGuideContract.Episodes.NUMBER + "="
+                                + NUMBER + "="
                                 + episode.getEpisodeNumber(), null)
                         .withValues(values)
                         .build();
@@ -403,11 +409,11 @@ public class HexagonEpisodeSync {
                 SeriesGuideContract.Episodes.SEASON,
                 SeriesGuideContract.Episodes.NUMBER,
                 SeriesGuideContract.Episodes.WATCHED,
-                SeriesGuideContract.Episodes.COLLECTED
+                COLLECTED
         };
 
         String SELECTION = SeriesGuideContract.Episodes.WATCHED + "!=" + EpisodeFlags.UNWATCHED
-                + " OR " + SeriesGuideContract.Episodes.COLLECTED + "=1";
+                + " OR " + COLLECTED + "=1";
 
         int SEASON = 1;
         int NUMBER = 2;

@@ -1,5 +1,9 @@
 package com.battlelancer.seriesguide.util.tasks;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Lists.LIST_ID;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Lists.NAME;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Lists.ORDER;
+
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -84,10 +88,10 @@ public class AddListTask extends BaseActionTask {
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     public boolean doDatabaseUpdate(ContentResolver contentResolver, String listId) {
         ContentValues values = new ContentValues();
-        values.put(SeriesGuideContract.Lists.LIST_ID, listId);
-        values.put(SeriesGuideContract.Lists.NAME, listName);
+        values.put(LIST_ID, listId);
+        values.put(NAME, listName);
         // default value
-        values.put(SeriesGuideContract.Lists.ORDER, 0);
+        values.put(ORDER, 0);
         contentResolver.insert(SeriesGuideContract.Lists.CONTENT_URI, values);
 
         // notify lists activity

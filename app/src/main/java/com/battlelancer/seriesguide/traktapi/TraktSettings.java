@@ -11,6 +11,10 @@ import org.threeten.bp.OffsetDateTime;
  */
 public class TraktSettings {
 
+    private TraktSettings() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static final String KEY_LAST_ACTIVITY_DOWNLOAD
             = "com.battlelancer.seriesguide.lasttraktupdate";
 

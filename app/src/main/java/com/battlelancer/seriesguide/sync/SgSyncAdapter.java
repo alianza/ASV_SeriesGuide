@@ -103,11 +103,10 @@ public class SgSyncAdapter extends AbstractThreadedSyncAdapter {
 
         // should we sync?
         final long currentTime = System.currentTimeMillis();
-        if (!options.syncImmediately && tvdbSync.isSyncMultiple()) {
-            if (!isTimeForSync(getContext(), currentTime)) {
-                Timber.d("Syncing: ABORT_DID_JUST_SYNC");
-                return;
-            }
+        if (!options.syncImmediately && tvdbSync.isSyncMultiple() && !isTimeForSync(getContext(),
+                currentTime)) {
+            Timber.d("Syncing: ABORT_DID_JUST_SYNC");
+            return;
         }
 
         // from here on we need more sophisticated abort handling, so keep track of errors
@@ -224,7 +223,7 @@ public class SgSyncAdapter extends AbstractThreadedSyncAdapter {
             if (failed < 4) {
                 // 1, -3, -9, -27
                 int posOrNegInterval = SYNC_INTERVAL_MINIMUM_MINUTES
-                        - (int) Math.pow(2, failed + 2);
+                        - (int) Math.pow(2, (double) failed + 2);
                 fakeLastUpdateTime = currentTime - (posOrNegInterval * DateUtils.MINUTE_IN_MILLIS);
             } else {
                 fakeLastUpdateTime = currentTime;

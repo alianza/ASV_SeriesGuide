@@ -12,19 +12,19 @@ import com.amazon.device.iap.model.Receipt;
 import com.amazon.device.iap.model.UserData;
 import com.battlelancer.seriesguide.R;
 import com.battlelancer.seriesguide.settings.AdvancedSettings;
-import org.greenrobot.eventbus.EventBus;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.greenrobot.eventbus.EventBus;
 import timber.log.Timber;
 
 public class AmazonIapManager {
 
     public static class AmazonIapMessageEvent {
-        public final int messageResId;
+        final int messageResId;
 
-        public AmazonIapMessageEvent(int messageResId) {
+        AmazonIapMessageEvent(int messageResId) {
             this.messageResId = messageResId;
         }
     }
@@ -37,7 +37,7 @@ public class AmazonIapManager {
     public static class AmazonIapProductEvent {
         public final Product product;
 
-        public AmazonIapProductEvent(Product product) {
+        AmazonIapProductEvent(Product product) {
             this.product = product;
         }
     }
@@ -47,11 +47,11 @@ public class AmazonIapManager {
      * active purchase to support the app.
      */
     public static class AmazonIapAvailabilityEvent {
-        public final boolean subscriptionAvailable;
-        public final boolean passAvailable;
-        public final boolean userHasActivePurchase;
+        final boolean subscriptionAvailable;
+        final boolean passAvailable;
+        final boolean userHasActivePurchase;
 
-        public AmazonIapAvailabilityEvent(boolean subscriptionAvailable, boolean passAvailable,
+        AmazonIapAvailabilityEvent(boolean subscriptionAvailable, boolean passAvailable,
                 boolean userHasActivePurchase) {
             this.subscriptionAvailable = subscriptionAvailable;
             this.passAvailable = passAvailable;
@@ -94,7 +94,7 @@ public class AmazonIapManager {
     private boolean passAvailable;
     private UserIapData userIapData;
 
-    public AmazonIapManager(Context context) {
+    private AmazonIapManager(Context context) {
         this.context = context.getApplicationContext();
         this.dataSource = new PurchaseDataSource(context);
         this.userDataAvailable = false;
@@ -185,7 +185,7 @@ public class AmazonIapManager {
     /**
      * Method to set the app's amazon user id and marketplace from IAP SDK responses.
      */
-    protected void setAmazonUserId(final String newAmazonUserId,
+    void setAmazonUserId(final String newAmazonUserId,
             final String newAmazonMarketplace) {
         userDataAvailable = true;
 
@@ -206,7 +206,7 @@ public class AmazonIapManager {
         }
     }
 
-    protected void enablePurchaseForSkus(final Map<String, Product> productData) {
+    void enablePurchaseForSkus(final Map<String, Product> productData) {
         Product product = productData.get(AmazonSku.SERIESGUIDE_SUB_YEARLY.getSku());
         if (product != null) {
             subscriptionAvailable = true;
@@ -219,7 +219,7 @@ public class AmazonIapManager {
         }
     }
 
-    protected void disablePurchaseForSkus(final Set<String> unavailableSkus) {
+    void disablePurchaseForSkus(final Set<String> unavailableSkus) {
         // reasons for product not available can be:
         // * Item not available for this country
         // * Item pulled off from Appstore by developer
@@ -235,7 +235,7 @@ public class AmazonIapManager {
         }
     }
 
-    protected void disableAllPurchases() {
+    void disableAllPurchases() {
         subscriptionAvailable = false;
         passAvailable = false;
         refreshPurchasesAvailability();
@@ -254,15 +254,9 @@ public class AmazonIapManager {
                 // We strongly recommend that you verify the receipt
                 // server-side.
 
-                // don't care for now
-//                if (!verifyReceiptFromYourService(receipt.getReceiptId(), userData)) {
-//                    // if the purchase cannot be verified,
-//                    // show relevant error message to the customer.
-//                    return;
-//                }
                 grantPurchase(receipt, userData);
             }
-        } catch (final Throwable e) {
+        } catch (final Exception e) {
             EventBus.getDefault().post(new AmazonIapMessageEvent(R.string.subscription_failed));
         }
     }
@@ -272,7 +266,7 @@ public class AmazonIapManager {
      * receipt received from InAppPurchase SDK's {@link com.amazon.device.iap.PurchasingListener#onPurchaseResponse}
      * or {@link com.amazon.device.iap.PurchasingListener#onPurchaseUpdatesResponse}.
      */
-    protected void handleSubscriptionPurchase(final Receipt receipt, final UserData userData) {
+    private void handleSubscriptionPurchase(final Receipt receipt, final UserData userData) {
         try {
             if (receipt.isCanceled()) {
                 // Check whether this receipt is for an expired or canceled subscription
@@ -280,16 +274,9 @@ public class AmazonIapManager {
             } else {
                 // We strongly recommend that you verify the receipt on server-side.
 
-                // don't care for now
-                //if (!verifyReceiptFromYourService(receipt.getReceiptId(), userData)) {
-                //    // if the purchase cannot be verified,
-                //    // show relevant error message to the customer.
-                //    return;
-                //}
-
                 grantPurchase(receipt, userData);
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
             EventBus.getDefault().post(new AmazonIapMessageEvent(R.string.subscription_failed));
         }
     }
@@ -313,14 +300,14 @@ public class AmazonIapManager {
             AdvancedSettings.setSupporterState(context, true);
             PurchasingService.notifyFulfillment(receipt.getReceiptId(),
                     FulfillmentResult.FULFILLED);
-        } catch (final Throwable e) {
+        } catch (final Exception e) {
             // If for any reason the app is not able to fulfill the purchase,
             // add your own error handling code here.
             Timber.e("Failed to grant purchase, with error %s", e.getMessage());
         }
     }
 
-    protected void handleReceipt(final Receipt receipt, final UserData userData) {
+    void handleReceipt(final Receipt receipt, final UserData userData) {
         ProductType productType = receipt.getProductType();
         if (productType == ProductType.CONSUMABLE) {
             // check consumable sample for how to handle consumable purchases
@@ -335,7 +322,7 @@ public class AmazonIapManager {
         }
     }
 
-    protected void purchaseFailed() {
+    void purchaseFailed() {
         EventBus.getDefault().post(new AmazonIapMessageEvent(R.string.subscription_failed));
     }
 
@@ -343,11 +330,11 @@ public class AmazonIapManager {
      * Sends a {@link com.battlelancer.seriesguide.billing.amazon.AmazonIapManager.AmazonIapAvailabilityEvent}
      * with info about if a user could purchase a product and if they already purchased it.
      */
-    protected void refreshPurchasesAvailability() {
-        boolean userDataAvailable = userIapData != null && userIapData.getAmazonUserId() != null;
+    void refreshPurchasesAvailability() {
+        boolean currentUserDataAvailable = userIapData != null && userIapData.getAmazonUserId() != null;
         EventBus.getDefault().post(new AmazonIapAvailabilityEvent(
-                subscriptionAvailable && userDataAvailable,
-                passAvailable && userDataAvailable,
+                subscriptionAvailable && currentUserDataAvailable,
+                passAvailable && currentUserDataAvailable,
                 userIapData != null && userIapData.hasActivePurchase()
         ));
     }
@@ -355,7 +342,7 @@ public class AmazonIapManager {
     /**
      * Reload the purchase history from the database and update if the user is a supporter.
      */
-    protected void reloadPurchaseStatus() {
+    void reloadPurchaseStatus() {
         loadPurchaseRecords();
         refreshPurchasesAvailability();
     }

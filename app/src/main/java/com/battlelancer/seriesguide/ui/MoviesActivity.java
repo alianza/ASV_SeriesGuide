@@ -42,11 +42,9 @@ public class MoviesActivity extends BaseTopActivity {
     public static final int TAB_POSITION_WATCHLIST_WITH_NOW = 2;
     public static final int TAB_POSITION_COLLECTION_WITH_NOW = 3;
     public static final int TAB_POSITION_WATCHED_WITH_NOW = 4;
-    private static final int TAB_COUNT_WITH_TRAKT = 5;
 
     @BindView(R.id.viewPagerTabs) ViewPager viewPager;
     @BindView(R.id.tabLayoutTabs) SlidingTabLayout tabs;
-    private TabStripAdapter tabsAdapter;
     private boolean showNowTab;
 
     private MoviesActivityViewModel viewModel;
@@ -81,7 +79,8 @@ public class MoviesActivity extends BaseTopActivity {
                 scrollSelectedTabToTop();
             }
         });
-        tabsAdapter = new TabStripAdapter(getSupportFragmentManager(), this, viewPager, tabs);
+        TabStripAdapter tabsAdapter = new TabStripAdapter(getSupportFragmentManager(), this,
+                viewPager, tabs);
         // discover
         tabsAdapter.addTab(R.string.title_discover, MoviesDiscoverFragment.class, null);
         // trakt-only tabs should only be visible if connected
@@ -112,15 +111,6 @@ public class MoviesActivity extends BaseTopActivity {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-
-        // Broken: tabs will update, but view pager does not use correct fragments.
-        // add trakt-only tab if user just signed in
-//        maybeAddNowTab();
-    }
-
-    @Override
     protected void onPause() {
         super.onPause();
         PreferenceManager.getDefaultSharedPreferences(this).edit()
@@ -143,18 +133,6 @@ public class MoviesActivity extends BaseTopActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    private void maybeAddNowTab() {
-        int currentTabCount = tabsAdapter.getCount();
-        showNowTab = TraktCredentials.get(this).hasCredentials();
-        if (showNowTab && currentTabCount != TAB_COUNT_WITH_TRAKT) {
-            tabsAdapter.addTab(
-                    R.string.user_stream, MoviesNowFragment.class, null, TAB_POSITION_NOW
-            );
-            // update tabs
-            tabsAdapter.notifyTabsChanged();
-        }
     }
 
     @Override

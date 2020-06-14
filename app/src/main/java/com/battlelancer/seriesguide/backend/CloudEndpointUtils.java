@@ -1,7 +1,6 @@
 package com.battlelancer.seriesguide.backend;
 
 import android.content.Context;
-import com.battlelancer.seriesguide.BuildConfig;
 import com.battlelancer.seriesguide.util.Utils;
 import com.google.api.client.googleapis.services.AbstractGoogleClient;
 
@@ -15,24 +14,22 @@ import com.google.api.client.googleapis.services.AbstractGoogleClient;
  */
 public class CloudEndpointUtils {
 
+    private CloudEndpointUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     private static final String PATH_API = "/_ah/api/";
 
     /**
      * Change this to 'true' if you're running your backend locally using the DevAppServer.
      */
     @SuppressWarnings("PointlessBooleanExpression")
-    protected static final boolean USE_LOCAL_VERSION = false && BuildConfig.DEBUG;
+    protected static final boolean USE_LOCAL_VERSION = false;
 
     @SuppressWarnings("PointlessBooleanExpression")
-    private static final boolean USE_STAGING_VERSION = false && BuildConfig.DEBUG;
+    private static final boolean USE_STAGING_VERSION = false;
 
     private static final String ROOT_URL_STAGING = "";
-
-    /**
-     * The root URL of where your DevAppServer is running (if you're running the DevAppServer
-     * locally).
-     */
-    private static final String ROOT_URL_LOCALHOST = "http://localhost:8080/";
 
     /**
      * The root URL of where your DevAppServer is running when it's being accessed via the Android

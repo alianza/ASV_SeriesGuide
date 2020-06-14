@@ -1,5 +1,12 @@
 package com.battlelancer.seriesguide.ui.lists;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.TITLE;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes._ID;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.buildEpisodeUri;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Lists.SORT_ORDER_THEN_NAME;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Lists.buildListsWithListItemUri;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.SeasonsColumns.COMBINED;
+
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
@@ -27,7 +34,6 @@ import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
 import com.battlelancer.seriesguide.R;
 import com.battlelancer.seriesguide.provider.SeriesGuideContract;
-import com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes;
 import com.battlelancer.seriesguide.provider.SeriesGuideContract.ListItems;
 import com.battlelancer.seriesguide.provider.SeriesGuideContract.Lists;
 import com.battlelancer.seriesguide.provider.SeriesGuideContract.Seasons;
@@ -161,21 +167,21 @@ public class ManageListsDialogFragment extends AppCompatDialogFragment implement
                 // show
                 uri = Shows.buildShowUri(itemTvdbId);
                 projection = new String[]{
-                        Shows._ID, Shows.TITLE
+                        Shows._ID, SeriesGuideContract.ShowsColumns.TITLE
                 };
                 break;
             case 2:
                 // season
                 uri = Seasons.buildSeasonUri(itemTvdbId);
                 projection = new String[]{
-                        Seasons._ID, Seasons.COMBINED
+                        Seasons._ID, COMBINED
                 };
                 break;
             case 3:
                 // episode
-                uri = Episodes.buildEpisodeUri(itemTvdbId);
+                uri = buildEpisodeUri(itemTvdbId);
                 projection = new String[]{
-                        Episodes._ID, Episodes.TITLE
+                        _ID, TITLE
                 };
                 break;
         }
@@ -218,9 +224,9 @@ public class ManageListsDialogFragment extends AppCompatDialogFragment implement
         int itemTvdbId = args.getInt(InitBundle.INT_ITEM_TVDB_ID);
         int itemType = args.getInt(InitBundle.INT_ITEM_TYPE);
 
-        return new CursorLoader(requireContext(), Lists.buildListsWithListItemUri(ListItems
+        return new CursorLoader(requireContext(), buildListsWithListItemUri(ListItems
                 .generateListItemIdWildcard(itemTvdbId, itemType)),
-                ListsQuery.PROJECTION, null, null, Lists.SORT_ORDER_THEN_NAME);
+                ListsQuery.PROJECTION, null, null, SORT_ORDER_THEN_NAME);
     }
 
     @Override
@@ -282,7 +288,7 @@ public class ManageListsDialogFragment extends AppCompatDialogFragment implement
     interface ListsQuery {
 
         String[] PROJECTION = new String[]{
-                Tables.LISTS + "." + Lists._ID, Tables.LISTS + "." + Lists.LIST_ID, Lists.NAME,
+                Tables.LISTS + "." + _ID, Tables.LISTS + "." + Lists.LIST_ID, Lists.NAME,
                 ListItems.LIST_ITEM_ID
         };
 

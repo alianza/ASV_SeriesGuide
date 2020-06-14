@@ -1,5 +1,10 @@
 package com.battlelancer.seriesguide.sync;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ShowsColumns.FAVORITE;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ShowsColumns.HIDDEN;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ShowsColumns.LANGUAGE;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ShowsColumns.NOTIFY;
+
 import android.content.ContentProviderOperation;
 import android.content.ContentValues;
 import android.content.Context;
@@ -174,27 +179,21 @@ public class HexagonShowSync {
      * value.
      */
     private void buildShowPropertyValues(Show show, ContentValues values, boolean mergeValues) {
-        if (show.getIsFavorite() != null) {
-            // when merging, favorite shows, but never unfavorite them
-            if (!mergeValues || show.getIsFavorite()) {
-                values.put(SeriesGuideContract.Shows.FAVORITE, show.getIsFavorite() ? 1 : 0);
-            }
+        // when merging, favorite shows, but never unfavorite them
+        if (show.getIsFavorite() != null && (!mergeValues || show.getIsFavorite())) {
+            values.put(FAVORITE, show.getIsFavorite() ? 1 : 0);
         }
-        if (show.getNotify() != null) {
-            // when merging, enable notifications, but never disable them
-            if (!mergeValues || show.getNotify()) {
-                values.put(SeriesGuideContract.Shows.NOTIFY, show.getNotify() ? 1 : 0);
-            }
+        // when merging, enable notifications, but never disable them
+        if (show.getNotify() != null && (!mergeValues || show.getNotify())) {
+            values.put(NOTIFY, show.getNotify() ? 1 : 0);
         }
-        if (show.getIsHidden() != null) {
-            // when merging, un-hide shows, but never hide them
-            if (!mergeValues || !show.getIsHidden()) {
-                values.put(SeriesGuideContract.Shows.HIDDEN, show.getIsHidden() ? 1 : 0);
-            }
+        // when merging, un-hide shows, but never hide them
+        if (show.getIsHidden() != null && (!mergeValues || !show.getIsHidden())) {
+            values.put(HIDDEN, show.getIsHidden() ? 1 : 0);
         }
         if (!TextUtils.isEmpty(show.getLanguage())) {
             // always overwrite with hexagon language value
-            values.put(SeriesGuideContract.Shows.LANGUAGE, show.getLanguage());
+            values.put(LANGUAGE, show.getLanguage());
         }
     }
 
@@ -208,7 +207,7 @@ public class HexagonShowSync {
             Timber.e("uploadAll: show query was null");
             return false;
         }
-        if (shows.size() == 0) {
+        if (shows.isEmpty()) {
             Timber.d("uploadAll: no shows to upload");
             // nothing to upload
             return true;
@@ -251,10 +250,10 @@ public class HexagonShowSync {
         Cursor query = context.getContentResolver()
                 .query(SeriesGuideContract.Shows.CONTENT_URI, new String[] {
                         SeriesGuideContract.Shows._ID, // 0
-                        SeriesGuideContract.Shows.FAVORITE, // 1
-                        SeriesGuideContract.Shows.NOTIFY, // 2
-                        SeriesGuideContract.Shows.HIDDEN, // 3
-                        SeriesGuideContract.Shows.LANGUAGE // 4
+                        FAVORITE, // 1
+                        NOTIFY, // 2
+                        HIDDEN, // 3
+                        LANGUAGE // 4
                 }, null, null, null);
         if (query == null) {
             return null;

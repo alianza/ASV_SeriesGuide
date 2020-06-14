@@ -328,22 +328,20 @@ public abstract class SeriesGuideExtension extends JobIntentService {
     @Override
     protected void onHandleWork(@NonNull Intent intent) {
         String action = intent.getAction();
+        // subscriber requests an updated action
         if (ACTION_SUBSCRIBE.equals(action)) {
             // just subscribing or unsubscribing
             handleSubscribe(
                     intent.getParcelableExtra(EXTRA_SUBSCRIBER_COMPONENT),
                     intent.getStringExtra(EXTRA_TOKEN));
-        } else if (ACTION_UPDATE.equals(action)) {
-            // subscriber requests an updated action
-            if (intent.hasExtra(EXTRA_ENTITY_IDENTIFIER)) {
-                int version = intent.getIntExtra(EXTRA_VERSION, 1);
-                if (intent.hasExtra(EXTRA_EPISODE)) {
-                    handleEpisodeRequest(intent.getIntExtra(EXTRA_ENTITY_IDENTIFIER, 0),
-                            intent.getBundleExtra(EXTRA_EPISODE), version);
-                } else if (intent.hasExtra(EXTRA_MOVIE)) {
-                    handleMovieRequest(intent.getIntExtra(EXTRA_ENTITY_IDENTIFIER, 0),
-                            intent.getBundleExtra(EXTRA_MOVIE), version);
-                }
+        } else if (ACTION_UPDATE.equals(action) && intent.hasExtra(EXTRA_ENTITY_IDENTIFIER)) {
+            int version = intent.getIntExtra(EXTRA_VERSION, 1);
+            if (intent.hasExtra(EXTRA_EPISODE)) {
+                handleEpisodeRequest(intent.getIntExtra(EXTRA_ENTITY_IDENTIFIER, 0),
+                        intent.getBundleExtra(EXTRA_EPISODE), version);
+            } else if (intent.hasExtra(EXTRA_MOVIE)) {
+                handleMovieRequest(intent.getIntExtra(EXTRA_ENTITY_IDENTIFIER, 0),
+                        intent.getBundleExtra(EXTRA_MOVIE), version);
             }
         }
     }
@@ -468,7 +466,6 @@ public abstract class SeriesGuideExtension extends JobIntentService {
     }
 
     private synchronized void publishCurrentAction() {
-        // TODO possibly only publish to requester (identify via token)
         for (ComponentName subscription : subscribers.keySet()) {
             publishCurrentAction(subscription);
         }

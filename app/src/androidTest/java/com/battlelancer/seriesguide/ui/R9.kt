@@ -1,13 +1,11 @@
+@file:Suppress("DEPRECATION")
+
 package com.battlelancer.seriesguide.ui
 
-import android.widget.FrameLayout
-import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
-import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -22,7 +20,6 @@ import com.battlelancer.seriesguide.utils.ChildAtPosition.Companion.childAtPosit
 import com.battlelancer.seriesguide.utils.GlobalUtils
 import com.battlelancer.seriesguide.utils.SleepIdlingHelper.Companion.sleep
 import org.hamcrest.Matchers
-import org.hamcrest.core.IsInstanceOf
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule

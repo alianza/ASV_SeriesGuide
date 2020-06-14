@@ -137,13 +137,13 @@ public class MoviesSearchFragment extends Fragment {
             = new LoaderCallbacks<TmdbMoviesLoader.Result>() {
         @Override
         public Loader<TmdbMoviesLoader.Result> onCreateLoader(int id, Bundle args) {
-            MoviesDiscoverLink link = MoviesDiscoverAdapter.DISCOVER_LINK_DEFAULT;
+            MoviesDiscoverLink discoverLinkDefault = MoviesDiscoverAdapter.DISCOVER_LINK_DEFAULT;
             String query = null;
             if (args != null) {
-                link = MoviesDiscoverLink.fromId(args.getInt(ARG_ID_LINK));
+                discoverLinkDefault = MoviesDiscoverLink.fromId(args.getInt(ARG_ID_LINK));
                 query = args.getString(ARG_SEARCH_QUERY);
             }
-            return new TmdbMoviesLoader(requireContext(), link, query);
+            return new TmdbMoviesLoader(requireContext(), discoverLinkDefault, query);
         }
 
         @Override

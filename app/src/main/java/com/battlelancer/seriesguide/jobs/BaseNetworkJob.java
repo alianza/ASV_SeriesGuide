@@ -33,7 +33,6 @@ public abstract class BaseNetworkJob implements NetworkJob {
             case NetworkJob.ERROR_TRAKT_SERVER:
                 return new JobResult(false, false);
             case NetworkJob.ERROR_HEXAGON_AUTH:
-                // TODO ut better error message if auth is missing, or drop?
                 error = context.getString(R.string.api_error_generic,
                         context.getString(R.string.hexagon));
                 removeJob = false;

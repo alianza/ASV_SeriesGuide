@@ -58,7 +58,7 @@ public class ExtensionManager {
     public static class EpisodeActionReceivedEvent {
         public int episodeTvdbId;
 
-        public EpisodeActionReceivedEvent(int episodeTvdbId) {
+        EpisodeActionReceivedEvent(int episodeTvdbId) {
             this.episodeTvdbId = episodeTvdbId;
         }
     }
@@ -71,7 +71,7 @@ public class ExtensionManager {
     public static class MovieActionReceivedEvent {
         public int movieTmdbId;
 
-        public MovieActionReceivedEvent(int movieTmdbId) {
+        MovieActionReceivedEvent(int movieTmdbId) {
             this.movieTmdbId = movieTmdbId;
         }
     }
@@ -164,14 +164,14 @@ public class ExtensionManager {
      */
     private synchronized void checkEnabledExtensions(Context context) {
         // make a copy of enabled extensions
-        List<ComponentName> enabledExtensions = getEnabledExtensions(context);
+        List<ComponentName> enabledExtensions1 = getEnabledExtensions(context);
 
         Timber.i("App restart: temporarily un-subscribing from all extensions.");
         List<ComponentName> extensionsToKeep = new ArrayList<>();
         setEnabledExtensions(context, extensionsToKeep);
 
         // check which are still installed
-        for (ComponentName extension : enabledExtensions) {
+        for (ComponentName extension : enabledExtensions1) {
             try {
                 context.getPackageManager().getReceiverInfo(extension, 0);
                 extensionsToKeep.add(extension);
@@ -245,8 +245,8 @@ public class ExtensionManager {
             return;
         }
 
-        Map<ComponentName, String> subscriptions = subscriptions(context);
-        if (subscriptions.containsKey(extension)) {
+        Map<ComponentName, String> subscriptions1 = subscriptions(context);
+        if (subscriptions1.containsKey(extension)) {
             // already subscribed
             Timber.d("enableExtension: already subscribed to %s", extension);
             return;
@@ -254,8 +254,8 @@ public class ExtensionManager {
 
         // subscribe
         String token = UUID.randomUUID().toString();
-        Map<String, ComponentName> tokens = tokens(context);
-        while (tokens.containsKey(token)) {
+        Map<String, ComponentName> tokens1 = tokens(context);
+        while (tokens1.containsKey(token)) {
             // create another UUID on collision
             /*
               As the number of enabled extensions is rather low compared to the UUID number
@@ -264,8 +264,8 @@ public class ExtensionManager {
             token = UUID.randomUUID().toString();
         }
         Timber.d("enableExtension: subscribing to %s", extension);
-        subscriptions.put(extension, token);
-        tokens.put(token, extension);
+        subscriptions1.put(extension, token);
+        tokens1.put(token, extension);
         context.sendBroadcast(new Intent(IncomingConstants.ACTION_SUBSCRIBE)
                 .setComponent(extension)
                 .putExtra(IncomingConstants.EXTRA_SUBSCRIBER_COMPONENT,
@@ -279,8 +279,8 @@ public class ExtensionManager {
             Timber.e("disableExtension: extension empty");
         }
 
-        Map<ComponentName, String> subscriptions = subscriptions(context);
-        if (!subscriptions.containsKey(extension)) {
+        Map<ComponentName, String> subscriptions2 = subscriptions(context);
+        if (!subscriptions2.containsKey(extension)) {
             Timber.d("disableExtension: extension not enabled %s", extension);
             return;
         }
@@ -298,7 +298,7 @@ public class ExtensionManager {
             // log in release builds to help extension developers debug
             Log.i("ExtensionManager", "Failed to unsubscribe from extension " + extension + ".", e);
         }
-        tokens(context).remove(subscriptions.remove(extension));
+        tokens(context).remove(subscriptions2.remove(extension));
     }
 
     /**
@@ -402,8 +402,8 @@ public class ExtensionManager {
         }
 
         synchronized (this) {
-            Map<String, ComponentName> tokens = tokens(context);
-            if (!tokens.containsKey(token)) {
+            Map<String, ComponentName> tokens2 = tokens(context);
+            if (!tokens2.containsKey(token)) {
                 // we are not subscribed, ignore
                 Timber.d("handlePublishedAction: token invalid, ignoring incoming action");
                 return;
@@ -426,7 +426,7 @@ public class ExtensionManager {
                 return;
             }
             // store action for this entity
-            ComponentName extension = tokens.get(token);
+            ComponentName extension = tokens2.get(token);
             //noinspection ConstantConditions Should never be null if token exists.
             actionMap.put(extension, action);
         }
@@ -484,10 +484,10 @@ public class ExtensionManager {
 
     private void saveSubscriptions(Context context) {
         List<String> serializedSubscriptions = new ArrayList<>();
-        Map<ComponentName, String> subscriptions = subscriptions(context);
+        Map<ComponentName, String> subscriptions3 = subscriptions(context);
         for (ComponentName extension : enabledExtensions(context)) {
             serializedSubscriptions.add(extension.flattenToShortString() + "|"
-                    + subscriptions.get(extension));
+                    + subscriptions3.get(extension));
         }
         Timber.d("Saving %s subscriptions", serializedSubscriptions.size());
         JSONArray json = new JSONArray(serializedSubscriptions);

@@ -1,5 +1,17 @@
 package com.battlelancer.seriesguide.sync;
 
+import static android.provider.BaseColumns._ID;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.NUMBER;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.SELECTION_COLLECTED;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.SELECTION_WATCHED;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.SORT_NUMBER_ASC;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.SORT_SEASON_ASC;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.buildEpisodeUri;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.buildEpisodesOfSeasonUri;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.buildEpisodesOfShowUri;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.SeasonsColumns.COMBINED;
+import static com.battlelancer.seriesguide.ui.episodes.EpisodeFlags.UNWATCHED;
+
 import android.content.ContentProviderOperation;
 import android.content.Context;
 import android.content.OperationApplicationException;
@@ -8,6 +20,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.preference.PreferenceManager;
 import com.battlelancer.seriesguide.provider.SeriesGuideContract;
+import com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes;
 import com.battlelancer.seriesguide.traktapi.SgTrakt;
 import com.battlelancer.seriesguide.traktapi.TraktSettings;
 import com.battlelancer.seriesguide.traktapi.TraktTools;
@@ -205,7 +218,7 @@ public class TraktEpisodeSync {
                     } else {
                         // set all watched/collected episodes of show not watched/collected
                         batch.add(ContentProviderOperation.newUpdate(
-                                SeriesGuideContract.Episodes.buildEpisodesOfShowUri(localShow))
+                                buildEpisodesOfShowUri(localShow))
                                 .withSelection(flag.clearFlagSelection, null)
                                 .withValue(flag.databaseColumn, flag.notFlaggedValue)
                                 .build());
@@ -242,8 +255,8 @@ public class TraktEpisodeSync {
 
         Cursor localSeasonsQuery = context.getContentResolver()
                 .query(SeriesGuideContract.Seasons.buildSeasonsOfShowUri(localShow),
-                        new String[] { SeriesGuideContract.Seasons._ID,
-                                SeriesGuideContract.Seasons.COMBINED }, null, null,
+                        new String[] { _ID,
+                                COMBINED }, null, null,
                         null);
         if (localSeasonsQuery == null) {
             return false;
@@ -270,7 +283,7 @@ public class TraktEpisodeSync {
                 } else {
                     // set all watched/collected episodes of season not watched/collected
                     batch.add(ContentProviderOperation.newUpdate(
-                            SeriesGuideContract.Episodes.buildEpisodesOfSeasonUri(seasonId))
+                            buildEpisodesOfSeasonUri(seasonId))
                             .withSelection(flag.clearFlagSelection, null)
                             .withValue(flag.databaseColumn, flag.notFlaggedValue)
                             .build());
@@ -285,7 +298,7 @@ public class TraktEpisodeSync {
             Timber.e(e, "Setting seasons unwatched failed.");
         }
 
-        if (isInitialSync && syncSeasons.size() > 0) {
+        if (isInitialSync && !syncSeasons.isEmpty()) {
             // upload watched/collected episodes for this show
             Integer showTraktId = ShowTools.getShowTraktId(context, localShow);
             //noinspection SimplifiableIfStatement
@@ -303,10 +316,10 @@ public class TraktEpisodeSync {
         HashSet<Integer> traktEpisodes = TraktTools.buildTraktEpisodesMap(traktSeason.episodes);
 
         Cursor localEpisodesQuery = context.getContentResolver()
-                .query(SeriesGuideContract.Episodes.buildEpisodesOfSeasonUri(
+                .query(buildEpisodesOfSeasonUri(
                         seasonId), new String[] {
-                        SeriesGuideContract.Episodes._ID,
-                        SeriesGuideContract.Episodes.NUMBER,
+                        _ID,
+                        NUMBER,
                         flag.databaseColumn }, null, null, null);
         if (localEpisodesQuery == null) {
             return false;
@@ -326,7 +339,7 @@ public class TraktEpisodeSync {
                 if (!isFlagged) {
                     // set as watched/collected
                     batch.add(ContentProviderOperation.newUpdate(
-                            SeriesGuideContract.Episodes.buildEpisodeUri(episodeId))
+                            buildEpisodeUri(episodeId))
                             .withValue(flag.databaseColumn, flag.flaggedValue)
                             .build());
                     episodesAddFlagCount++;
@@ -344,7 +357,7 @@ public class TraktEpisodeSync {
                                 flagValue);
                         if (!isSkipped) {
                             batch.add(ContentProviderOperation.newUpdate(
-                                    SeriesGuideContract.Episodes.buildEpisodeUri(episodeId))
+                                    buildEpisodeUri(episodeId))
                                     .withValue(flag.databaseColumn, flag.notFlaggedValue)
                                     .build());
                             episodesRemoveFlagCount++;
@@ -363,7 +376,7 @@ public class TraktEpisodeSync {
         if (addFlagToWholeSeason || removeFlagFromWholeSeason) {
             batch.clear();
             batch.add(ContentProviderOperation.newUpdate(
-                    SeriesGuideContract.Episodes.buildEpisodesOfSeasonUri(seasonId))
+                    buildEpisodesOfSeasonUri(seasonId))
                     .withValue(flag.databaseColumn,
                             addFlagToWholeSeason ? flag.flaggedValue : flag.notFlaggedValue)
                     .build());
@@ -375,7 +388,7 @@ public class TraktEpisodeSync {
             Timber.e(e, "Episodes watched/collected values database update failed.");
         }
 
-        if (isInitialSync && syncEpisodes.size() > 0) {
+        if (isInitialSync && !syncEpisodes.isEmpty()) {
             syncSeasons.add(new SyncSeason()
                     .number(traktSeason.number)
                     .episodes(syncEpisodes));
@@ -405,11 +418,11 @@ public class TraktEpisodeSync {
     private boolean upload(int showTvdbId, int showTraktId, Flag flag) {
         // query for watched/collected episodes
         Cursor localEpisodes = context.getContentResolver().query(
-                SeriesGuideContract.Episodes.buildEpisodesOfShowUri(showTvdbId),
+                buildEpisodesOfShowUri(showTvdbId),
                 EpisodesQuery.PROJECTION,
                 flag.flagSelection,
                 null,
-                SeriesGuideContract.Episodes.SORT_SEASON_ASC);
+                SORT_SEASON_ASC);
         if (localEpisodes == null) {
             Timber.e("upload: query failed");
             return false;
@@ -420,7 +433,7 @@ public class TraktEpisodeSync {
         localEpisodes.close();
 
         //noinspection SimplifiableIfStatement
-        if (syncSeasons.size() == 0) {
+        if (syncSeasons.isEmpty()) {
             return true; // nothing to upload for this show
         }
 
@@ -471,11 +484,11 @@ public class TraktEpisodeSync {
             Flag flag) {
         // query for watched/collected episodes of the given season
         Cursor flaggedEpisodesQuery = context.getContentResolver().query(
-                SeriesGuideContract.Episodes.buildEpisodesOfSeasonUri(seasonTvdbId),
-                new String[] { SeriesGuideContract.Episodes.NUMBER },
+                buildEpisodesOfSeasonUri(seasonTvdbId),
+                new String[] { NUMBER },
                 flag.flagSelection,
                 null,
-                SeriesGuideContract.Episodes.SORT_NUMBER_ASC);
+                SORT_NUMBER_ASC);
         if (flaggedEpisodesQuery == null) {
             // query failed
             return null;
@@ -488,7 +501,7 @@ public class TraktEpisodeSync {
         }
         flaggedEpisodesQuery.close();
 
-        if (syncEpisodes.size() == 0) {
+        if (syncEpisodes.isEmpty()) {
             return null; // no episodes watched/collected
         }
 
@@ -523,7 +536,7 @@ public class TraktEpisodeSync {
     private interface EpisodesQuery {
 
         String[] PROJECTION = new String[] {
-                SeriesGuideContract.Episodes.SEASON, SeriesGuideContract.Episodes.NUMBER
+                Episodes.SEASON, NUMBER
         };
 
         int SEASON = 0;
@@ -532,17 +545,17 @@ public class TraktEpisodeSync {
 
     public enum Flag {
         COLLECTED("collected",
-                SeriesGuideContract.Episodes.COLLECTED,
+                Episodes.COLLECTED,
                 // only remove flags for already collected episodes
-                SeriesGuideContract.Episodes.COLLECTED + "=1",
-                SeriesGuideContract.Episodes.SELECTION_COLLECTED,
+                Episodes.COLLECTED + "=1",
+                SELECTION_COLLECTED,
                 1, 0),
         WATCHED("watched",
-                SeriesGuideContract.Episodes.WATCHED,
+                Episodes.WATCHED,
                 // do not remove flags of skipped episodes, only of watched ones
-                SeriesGuideContract.Episodes.WATCHED + "=" + EpisodeFlags.WATCHED,
-                SeriesGuideContract.Episodes.SELECTION_WATCHED,
-                EpisodeFlags.WATCHED, EpisodeFlags.UNWATCHED);
+                Episodes.WATCHED + "=" + EpisodeFlags.WATCHED,
+                SELECTION_WATCHED,
+                EpisodeFlags.WATCHED, UNWATCHED);
 
         final String name;
         final String databaseColumn;

@@ -1,12 +1,20 @@
 package com.battlelancer.seriesguide.util.tasks;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ListItems.CONTENT_URI;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ListItems.CONTENT_WITH_DETAILS_URI;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ListItems.ITEM_REF_ID;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ListItems.LIST_ITEM_ID;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ListItems.TYPE;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ListItems.buildListItemUri;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ListItems.generateListItemId;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Lists.LIST_ID;
+
 import android.content.ContentProviderOperation;
 import android.content.Context;
 import android.content.OperationApplicationException;
 import androidx.annotation.NonNull;
 import com.battlelancer.seriesguide.SgApp;
 import com.battlelancer.seriesguide.backend.HexagonTools;
-import com.battlelancer.seriesguide.provider.SeriesGuideContract;
 import com.battlelancer.seriesguide.util.DBUtils;
 import com.battlelancer.seriesguide.util.Errors;
 import com.uwetrottmann.seriesguide.backend.lists.Lists;
@@ -52,7 +60,7 @@ public class ChangeListItemListsTask extends BaseActionTask {
             }
 
             SgListList wrapper = new SgListList();
-            if (addToTheseLists.size() > 0) {
+            if (addToTheseLists.isEmpty()) {
                 List<SgList> lists = buildListItemLists(addToTheseLists);
                 wrapper.setLists(lists);
 
@@ -64,7 +72,7 @@ public class ChangeListItemListsTask extends BaseActionTask {
                 }
             }
 
-            if (removeFromTheseLists.size() > 0) {
+            if (removeFromTheseLists.isEmpty()) {
                 List<SgList> lists = buildListItemLists(removeFromTheseLists);
                 wrapper.setLists(lists);
 
@@ -96,8 +104,7 @@ public class ChangeListItemListsTask extends BaseActionTask {
             List<SgListItem> items = new ArrayList<>(1);
             list.setListItems(items);
 
-            String listItemId = SeriesGuideContract.ListItems
-                    .generateListItemId(itemTvdbId, itemType, listId);
+            String listItemId = generateListItemId(itemTvdbId, itemType, listId);
             SgListItem item = new SgListItem();
             items.add(item);
             item.setListItemId(listItemId);
@@ -109,21 +116,21 @@ public class ChangeListItemListsTask extends BaseActionTask {
         ArrayList<ContentProviderOperation> batch = new ArrayList<>(
                 addToTheseLists.size() + removeFromTheseLists.size());
         for (String listId : addToTheseLists) {
-            String listItemId = SeriesGuideContract.ListItems.generateListItemId(itemTvdbId,
+            String listItemId = generateListItemId(itemTvdbId,
                     itemType, listId);
             batch.add(ContentProviderOperation
-                    .newInsert(SeriesGuideContract.ListItems.CONTENT_URI)
-                    .withValue(SeriesGuideContract.ListItems.LIST_ITEM_ID, listItemId)
-                    .withValue(SeriesGuideContract.ListItems.ITEM_REF_ID, itemTvdbId)
-                    .withValue(SeriesGuideContract.ListItems.TYPE, itemType)
-                    .withValue(SeriesGuideContract.Lists.LIST_ID, listId)
+                    .newInsert(CONTENT_URI)
+                    .withValue(LIST_ITEM_ID, listItemId)
+                    .withValue(ITEM_REF_ID, itemTvdbId)
+                    .withValue(TYPE, itemType)
+                    .withValue(LIST_ID, listId)
                     .build());
         }
         for (String listId : removeFromTheseLists) {
-            String listItemId = SeriesGuideContract.ListItems.generateListItemId(itemTvdbId,
+            String listItemId = generateListItemId(itemTvdbId,
                     itemType, listId);
             batch.add(ContentProviderOperation
-                    .newDelete(SeriesGuideContract.ListItems.buildListItemUri(listItemId))
+                    .newDelete(buildListItemUri(listItemId))
                     .build());
         }
 
@@ -137,7 +144,7 @@ public class ChangeListItemListsTask extends BaseActionTask {
 
         // notify URI used by list fragments
         getContext().getContentResolver()
-                .notifyChange(SeriesGuideContract.ListItems.CONTENT_WITH_DETAILS_URI, null);
+                .notifyChange(CONTENT_WITH_DETAILS_URI, null);
 
         return true;
     }

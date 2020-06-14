@@ -1,11 +1,15 @@
 package com.battlelancer.seriesguide.jobs;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Jobs;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Jobs.CREATED_MS;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Jobs.EXTRAS;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Jobs.TYPE;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.net.Uri;
 import androidx.annotation.NonNull;
 import com.battlelancer.seriesguide.jobs.episodes.JobAction;
-import com.battlelancer.seriesguide.provider.SeriesGuideContract;
 
 public abstract class BaseJob {
 
@@ -17,11 +21,11 @@ public abstract class BaseJob {
 
     protected boolean persistNetworkJob(Context context, @NonNull byte[] jobInfo) {
         ContentValues values = new ContentValues();
-        values.put(SeriesGuideContract.Jobs.TYPE, action.id);
-        values.put(SeriesGuideContract.Jobs.CREATED_MS, System.currentTimeMillis());
-        values.put(SeriesGuideContract.Jobs.EXTRAS, jobInfo);
+        values.put(TYPE, action.id);
+        values.put(CREATED_MS, System.currentTimeMillis());
+        values.put(EXTRAS, jobInfo);
 
-        Uri insert = context.getContentResolver().insert(SeriesGuideContract.Jobs.CONTENT_URI, values);
+        Uri insert = context.getContentResolver().insert(Jobs.CONTENT_URI, values);
 
         return insert != null;
     }

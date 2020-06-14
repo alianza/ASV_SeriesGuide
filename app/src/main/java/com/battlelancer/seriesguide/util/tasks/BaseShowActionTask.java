@@ -74,7 +74,7 @@ public abstract class BaseShowActionTask extends BaseActionTask {
     private static boolean isShowNotFound(SyncResponse response) {
         // if show was not found on trakt
         return response.not_found != null && response.not_found.shows != null
-                && response.not_found.shows.size() != 0;
+                && !response.not_found.shows.isEmpty();
     }
 
     @NonNull

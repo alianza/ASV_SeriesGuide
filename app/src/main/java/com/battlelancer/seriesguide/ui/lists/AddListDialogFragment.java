@@ -1,6 +1,8 @@
 
 package com.battlelancer.seriesguide.ui.lists;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Lists.NAME;
+
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -121,7 +123,7 @@ public class AddListDialogFragment extends AppCompatDialogFragment {
             this.buttonPositive = buttonPositive;
             this.currentName = currentName;
             Cursor listNameQuery = context.getContentResolver()
-                    .query(Lists.CONTENT_URI, new String[] { Lists._ID, Lists.NAME }, null, null,
+                    .query(Lists.CONTENT_URI, new String[] { Lists._ID, NAME }, null, null,
                             null);
             listNames = new HashSet<>();
             if (listNameQuery != null) {
@@ -134,6 +136,7 @@ public class AddListDialogFragment extends AppCompatDialogFragment {
 
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            // Unused
         }
 
         @Override
@@ -161,6 +164,7 @@ public class AddListDialogFragment extends AppCompatDialogFragment {
 
         @Override
         public void afterTextChanged(Editable s) {
+            // Unused
         }
     }
 }

@@ -55,13 +55,11 @@ public abstract class BaseRateItemTask extends BaseActionTask {
                 return ERROR_TRAKT_API;
             }
 
-            if (notFound != null) {
-                if ((notFound.movies != null && notFound.movies.size() != 0)
-                        || (notFound.shows != null && notFound.shows.size() != 0)
-                        || (notFound.episodes != null && notFound.episodes.size() != 0)) {
-                    // movie, show or episode not found on trakt
-                    return ERROR_TRAKT_API_NOT_FOUND;
-                }
+            if (notFound != null && ((notFound.movies != null && !notFound.movies.isEmpty())
+                    || (notFound.shows != null && !notFound.shows.isEmpty())
+                    || (notFound.episodes != null && !notFound.episodes.isEmpty()))) {
+                // movie, show or episode not found on trakt
+                return ERROR_TRAKT_API_NOT_FOUND;
             }
         }
 

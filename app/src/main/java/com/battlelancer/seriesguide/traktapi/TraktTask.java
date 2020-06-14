@@ -231,12 +231,10 @@ public class TraktTask extends AsyncTask<Void, Void, TraktTask.TraktResponse> {
 
         switch (action) {
             case CHECKIN_EPISODE:
-            case CHECKIN_MOVIE: {
+            case CHECKIN_MOVIE:
                 return doCheckInAction();
-            }
-            case COMMENT: {
+            case COMMENT:
                 return doCommentAction();
-            }
             default:
                 return null;
         }
@@ -248,26 +246,24 @@ public class TraktTask extends AsyncTask<Void, Void, TraktTask.TraktResponse> {
             retrofit2.Response response;
             String message = args.getString(InitBundle.MESSAGE);
             switch (action) {
-                case CHECKIN_EPISODE: {
+                case CHECKIN_EPISODE:
                     int episodeTvdbId = args.getInt(InitBundle.EPISODE_TVDBID);
-                    EpisodeCheckin checkin = new EpisodeCheckin.Builder(
+                    EpisodeCheckin checkinEpisode = new EpisodeCheckin.Builder(
                             new SyncEpisode().id(EpisodeIds.tvdb(episodeTvdbId)), APP_VERSION, null)
                             .message(message)
                             .build();
 
-                    response = trakt.checkin().checkin(checkin).execute();
+                    response = trakt.checkin().checkin(checkinEpisode).execute();
                     break;
-                }
-                case CHECKIN_MOVIE: {
+                case CHECKIN_MOVIE:
                     int movieTmdbId = args.getInt(InitBundle.MOVIE_TMDB_ID);
-                    MovieCheckin checkin = new MovieCheckin.Builder(
+                    MovieCheckin checkinMovie = new MovieCheckin.Builder(
                             new SyncMovie().id(MovieIds.tmdb(movieTmdbId)), APP_VERSION, null)
                             .message(message)
                             .build();
 
-                    response = trakt.checkin().checkin(checkin).execute();
+                    response = trakt.checkin().checkin(checkinMovie).execute();
                     break;
-                }
                 default:
                     throw new IllegalArgumentException("check-in action unknown.");
             }
@@ -398,17 +394,16 @@ public class TraktTask extends AsyncTask<Void, Void, TraktTask.TraktResponse> {
             EventBus.getDefault().post(new TraktActionCompleteEvent(action, true, r.message));
         } else {
             // special handling of blocked check-ins
-            if (action == TraktAction.CHECKIN_EPISODE
-                    || action == TraktAction.CHECKIN_MOVIE) {
-                if (r instanceof CheckinBlockedResponse) {
-                    CheckinBlockedResponse checkinBlockedResponse = (CheckinBlockedResponse) r;
-                    if (checkinBlockedResponse.waitTimeMin > 0) {
-                        // looks like a check in is already in progress
-                        EventBus.getDefault().post(
-                                new TraktCheckInBlockedEvent(args,
-                                        checkinBlockedResponse.waitTimeMin));
-                        return;
-                    }
+            if ((action == TraktAction.CHECKIN_EPISODE
+                    || action == TraktAction.CHECKIN_MOVIE)
+                    && r instanceof CheckinBlockedResponse) {
+                CheckinBlockedResponse checkinBlockedResponse = (CheckinBlockedResponse) r;
+                if (checkinBlockedResponse.waitTimeMin > 0) {
+                    // looks like a check in is already in progress
+                    EventBus.getDefault().post(
+                            new TraktCheckInBlockedEvent(args,
+                                    checkinBlockedResponse.waitTimeMin));
+                    return;
                 }
             }
 

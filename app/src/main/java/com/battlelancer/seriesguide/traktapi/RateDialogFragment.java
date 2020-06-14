@@ -150,22 +150,19 @@ public class RateDialogFragment extends AppCompatDialogFragment {
         int itemId = args.getInt(InitBundle.ITEM_ID);
         BaseRateItemTask task = null;
         switch (itemType) {
-            case ITEM_MOVIE: {
+            case ITEM_MOVIE:
                 task = new RateMovieTask(getContext(), rating, itemId);
                 break;
-            }
-            case ITEM_SHOW: {
+            case ITEM_SHOW:
                 task = new RateShowTask(getContext(), rating, itemId);
                 break;
-            }
-            case ITEM_EPISODE: {
+            case ITEM_EPISODE:
                 task = new RateEpisodeTask(getContext(), rating, itemId);
                 break;
-            }
+            default:
+                throw new IllegalStateException("Unexpected value: " + itemType);
         }
-        if (task != null) {
-            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        }
+        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
         // guard against onClick being called after onSaveInstanceState by allowing state loss
         dismissAllowingStateLoss();

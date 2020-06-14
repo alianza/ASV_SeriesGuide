@@ -342,12 +342,8 @@ class SgPreferencesFragment : PreferenceFragmentCompat(),
                 var ringtoneUri: Uri? = data.getParcelableExtra(
                     RingtoneManager.EXTRA_RINGTONE_PICKED_URI
                 )
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    // Xiaomi devices incorrectly return file:// uris on N
-                    // protect against FileUriExposedException
-                    if (ringtoneUri != null /* not silent */ && "content" != ringtoneUri.scheme) {
-                        ringtoneUri = Settings.System.DEFAULT_NOTIFICATION_URI
-                    }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && ringtoneUri != null /* not silent */ && "content" != ringtoneUri.scheme) {
+                    ringtoneUri = Settings.System.DEFAULT_NOTIFICATION_URI
                 }
                 PreferenceManager.getDefaultSharedPreferences(activity).edit {
                     // map silent (null) to empty string
@@ -419,11 +415,9 @@ class SgPreferencesFragment : PreferenceFragmentCompat(),
         }
 
         // Toggle auto-update on SyncAdapter
-        if (UpdateSettings.KEY_AUTOUPDATE == key) {
-            if (pref != null) {
-                val autoUpdatePref = pref as SwitchPreferenceCompat
-                SgSyncAdapter.setSyncAutomatically(activity, autoUpdatePref.isChecked)
-            }
+        if (UpdateSettings.KEY_AUTOUPDATE == key && pref != null) {
+            val autoUpdatePref = pref as SwitchPreferenceCompat
+            SgSyncAdapter.setSyncAutomatically(activity, autoUpdatePref.isChecked)
         }
     }
 

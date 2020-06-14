@@ -1,8 +1,8 @@
+@file:Suppress("DEPRECATION")
+
 package com.battlelancer.seriesguide.ui
 
-import android.content.Context
 import androidx.recyclerview.widget.RecyclerView
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -15,13 +15,10 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.rule.ActivityTestRule
 import androidx.test.runner.AndroidJUnit4
 import com.battlelancer.seriesguide.R
-import com.battlelancer.seriesguide.provider.SeriesGuideContract
-import com.battlelancer.seriesguide.provider.SeriesGuideDatabase
 import com.battlelancer.seriesguide.utils.ChildAtPosition.Companion.childAtPosition
 import com.battlelancer.seriesguide.utils.GlobalUtils
 import com.battlelancer.seriesguide.utils.GlobalUtils.Companion.closeFiltersNotice
 import com.battlelancer.seriesguide.utils.GlobalUtils.Companion.closeFirstRunNotice
-import com.battlelancer.seriesguide.utils.GlobalUtils.Companion.doRepeatedCheck
 import com.battlelancer.seriesguide.utils.GlobalUtils.Companion.refreshApp
 import com.battlelancer.seriesguide.utils.RecyclerViewItemCountAssertion.Companion.withItemCount
 import com.battlelancer.seriesguide.utils.SleepIdlingHelper.Companion.sleep

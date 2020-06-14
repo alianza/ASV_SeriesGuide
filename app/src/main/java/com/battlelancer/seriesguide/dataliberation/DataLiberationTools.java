@@ -10,6 +10,10 @@ import com.battlelancer.seriesguide.util.Utils;
 
 public class DataLiberationTools {
 
+    private DataLiberationTools() {
+        throw new IllegalStateException("Utility class");
+    }
+
     /**
      * Transform a string representation of {@link com.battlelancer.seriesguide.dataliberation.JsonExportTask.ShowStatusExport}
      * to a {@link ShowTools.Status} to be stored in the database.

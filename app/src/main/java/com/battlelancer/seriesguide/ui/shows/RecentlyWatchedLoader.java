@@ -1,10 +1,21 @@
 package com.battlelancer.seriesguide.ui.shows;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Activity.EPISODE_TVDB_ID;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Activity.SORT_LATEST;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Activity.TIMESTAMP_MS;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Activity._ID;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.FIRSTAIREDMS;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.NUMBER;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.SEASON;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.TITLE;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.buildEpisodeWithShowUri;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.POSTER_SMALL;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ShowsColumns.REF_SHOW_ID;
+
 import android.content.Context;
 import android.database.Cursor;
 import com.battlelancer.seriesguide.R;
 import com.battlelancer.seriesguide.provider.SeriesGuideContract.Activity;
-import com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes;
 import com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows;
 import com.battlelancer.seriesguide.provider.SeriesGuideDatabase;
 import com.battlelancer.seriesguide.thetvdbapi.TvdbImageTools;
@@ -27,10 +38,10 @@ class RecentlyWatchedLoader extends GenericSimpleLoader<List<NowAdapter.NowItem>
         // get all activity with the latest one first
         Cursor query = getContext().getContentResolver()
                 .query(Activity.CONTENT_URI,
-                        new String[] { Activity.TIMESTAMP_MS, Activity.EPISODE_TVDB_ID },
-                        null, null, Activity.SORT_LATEST);
+                        new String[] { TIMESTAMP_MS, EPISODE_TVDB_ID },
+                        null, null, SORT_LATEST);
         if (query == null) {
-            return null;
+            return new ArrayList<>();
         }
 
         List<NowAdapter.NowItem> items = new ArrayList<>();
@@ -44,17 +55,17 @@ class RecentlyWatchedLoader extends GenericSimpleLoader<List<NowAdapter.NowItem>
 
             // get episode details
             Cursor episodeQuery = getContext().getContentResolver().query(
-                    Episodes.buildEpisodeWithShowUri(episodeTvdbId),
+                    buildEpisodeWithShowUri(episodeTvdbId),
                     new String[] {
                             SeriesGuideDatabase.Tables.EPISODES + "."
-                                    + Episodes._ID, // 0
-                            Episodes.TITLE,
-                            Episodes.NUMBER,
-                            Episodes.SEASON, // 3
-                            Episodes.FIRSTAIREDMS,
-                            Shows.REF_SHOW_ID,
+                                    + _ID, // 0
+                            TITLE,
+                            NUMBER,
+                            SEASON, // 3
+                            FIRSTAIREDMS,
+                            REF_SHOW_ID,
                             Shows.TITLE,
-                            Shows.POSTER_SMALL // 7
+                            POSTER_SMALL // 7
                     }, null, null, null);
             if (episodeQuery == null) {
                 continue;
@@ -78,7 +89,7 @@ class RecentlyWatchedLoader extends GenericSimpleLoader<List<NowAdapter.NowItem>
         query.close();
 
         // add header
-        if (items.size() > 0) {
+        if (items.isEmpty()) {
             items.add(0, new NowAdapter.NowItem().header(
                     getContext().getString(R.string.recently_watched)));
         }

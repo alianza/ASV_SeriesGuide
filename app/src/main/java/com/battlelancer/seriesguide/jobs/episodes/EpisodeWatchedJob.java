@@ -1,5 +1,8 @@
 package com.battlelancer.seriesguide.jobs.episodes;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.WATCHED;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ShowsColumns.LASTWATCHEDID;
+
 import android.content.Context;
 import android.database.Cursor;
 import androidx.annotation.NonNull;
@@ -20,7 +23,7 @@ public class EpisodeWatchedJob extends EpisodeBaseJob {
 
     @Override
     protected String getDatabaseColumnToUpdate() {
-        return SeriesGuideContract.Episodes.WATCHED;
+        return WATCHED;
     }
 
     private int getLastWatchedEpisodeTvdbId(Context context) {
@@ -36,7 +39,7 @@ public class EpisodeWatchedJob extends EpisodeBaseJob {
                     SeriesGuideContract.Shows.buildShowUri(String.valueOf(getShowTvdbId())),
                     new String[] {
                             SeriesGuideContract.Shows._ID,
-                            SeriesGuideContract.Shows.LASTWATCHEDID
+                            LASTWATCHEDID
                     }, null, null, null
             );
             if (show != null) {

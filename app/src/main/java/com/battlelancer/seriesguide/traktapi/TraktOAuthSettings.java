@@ -8,6 +8,10 @@ import androidx.annotation.Nullable;
 
 public class TraktOAuthSettings {
 
+    private TraktOAuthSettings() {
+        throw new IllegalStateException("Utility class");
+    }
+
     private static final String KEY_REFRESH_TOKEN = "trakt.refresh_token";
     private static final String KEY_ACCESS_TOKEN_EXPIRY_DATE = "trakt.access_token_expiry";
     private static final String SETTINGS_FILE = "trakt-oauth-settings";

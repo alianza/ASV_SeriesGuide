@@ -6,6 +6,10 @@ package com.battlelancer.seriesguide.settings;
  */
 public class SearchSettings {
 
+    private SearchSettings() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static final String KEY_SUFFIX_THETVDB = "thetvdb";
     public static final String KEY_SUFFIX_TMDB = "tmdb";
 }

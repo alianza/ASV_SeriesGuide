@@ -1,5 +1,9 @@
 package com.battlelancer.seriesguide.ui;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.LAST_UPDATED;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ShowsColumns.LASTUPDATED;
+import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_LONG;
+
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.ContentValues;
@@ -356,7 +360,7 @@ public class ShowsActivity extends BaseTopActivity implements
 
         if (lastVersion < currentVersion) {
             // Let the user know the app has updated.
-            Snackbar.make(getSnackbarParentView(), R.string.updated, Snackbar.LENGTH_LONG)
+            Snackbar.make(getSnackbarParentView(), R.string.updated, LENGTH_LONG)
                     .setAction(
                             R.string.updated_details,
                             v -> Utils.launchWebsite(
@@ -371,7 +375,7 @@ public class ShowsActivity extends BaseTopActivity implements
             if (lastVersion < SgApp.RELEASE_VERSION_12_BETA5) {
                 // flag all episodes as outdated
                 ContentValues values = new ContentValues();
-                values.put(SeriesGuideContract.Episodes.LAST_UPDATED, 0);
+                values.put(LAST_UPDATED, 0);
                 getContentResolver().update(SeriesGuideContract.Episodes.CONTENT_URI, values, null,
                         null);
                 // sync is triggered in last condition
@@ -394,12 +398,11 @@ public class ShowsActivity extends BaseTopActivity implements
                 ActivityTools.populateShowsLastWatchedTime(this);
             }
             Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
-            if (lastVersion < SgApp.RELEASE_VERSION_36_BETA2) {
-                // used account name to determine sign-in state before switch to Google Sign-In
-                if (!TextUtils.isEmpty(HexagonSettings.getAccountName(this))) {
-                    // tell users to sign in again
-                    editor.putBoolean(HexagonSettings.KEY_SHOULD_VALIDATE_ACCOUNT, true);
-                }
+            // used account name to determine sign-in state before switch to Google Sign-In
+            if (lastVersion < SgApp.RELEASE_VERSION_36_BETA2 && !TextUtils
+                    .isEmpty(HexagonSettings.getAccountName(this))) {
+                // tell users to sign in again
+                editor.putBoolean(HexagonSettings.KEY_SHOULD_VALIDATE_ACCOUNT, true);
             }
             if (lastVersion < SgApp.RELEASE_VERSION_40_BETA4) {
                 ExtensionManager.get(this).setDefaultEnabledExtensions(this);
@@ -431,7 +434,7 @@ public class ShowsActivity extends BaseTopActivity implements
     private void scheduleAllShowsUpdate() {
         // force update of all shows
         ContentValues values = new ContentValues();
-        values.put(Shows.LASTUPDATED, 0);
+        values.put(LASTUPDATED, 0);
         getContentResolver().update(Shows.CONTENT_URI, values, null, null);
     }
 
@@ -458,10 +461,12 @@ public class ShowsActivity extends BaseTopActivity implements
 
         @Override
         public void onPageScrollStateChanged(int arg0) {
+            // Empty
         }
 
         @Override
         public void onPageScrolled(int arg0, float arg1, int arg2) {
+            // Empty
         }
 
         @Override

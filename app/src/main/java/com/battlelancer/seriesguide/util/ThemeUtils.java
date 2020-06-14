@@ -13,6 +13,10 @@ import com.battlelancer.seriesguide.ui.SeriesGuidePreferences;
  */
 public class ThemeUtils {
 
+    private ThemeUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     /**
      * Sets the global app theme variable. Applied by all activities once they are created.
      */

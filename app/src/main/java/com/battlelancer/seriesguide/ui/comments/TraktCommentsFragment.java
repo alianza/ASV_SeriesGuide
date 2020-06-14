@@ -33,8 +33,8 @@ import com.battlelancer.seriesguide.traktapi.TraktAction;
 import com.battlelancer.seriesguide.traktapi.TraktTask;
 import com.battlelancer.seriesguide.util.Utils;
 import com.battlelancer.seriesguide.util.ViewTools;
-import com.uwetrottmann.seriesguide.widgets.EmptyViewSwipeRefreshLayout;
 import com.uwetrottmann.androidutils.AndroidUtils;
+import com.uwetrottmann.seriesguide.widgets.EmptyViewSwipeRefreshLayout;
 import com.uwetrottmann.trakt5.TraktLink;
 import com.uwetrottmann.trakt5.entities.Comment;
 import org.greenrobot.eventbus.EventBus;
@@ -87,6 +87,7 @@ public class TraktCommentsFragment extends Fragment {
         editTextShout.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // Empty
             }
 
             @Override
@@ -96,6 +97,7 @@ public class TraktCommentsFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
+                // Empty
             }
         });
 

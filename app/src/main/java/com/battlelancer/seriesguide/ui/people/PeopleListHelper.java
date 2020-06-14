@@ -24,6 +24,10 @@ import timber.log.Timber;
  */
 public class PeopleListHelper {
 
+    private PeopleListHelper() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static boolean populateShowCast(Activity activity,
             ViewGroup peopleContainer, Credits credits) {
         return populateCast(activity, peopleContainer, credits, PeopleActivity.MediaType.SHOW);

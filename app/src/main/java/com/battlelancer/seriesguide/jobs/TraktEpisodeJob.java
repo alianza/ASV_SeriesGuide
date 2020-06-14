@@ -186,23 +186,9 @@ public class TraktEpisodeJob extends BaseNetworkEpisodeJob {
      * false}.
      */
     private static boolean isSyncSuccessful(@Nullable SyncResponse response) {
-        if (response == null || response.not_found == null) {
-            return true;
-        }
-
-        if (response.not_found.shows != null && !response.not_found.shows.isEmpty()) {
-            // show not found
-            return false;
-        }
-        if (response.not_found.seasons != null && !response.not_found.seasons.isEmpty()) {
-            // show exists, but seasons not found
-            return false;
-        }
-        //noinspection RedundantIfStatement
-        if (response.not_found.episodes != null && !response.not_found.episodes.isEmpty()) {
-            // show and season exists, but episodes not found
-            return false;
-        }
-        return true;
+        return response == null || response.not_found == null        // show not found
+                || (response.not_found.shows == null || response.not_found.shows.isEmpty()) && (        // show exists, but seasons not found
+                response.not_found.seasons == null || response.not_found.seasons.isEmpty()) && (         // show and season exists, but episodes not found
+                response.not_found.episodes == null || response.not_found.episodes.isEmpty());
     }
 }

@@ -1,12 +1,16 @@
 package com.battlelancer.seriesguide.sync;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.IN_COLLECTION;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.IN_WATCHLIST;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.WATCHED;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.buildMovieUri;
+
 import android.content.ContentProviderOperation;
 import android.content.Context;
 import android.content.OperationApplicationException;
 import androidx.annotation.Nullable;
 import androidx.preference.PreferenceManager;
 import com.battlelancer.seriesguide.model.SgMovieFlags;
-import com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies;
 import com.battlelancer.seriesguide.provider.SgRoomDatabase;
 import com.battlelancer.seriesguide.traktapi.SgTrakt;
 import com.battlelancer.seriesguide.traktapi.TraktCredentials;
@@ -23,6 +27,7 @@ import com.uwetrottmann.trakt5.entities.SyncMovie;
 import com.uwetrottmann.trakt5.entities.SyncResponse;
 import com.uwetrottmann.trakt5.services.Sync;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -142,19 +147,19 @@ public class TraktMovieSync {
                 if (inCollectionOnTrakt || inWatchlistOnTrakt || isWatchedOnTrakt) {
 
                     ContentProviderOperation.Builder builder = ContentProviderOperation
-                            .newUpdate(Movies.buildMovieUri(tmdbId));
+                            .newUpdate(buildMovieUri(tmdbId));
                     boolean changed = false;
 
                     if (!localMovie.getInCollection() && inCollectionOnTrakt) {
-                        builder.withValue(Movies.IN_COLLECTION, true);
+                        builder.withValue(IN_COLLECTION, true);
                         changed = true;
                     }
                     if (!localMovie.getInWatchlist() && inWatchlistOnTrakt) {
-                        builder.withValue(Movies.IN_WATCHLIST, true);
+                        builder.withValue(IN_WATCHLIST, true);
                         changed = true;
                     }
                     if (!localMovie.getWatched() && isWatchedOnTrakt) {
-                        builder.withValue(Movies.WATCHED, true);
+                        builder.withValue(WATCHED, true);
                         changed = true;
                     }
 
@@ -171,10 +176,10 @@ public class TraktMovieSync {
                     // Note: unneeded (not watched or in any list) movies
                     // are removed in a later sync step.
                     ContentProviderOperation op = ContentProviderOperation
-                            .newUpdate(Movies.buildMovieUri(tmdbId))
-                            .withValue(Movies.IN_COLLECTION, inCollectionOnTrakt)
-                            .withValue(Movies.IN_WATCHLIST, inWatchlistOnTrakt)
-                            .withValue(Movies.WATCHED, isWatchedOnTrakt)
+                            .newUpdate(buildMovieUri(tmdbId))
+                            .withValue(IN_COLLECTION, inCollectionOnTrakt)
+                            .withValue(IN_WATCHLIST, inWatchlistOnTrakt)
+                            .withValue(WATCHED, isWatchedOnTrakt)
                             .build();
                     batch.add(op);
                 }
@@ -222,7 +227,7 @@ public class TraktMovieSync {
                     activity.watched_at
             );
             // if movies were added, ensure ratings for them are downloaded next
-            if (collection.size() > 0 || watchlist.size() > 0 || watched.size() > 0) {
+            if (!collection.isEmpty() || !watchlist.isEmpty() || !watched.isEmpty()) {
                 TraktSettings.resetMoviesLastRatedAt(context);
             }
         }
@@ -239,7 +244,7 @@ public class TraktMovieSync {
             return verifyListResponse(response, "null collection response", ACTION_GET_COLLECTION);
         } catch (Exception e) {
             Errors.logAndReport(ACTION_GET_COLLECTION, e);
-            return null;
+            return Collections.emptySet();
         }
     }
 
@@ -252,7 +257,7 @@ public class TraktMovieSync {
             return verifyListResponse(response, "null watchlist response", ACTION_GET_WATCHLIST);
         } catch (Exception e) {
             Errors.logAndReport(ACTION_GET_WATCHLIST, e);
-            return null;
+            return Collections.emptySet();
         }
     }
 
@@ -265,7 +270,7 @@ public class TraktMovieSync {
             return verifyListResponse(response, "null watched response", ACTION_GET_WATCHED);
         } catch (Exception e) {
             Errors.logAndReport(ACTION_GET_WATCHED, e);
-            return null;
+            return Collections.emptySet();
         }
     }
 
@@ -283,17 +288,17 @@ public class TraktMovieSync {
             return tmdbIdSet;
         } else {
             if (SgTrakt.isUnauthorized(context, response)) {
-                return null;
+                return Collections.emptySet();
             }
             Errors.logAndReport(action, response);
-            return null;
+            return Collections.emptySet();
         }
     }
 
     @Nullable
     private Set<Integer> buildTmdbIdSet(@Nullable List<BaseMovie> movies) {
         if (movies == null) {
-            return null;
+            return Collections.emptySet();
         }
 
         Set<Integer> tmdbIdSet = new HashSet<>();
@@ -314,9 +319,9 @@ public class TraktMovieSync {
             Set<Integer> toWatchlistOnTrakt,
             Set<Integer> toSetWatchedOnTrakt
     ) {
-        if (toCollectOnTrakt.size() == 0
-                && toWatchlistOnTrakt.size() == 0
-                && toSetWatchedOnTrakt.size() == 0) {
+        if (toCollectOnTrakt.isEmpty()
+                && toWatchlistOnTrakt.isEmpty()
+                && toSetWatchedOnTrakt.isEmpty()) {
             Timber.d("uploadLists: nothing to upload");
             return true;
         }
@@ -331,7 +336,7 @@ public class TraktMovieSync {
         Response<SyncResponse> response = null;
 
         try {
-            if (toCollectOnTrakt.size() > 0) {
+            if (!toCollectOnTrakt.isEmpty()) {
                 List<SyncMovie> moviesToCollect =
                         convertToSyncMovieList(toCollectOnTrakt);
                 action = "add movies to collection";
@@ -339,26 +344,22 @@ public class TraktMovieSync {
                 response = traktSync.addItemsToCollection(items).execute();
             }
 
-            if (response == null || response.isSuccessful()) {
-                if (toWatchlistOnTrakt.size() > 0) {
-                    List<SyncMovie> moviesToWatchlist =
-                            convertToSyncMovieList(toWatchlistOnTrakt);
-                    action = "add movies to watchlist";
-                    items.movies(moviesToWatchlist);
-                    response = traktSync.addItemsToWatchlist(items).execute();
-                }
+            if ((response == null || response.isSuccessful()) && !toWatchlistOnTrakt.isEmpty()) {
+                List<SyncMovie> moviesToWatchlist =
+                        convertToSyncMovieList(toWatchlistOnTrakt);
+                action = "add movies to watchlist";
+                items.movies(moviesToWatchlist);
+                response = traktSync.addItemsToWatchlist(items).execute();
             }
 
-            if (response == null || response.isSuccessful()) {
-                if (toSetWatchedOnTrakt.size() > 0) {
-                    List<SyncMovie> moviesToSetWatched =
-                            convertToSyncMovieList(toSetWatchedOnTrakt);
-                    // Note: not setting a watched date (because not having one),
-                    // so Trakt will use the movie release date.
-                    action = "add movies to watched history";
-                    items.movies(moviesToSetWatched);
-                    response = traktSync.addItemsToWatchedHistory(items).execute();
-                }
+            if ((response == null || response.isSuccessful()) && !toSetWatchedOnTrakt.isEmpty()) {
+                List<SyncMovie> moviesToSetWatched =
+                        convertToSyncMovieList(toSetWatchedOnTrakt);
+                // Note: not setting a watched date (because not having one),
+                // so Trakt will use the movie release date.
+                action = "add movies to watched history";
+                items.movies(moviesToSetWatched);
+                response = traktSync.addItemsToWatchedHistory(items).execute();
             }
         } catch (Exception e) {
             Errors.logAndReport(action, e);

@@ -580,7 +580,7 @@ class ShowFragment : Fragment() {
         }
 
         override fun onLoaderReset(loader: Loader<Credits?>) {
-
+            // Empty
         }
     }
 

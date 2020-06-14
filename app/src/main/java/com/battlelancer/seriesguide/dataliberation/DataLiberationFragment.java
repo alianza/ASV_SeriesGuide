@@ -1,5 +1,8 @@
 package com.battlelancer.seriesguide.dataliberation;
 
+import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_INDEFINITE;
+import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT;
+
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
@@ -40,12 +43,12 @@ public class DataLiberationFragment extends Fragment implements
         private final String message;
         private final boolean showIndefinite;
 
-        public LiberationResultEvent() {
+        LiberationResultEvent() {
             this.message = null;
             this.showIndefinite = false;
         }
 
-        public LiberationResultEvent(String message, String errorCause, boolean showIndefinite) {
+        LiberationResultEvent(String message, String errorCause, boolean showIndefinite) {
             if (errorCause != null) {
                 message += " (" + errorCause + ")";
             }
@@ -56,7 +59,7 @@ public class DataLiberationFragment extends Fragment implements
         public void handle(@Nullable View view) {
             if (view != null && message != null) {
                 Snackbar snackbar = Snackbar.make(view, message,
-                        showIndefinite ? Snackbar.LENGTH_INDEFINITE : Snackbar.LENGTH_SHORT);
+                        showIndefinite ? LENGTH_INDEFINITE : LENGTH_SHORT);
                 TextView textView = snackbar.getView().findViewById(
                         com.google.android.material.R.id.snackbar_text);
                 textView.setMaxLines(5);

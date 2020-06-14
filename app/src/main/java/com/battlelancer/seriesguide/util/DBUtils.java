@@ -1,6 +1,36 @@
 package com.battlelancer.seriesguide.util;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.FIRSTAIREDMS;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.LAST_UPDATED;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.NUMBER;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.SEASON;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.SELECTION_HAS_RELEASE_DATE;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.SELECTION_NOT_COLLECTED;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.SELECTION_NO_SPECIALS;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.SELECTION_RELEASED_BEFORE_X;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.WATCHED;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes._ID;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.buildEpisodeUri;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.buildEpisodesOfSeasonUri;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.buildEpisodesOfShowUri;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Seasons.COMBINED;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Seasons.NOAIRDATECOUNT;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Seasons.TAGS;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Seasons.TOTALCOUNT;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Seasons.UNAIREDCOUNT;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Seasons.buildSeasonUri;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Seasons.buildSeasonsOfShowUri;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.SeasonsColumns.WATCHCOUNT;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.CONTENT_URI_WITH_LAST_EPISODE;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.LASTWATCHEDID;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.NEXTAIRDATEMS;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.NEXTEPISODE;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.REF_SHOW_ID;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.UNWATCHED_COUNT;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.buildShowUri;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ShowsColumns.NEXTTEXT;
 import static com.battlelancer.seriesguide.provider.SeriesGuideDatabase.Qualified;
+import static com.battlelancer.seriesguide.ui.episodes.EpisodeFlags.SKIPPED;
 
 import android.annotation.SuppressLint;
 import android.content.ContentProviderOperation;
@@ -116,19 +146,19 @@ public class DBUtils {
     }
 
     interface UnwatchedQuery {
-        String AIRED_SELECTION = Episodes.WATCHED + "=0 AND " + Episodes.FIRSTAIREDMS
-                + " !=-1 AND " + Episodes.FIRSTAIREDMS + "<=?";
+        String AIRED_SELECTION = WATCHED + "=0 AND " + FIRSTAIREDMS
+                + " !=-1 AND " + FIRSTAIREDMS + "<=?";
 
         String AIRED_SELECTION_NO_SPECIALS = AIRED_SELECTION
-                + " AND " + Episodes.SELECTION_NO_SPECIALS;
+                + " AND " + SELECTION_NO_SPECIALS;
 
-        String FUTURE_SELECTION = Episodes.WATCHED + "=0 AND " + Episodes.FIRSTAIREDMS
+        String FUTURE_SELECTION = WATCHED + "=0 AND " + FIRSTAIREDMS
                 + ">?";
 
-        String NOAIRDATE_SELECTION = Episodes.WATCHED + "=0 AND "
-                + Episodes.FIRSTAIREDMS + "=-1";
+        String NOAIRDATE_SELECTION = WATCHED + "=0 AND "
+                + FIRSTAIREDMS + "=-1";
 
-        String SKIPPED_SELECTION = Episodes.WATCHED + "=" + EpisodeFlags.SKIPPED;
+        String SKIPPED_SELECTION = WATCHED + "=" + SKIPPED;
     }
 
     /**
@@ -137,7 +167,7 @@ public class DBUtils {
      */
     public static void updateUnwatchedCount(Context context, int seasonTvdbId) {
         final ContentResolver resolver = context.getContentResolver();
-        final Uri uri = Episodes.buildEpisodesOfSeasonUri(seasonTvdbId);
+        final Uri uri = buildEpisodesOfSeasonUri(seasonTvdbId);
 
         // all a seasons episodes
         final int totalCount = getCountOf(resolver, uri, null, null, -1);
@@ -175,12 +205,12 @@ public class DBUtils {
         }
 
         final ContentValues update = new ContentValues();
-        update.put(Seasons.WATCHCOUNT, count);
-        update.put(Seasons.UNAIREDCOUNT, unairedCount);
-        update.put(Seasons.NOAIRDATECOUNT, noAirDateCount);
-        update.put(Seasons.TAGS, skippedCount > 0 ? SeasonTags.SKIPPED : SeasonTags.NONE);
-        update.put(Seasons.TOTALCOUNT, totalCount);
-        resolver.update(Seasons.buildSeasonUri(seasonTvdbId), update, null, null);
+        update.put(WATCHCOUNT, count);
+        update.put(UNAIREDCOUNT, unairedCount);
+        update.put(NOAIRDATECOUNT, noAirDateCount);
+        update.put(TAGS, skippedCount > 0 ? SeasonTags.SKIPPED : SeasonTags.NONE);
+        update.put(TOTALCOUNT, totalCount);
+        resolver.update(buildSeasonUri(seasonTvdbId), update, null, null);
     }
 
     /**
@@ -193,7 +223,7 @@ public class DBUtils {
      */
     public static int getUnwatchedEpisodesOfSeason(@NonNull Context context, int seasonTvdbId) {
         return getCountOf(context.getContentResolver(),
-                Episodes.buildEpisodesOfSeasonUri(seasonTvdbId),
+                buildEpisodesOfSeasonUri(seasonTvdbId),
                 UnwatchedQuery.AIRED_SELECTION,
                 new String[]{String.valueOf(TimeTools.getCurrentTime(context))},
                 UNKNOWN_UNWATCHED_COUNT);
@@ -206,8 +236,8 @@ public class DBUtils {
      */
     public static int getUncollectedEpisodesOfSeason(@NonNull Context context, int seasonTvdbId) {
         return getCountOf(context.getContentResolver(),
-                Episodes.buildEpisodesOfSeasonUri(seasonTvdbId),
-                Episodes.SELECTION_NOT_COLLECTED,
+                buildEpisodesOfSeasonUri(seasonTvdbId),
+                SELECTION_NOT_COLLECTED,
                 null,
                 UNKNOWN_COLLECTED_COUNT);
     }
@@ -225,7 +255,7 @@ public class DBUtils {
 
         // unwatched, aired episodes
         return getCountOf(context.getContentResolver(),
-                Episodes.buildEpisodesOfShowUri(showId),
+                buildEpisodesOfShowUri(showId),
                 UnwatchedQuery.AIRED_SELECTION_NO_SPECIALS,
                 new String[]{
                         String.valueOf(TimeTools.getCurrentTime(context))
@@ -242,11 +272,11 @@ public class DBUtils {
         }
 
         // not collected, no special, previously released episodes
-        return getCountOf(context.getContentResolver(), Episodes.buildEpisodesOfShowUri(showId),
-                Episodes.SELECTION_NOT_COLLECTED
-                        + " AND " + Episodes.SELECTION_NO_SPECIALS
-                        + " AND " + Episodes.SELECTION_HAS_RELEASE_DATE
-                        + " AND " + Episodes.SELECTION_RELEASED_BEFORE_X,
+        return getCountOf(context.getContentResolver(), buildEpisodesOfShowUri(showId),
+                SELECTION_NOT_COLLECTED
+                        + " AND " + SELECTION_NO_SPECIALS
+                        + " AND " + SELECTION_HAS_RELEASE_DATE
+                        + " AND " + SELECTION_RELEASED_BEFORE_X,
                 new String[]{
                         String.valueOf(TimeTools.getCurrentTime(context))
                 },
@@ -275,8 +305,8 @@ public class DBUtils {
     public static void markNextEpisode(Context context, int showId, int episodeId) {
         if (episodeId > 0) {
             Cursor episode = context.getContentResolver().query(
-                    Episodes.buildEpisodeUri(String.valueOf(episodeId)), new String[]{
-                            Episodes.SEASON, Episodes.NUMBER
+                    buildEpisodeUri(String.valueOf(episodeId)), new String[]{
+                            SEASON, NUMBER
                     }, null, null, null
             );
             if (episode != null) {
@@ -294,9 +324,9 @@ public class DBUtils {
      * show is already in the database.
      */
     public static boolean isShowExists(Context context, int showTvdbId) {
-        Cursor testsearch = context.getContentResolver().query(Shows.buildShowUri(showTvdbId),
+        Cursor testsearch = context.getContentResolver().query(buildShowUri(showTvdbId),
                 new String[]{
-                        Shows._ID
+                        _ID
                 }, null, null, null
         );
         if (testsearch == null) {
@@ -325,7 +355,7 @@ public class DBUtils {
                     .withValues(values).build();
         } else {
             return ContentProviderOperation
-                    .newUpdate(Shows.buildShowUri(String.valueOf(show.tvdb_id)))
+                    .newUpdate(buildShowUri(String.valueOf(show.tvdb_id)))
                     .withValues(values).build();
         }
     }
@@ -340,8 +370,8 @@ public class DBUtils {
     public static HashMap<Integer, Long> getLastUpdatedByEpisodeId(Context context,
             int showTvdbId) {
         Cursor episodes = context.getContentResolver().query(
-                Episodes.buildEpisodesOfShowUri(showTvdbId), new String[]{
-                        Episodes._ID, Episodes.LAST_UPDATED
+                buildEpisodesOfShowUri(showTvdbId), new String[]{
+                        _ID, LAST_UPDATED
                 }, null, null, null
         );
         @SuppressLint("UseSparseArrays") HashMap<Integer, Long> episodeMap = new HashMap<>();
@@ -361,9 +391,9 @@ public class DBUtils {
      */
     public static HashSet<Integer> getSeasonIdsOfShow(Context context, int showTvdbId) {
         Cursor seasons = context.getContentResolver().query(
-                Seasons.buildSeasonsOfShowUri(showTvdbId),
+                buildSeasonsOfShowUri(showTvdbId),
                 new String[]{
-                        Seasons._ID
+                        _ID
                 }, null, null, null
         );
         HashSet<Integer> seasonIds = new HashSet<>();
@@ -380,9 +410,9 @@ public class DBUtils {
      * Creates an update {@link ContentProviderOperation} for the given episode values.
      */
     public static ContentProviderOperation buildEpisodeUpdateOp(ContentValues values) {
-        final String episodeId = values.getAsString(Episodes._ID);
+        final String episodeId = values.getAsString(_ID);
         return ContentProviderOperation
-                .newUpdate(Episodes.buildEpisodeUri(episodeId))
+                .newUpdate(buildEpisodeUri(episodeId))
                 .withValues(values).build();
     }
 
@@ -394,20 +424,20 @@ public class DBUtils {
             int seasonNumber, boolean isNew) {
         ContentProviderOperation op;
         final ContentValues values = new ContentValues();
-        values.put(Seasons.COMBINED, seasonNumber);
+        values.put(COMBINED, seasonNumber);
 
         if (isNew) {
-            values.put(Seasons._ID, seasonTvdbId);
-            values.put(Shows.REF_SHOW_ID, showTvdbId);
+            values.put(_ID, seasonTvdbId);
+            values.put(REF_SHOW_ID, showTvdbId);
             // set default values
-            values.put(Seasons.WATCHCOUNT, 0);
-            values.put(Seasons.UNAIREDCOUNT, 0);
-            values.put(Seasons.NOAIRDATECOUNT, 0);
-            values.put(Seasons.TOTALCOUNT, 0);
+            values.put(WATCHCOUNT, 0);
+            values.put(UNAIREDCOUNT, 0);
+            values.put(NOAIRDATECOUNT, 0);
+            values.put(TOTALCOUNT, 0);
             op = ContentProviderOperation.newInsert(Seasons.CONTENT_URI).withValues(values)
                     .build();
         } else {
-            op = ContentProviderOperation.newUpdate(Seasons.buildSeasonUri(seasonTvdbId))
+            op = ContentProviderOperation.newUpdate(buildSeasonUri(seasonTvdbId))
                     .withValues(values).build();
         }
         return op;
@@ -416,10 +446,10 @@ public class DBUtils {
     private interface LastWatchedEpisodeQuery {
         String[] PROJECTION = new String[]{
                 Qualified.SHOWS_ID,
-                Shows.LASTWATCHEDID,
-                Episodes.SEASON,
-                Episodes.NUMBER,
-                Episodes.FIRSTAIREDMS
+                LASTWATCHEDID,
+                SEASON,
+                NUMBER,
+                FIRSTAIREDMS
         };
 
         int SHOW_TVDB_ID = 0;
@@ -431,29 +461,29 @@ public class DBUtils {
 
     private interface NextEpisodesQuery {
         String[] PROJECTION = new String[]{
-                Episodes._ID,
+                _ID,
                 Episodes.SEASON,
                 Episodes.NUMBER,
-                Episodes.FIRSTAIREDMS,
+                FIRSTAIREDMS,
                 Episodes.TITLE
         };
 
         /**
          * Unwatched, airing later or has a different number or season if airing the same time.
          */
-        String SELECT_NEXT = Episodes.WATCHED + "=0 AND ("
-                + "(" + Episodes.FIRSTAIREDMS + "=? AND "
+        String SELECT_NEXT = WATCHED + "=0 AND ("
+                + "(" + FIRSTAIREDMS + "=? AND "
                 + "(" + Episodes.NUMBER + "!=? OR " + Episodes.SEASON + "!=?)) "
-                + "OR " + Episodes.FIRSTAIREDMS + ">?)";
+                + "OR " + FIRSTAIREDMS + ">?)";
 
-        String SELECT_WITHAIRDATE = " AND " + Episodes.FIRSTAIREDMS + "!=-1";
+        String SELECT_WITHAIRDATE = " AND " + FIRSTAIREDMS + "!=-1";
 
-        String SELECT_ONLYFUTURE = " AND " + Episodes.FIRSTAIREDMS + ">=?";
+        String SELECT_ONLYFUTURE = " AND " + FIRSTAIREDMS + ">=?";
 
         /**
          * Air time, then lowest season, or if identical lowest episode number.
          */
-        String SORTORDER = Episodes.FIRSTAIREDMS + " ASC," + Episodes.SEASON + " ASC,"
+        String SORTORDER = FIRSTAIREDMS + " ASC," + Episodes.SEASON + " ASC,"
                 + Episodes.NUMBER + " ASC";
 
         int ID = 0;
@@ -473,7 +503,7 @@ public class DBUtils {
         // get a list of shows and their last watched episodes
         Cursor shows;
         try {
-            shows = context.getContentResolver().query(Shows.CONTENT_URI_WITH_LAST_EPISODE,
+            shows = context.getContentResolver().query(CONTENT_URI_WITH_LAST_EPISODE,
                     LastWatchedEpisodeQuery.PROJECTION,
                     showTvdbIdToUpdate != null ?
                             Qualified.SHOWS_ID + "=" + showTvdbIdToUpdate : null,
@@ -547,7 +577,7 @@ public class DBUtils {
             Cursor next;
             try {
                 next = context.getContentResolver()
-                        .query(Episodes.buildEpisodesOfShowUri(showTvdbId),
+                        .query(buildEpisodesOfShowUri(showTvdbId),
                                 NextEpisodesQuery.PROJECTION, nextEpisodeSelection, selectionArgs,
                                 NextEpisodesQuery.SORTORDER);
             } catch (SQLiteException e) {
@@ -579,24 +609,24 @@ public class DBUtils {
                 long releaseTimeNext = next.getLong(NextEpisodesQuery.FIRST_RELEASE_MS);
 
                 nextEpisodeTvdbId = next.getInt(NextEpisodesQuery.ID);
-                newShowValues.put(Shows.NEXTEPISODE, nextEpisodeTvdbId);
-                newShowValues.put(Shows.NEXTAIRDATEMS, releaseTimeNext);
-                newShowValues.put(Shows.NEXTTEXT, nextEpisodeString);
+                newShowValues.put(NEXTEPISODE, nextEpisodeTvdbId);
+                newShowValues.put(NEXTAIRDATEMS, releaseTimeNext);
+                newShowValues.put(NEXTTEXT, nextEpisodeString);
             } else {
                 // no next episode, set empty values
                 nextEpisodeTvdbId = 0;
-                newShowValues.put(Shows.NEXTEPISODE, "");
-                newShowValues.put(Shows.NEXTAIRDATEMS, UNKNOWN_NEXT_RELEASE_DATE);
-                newShowValues.put(Shows.NEXTTEXT, "");
+                newShowValues.put(NEXTEPISODE, "");
+                newShowValues.put(NEXTAIRDATEMS, UNKNOWN_NEXT_RELEASE_DATE);
+                newShowValues.put(NEXTTEXT, "");
             }
             next.close();
 
             // STEP 4: get remaining episodes count
             int unwatchedEpisodesCount = getUnwatchedEpisodesOfShow(context, showTvdbId);
-            newShowValues.put(Shows.UNWATCHED_COUNT, unwatchedEpisodesCount);
+            newShowValues.put(UNWATCHED_COUNT, unwatchedEpisodesCount);
 
             // update the show with the new next episode values
-            batch.add(ContentProviderOperation.newUpdate(Shows.buildShowUri(showTvdbId))
+            batch.add(ContentProviderOperation.newUpdate(buildShowUri(showTvdbId))
                     .withValues(newShowValues)
                     .build());
             newShowValues.clear();
@@ -618,7 +648,7 @@ public class DBUtils {
                 NextEpisodesQuery.SELECT_NEXT);
         if (isHidingSpecials) {
             // do not take specials into account
-            nextEpisodeSelectionBuilder.append(" AND ").append(Episodes.SELECTION_NO_SPECIALS);
+            nextEpisodeSelectionBuilder.append(" AND ").append(SELECTION_NO_SPECIALS);
         }
         if (isNoReleasedEpisodes) {
             // restrict to episodes with future release date

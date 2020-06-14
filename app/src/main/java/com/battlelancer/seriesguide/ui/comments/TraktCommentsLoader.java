@@ -1,5 +1,9 @@
 package com.battlelancer.seriesguide.ui.comments;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.NUMBER;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.SEASON;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ShowsColumns.REF_SHOW_ID;
+
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -84,9 +88,9 @@ public class TraktCommentsLoader extends GenericSimpleLoader<TraktCommentsLoader
             // look up episode number, season and show id
             Cursor query = getContext().getContentResolver()
                     .query(SeriesGuideContract.Episodes.buildEpisodeUri(episodeTvdbId),
-                            new String[] { SeriesGuideContract.Episodes.SEASON,
-                                    SeriesGuideContract.Episodes.NUMBER,
-                                    SeriesGuideContract.Shows.REF_SHOW_ID }, null, null, null);
+                            new String[] { SEASON,
+                                    NUMBER,
+                                    REF_SHOW_ID }, null, null, null);
             int season = -1;
             int episode = -1;
             int showTvdbId = -1;

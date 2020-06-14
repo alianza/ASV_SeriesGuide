@@ -1,10 +1,45 @@
 package com.battlelancer.seriesguide.model;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.CONTENTRATING;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.FAVORITE;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.FIRST_RELEASE;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.GENRES;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.HEXAGON_MERGE_COMPLETE;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.HIDDEN;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.IMDBID;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.LANGUAGE;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.LASTEDIT;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.LASTUPDATED;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.LASTWATCHEDID;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.LASTWATCHED_MS;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.NETWORK;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.NEXTAIRDATEMS;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.NEXTEPISODE;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.NEXTTEXT;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.NOTIFY;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.OVERVIEW;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.POSTER;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.POSTER_SMALL;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.RATING_GLOBAL;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.RATING_USER;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.RATING_VOTES;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.RELEASE_COUNTRY;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.RELEASE_TIME;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.RELEASE_TIMEZONE;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.RELEASE_WEEKDAY;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.RUNTIME;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.SLUG;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.STATUS;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.TITLE;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.TRAKT_ID;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.UNWATCHED_COUNT;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows._ID;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ShowsColumns.TITLE_NOARTICLE;
+
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
-import com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows;
 import com.battlelancer.seriesguide.provider.SeriesGuideDatabase.Tables;
 import com.battlelancer.seriesguide.util.DBUtils;
 
@@ -12,26 +47,26 @@ import com.battlelancer.seriesguide.util.DBUtils;
 public class SgShow {
 
     @PrimaryKey
-    @ColumnInfo(name = Shows._ID)
+    @ColumnInfo(name = _ID)
     public int tvdbId;
 
-    @ColumnInfo(name = Shows.SLUG)
+    @ColumnInfo(name = SLUG)
     public String slug = "";
 
     /**
      * Ensure this is NOT null (enforced through database constraint).
      */
-    @ColumnInfo(name = Shows.TITLE)
+    @ColumnInfo(name = TITLE)
     @NonNull
     public String title = "";
 
     /**
      * The title without any articles (e.g. 'the' or 'an'). Added with db version 33.
      */
-    @ColumnInfo(name = Shows.TITLE_NOARTICLE)
+    @ColumnInfo(name = TITLE_NOARTICLE)
     public String titleNoArticle;
 
-    @ColumnInfo(name = Shows.OVERVIEW)
+    @ColumnInfo(name = OVERVIEW)
     public String overview = "";
 
     /**
@@ -42,7 +77,7 @@ public class SgShow {
      * Default: -1
      * </pre>
      */
-    @ColumnInfo(name = Shows.RELEASE_TIME)
+    @ColumnInfo(name = RELEASE_TIME)
     public Integer releaseTime;
     /**
      * Local release week day. Encoded as integer.
@@ -52,79 +87,79 @@ public class SgShow {
      * Default: -1
      * </pre>
      */
-    @ColumnInfo(name = Shows.RELEASE_WEEKDAY)
+    @ColumnInfo(name = RELEASE_WEEKDAY)
     public Integer releaseWeekDay;
-    @ColumnInfo(name = Shows.RELEASE_COUNTRY)
+    @ColumnInfo(name = RELEASE_COUNTRY)
     public String releaseCountry;
-    @ColumnInfo(name = Shows.RELEASE_TIMEZONE)
+    @ColumnInfo(name = RELEASE_TIMEZONE)
     public String releaseTimeZone;
 
-    @ColumnInfo(name = Shows.FIRST_RELEASE)
+    @ColumnInfo(name = FIRST_RELEASE)
     public String firstRelease;
 
-    @ColumnInfo(name = Shows.GENRES)
+    @ColumnInfo(name = GENRES)
     public String genres = "";
-    @ColumnInfo(name = Shows.NETWORK)
+    @ColumnInfo(name = NETWORK)
     public String network = "";
 
-    @ColumnInfo(name = Shows.RATING_GLOBAL)
+    @ColumnInfo(name = RATING_GLOBAL)
     public Double ratingGlobal;
-    @ColumnInfo(name = Shows.RATING_VOTES)
+    @ColumnInfo(name = RATING_VOTES)
     public Integer ratingVotes;
-    @ColumnInfo(name = Shows.RATING_USER)
+    @ColumnInfo(name = RATING_USER)
     public Integer ratingUser;
 
-    @ColumnInfo(name = Shows.RUNTIME)
+    @ColumnInfo(name = RUNTIME)
     public String runtime = "";
-    @ColumnInfo(name = Shows.STATUS)
+    @ColumnInfo(name = STATUS)
     public String status = "";
-    @ColumnInfo(name = Shows.CONTENTRATING)
+    @ColumnInfo(name = CONTENTRATING)
     public String contentRating = "";
 
-    @ColumnInfo(name = Shows.NEXTEPISODE)
+    @ColumnInfo(name = NEXTEPISODE)
     public String nextEpisode = "";
 
-    @ColumnInfo(name = Shows.POSTER)
+    @ColumnInfo(name = POSTER)
     public String poster = "";
 
-    @ColumnInfo(name = Shows.POSTER_SMALL)
+    @ColumnInfo(name = POSTER_SMALL)
     public String posterSmall = "";
 
-    @ColumnInfo(name = Shows.NEXTAIRDATEMS)
+    @ColumnInfo(name = NEXTAIRDATEMS)
     public Long nextAirdateMs;
-    @ColumnInfo(name = Shows.NEXTTEXT)
+    @ColumnInfo(name = NEXTTEXT)
     public String nextText = "";
 
-    @ColumnInfo(name = Shows.IMDBID)
+    @ColumnInfo(name = IMDBID)
     public String imdbId = "";
-    @ColumnInfo(name = Shows.TRAKT_ID)
+    @ColumnInfo(name = TRAKT_ID)
     public Integer traktId = 0;
 
-    @ColumnInfo(name = Shows.FAVORITE)
+    @ColumnInfo(name = FAVORITE)
     public boolean favorite = false;
 
-    @ColumnInfo(name = Shows.HEXAGON_MERGE_COMPLETE)
+    @ColumnInfo(name = HEXAGON_MERGE_COMPLETE)
     public boolean hexagonMergeComplete = true;
 
-    @ColumnInfo(name = Shows.HIDDEN)
+    @ColumnInfo(name = HIDDEN)
     public boolean hidden = false;
 
-    @ColumnInfo(name = Shows.LASTUPDATED)
+    @ColumnInfo(name = LASTUPDATED)
     public long lastUpdatedMs = 0L;
-    @ColumnInfo(name = Shows.LASTEDIT)
+    @ColumnInfo(name = LASTEDIT)
     public long lastEditedSec = 0L;
 
-    @ColumnInfo(name = Shows.LASTWATCHEDID)
+    @ColumnInfo(name = LASTWATCHEDID)
     public int lastWatchedEpisodeId = 0;
-    @ColumnInfo(name = Shows.LASTWATCHED_MS)
+    @ColumnInfo(name = LASTWATCHED_MS)
     public long lastWatchedMs = 0L;
 
-    @ColumnInfo(name = Shows.LANGUAGE)
+    @ColumnInfo(name = LANGUAGE)
     public String language = "";
 
-    @ColumnInfo(name = Shows.UNWATCHED_COUNT)
+    @ColumnInfo(name = UNWATCHED_COUNT)
     public int unwatchedCount = DBUtils.UNKNOWN_UNWATCHED_COUNT;
 
-    @ColumnInfo(name = Shows.NOTIFY)
-    public boolean notify = true;
+    @ColumnInfo(name = NOTIFY)
+    public boolean notifySg = true;
 }

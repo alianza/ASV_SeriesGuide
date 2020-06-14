@@ -29,21 +29,23 @@ public class AmazonPurchasingListener implements PurchasingListener {
 
         final UserDataResponse.RequestStatus status = response.getRequestStatus();
         switch (status) {
-            case SUCCESSFUL: {
-                Timber.d("onUserDataResponse: get user id (%s), marketplace (%s)",
-                        response.getUserData().getUserId(),
-                        response.getUserData().getMarketplace());
-                iapManager.setAmazonUserId(response.getUserData().getUserId(),
-                        response.getUserData().getMarketplace());
-                break;
-            }
+            case SUCCESSFUL: successFul(response); break;
             case FAILED:
-            case NOT_SUPPORTED: {
-                Timber.d("onUserDataResponse failed, status code is %s", status);
-                iapManager.setAmazonUserId(null, null);
-                break;
-            }
+            case NOT_SUPPORTED: notSupported(response, status); break;
         }
+    }
+
+    private void notSupported(UserDataResponse response, UserDataResponse.RequestStatus status) {
+            Timber.d("onUserDataResponse failed, status code is %s", status);
+            iapManager.setAmazonUserId(null, null);
+    }
+
+    private void successFul(UserDataResponse response) {
+            Timber.d("onUserDataResponse: get user id (%s), marketplace (%s)",
+                    response.getUserData().getUserId(),
+                    response.getUserData().getMarketplace());
+            iapManager.setAmazonUserId(response.getUserData().getUserId(),
+                    response.getUserData().getMarketplace());
     }
 
     /**

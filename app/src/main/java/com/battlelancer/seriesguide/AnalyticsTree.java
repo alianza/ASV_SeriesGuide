@@ -15,6 +15,7 @@ import timber.log.Timber;
 public class AnalyticsTree extends Timber.DebugTree {
 
     public AnalyticsTree() {
+        // Empty
     }
 
     @Override
@@ -40,18 +41,19 @@ public class AnalyticsTree extends Timber.DebugTree {
             case Log.ERROR:
                 level = "ERROR";
                 break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + priority);
         }
 
         // finally log to crashlytics
         CrashlyticsCore.getInstance().log(level + "/" + tag + ": " + message);
 
         // track some non-fatal exceptions with crashlytics
-        if (priority == Log.ERROR) {
-            if (t instanceof SQLiteException /* Content provider */
-                    || t instanceof JsonParseException /* Retrofit */
-                    || t instanceof DateTimeParseException /* TheTVDB */) {
-                CrashlyticsCore.getInstance().logException(t);
-            }
+        /* TheTVDB */
+        if (priority == Log.ERROR && (t instanceof SQLiteException /* Content provider */
+                || t instanceof JsonParseException /* Retrofit */
+                || t instanceof DateTimeParseException)) {
+            CrashlyticsCore.getInstance().logException(t);
         }
     }
 }

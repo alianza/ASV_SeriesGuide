@@ -9,11 +9,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.fragment.app.Fragment;
@@ -22,7 +20,6 @@ import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -31,6 +28,7 @@ import com.battlelancer.seriesguide.jobs.episodes.EpisodeWatchedJob;
 import com.battlelancer.seriesguide.provider.SeriesGuideContract;
 import com.battlelancer.seriesguide.traktapi.TraktCredentials;
 import com.battlelancer.seriesguide.ui.BaseMessageActivity;
+import com.battlelancer.seriesguide.ui.NowFragmentHelper;
 import com.battlelancer.seriesguide.ui.ShowsActivity;
 import com.battlelancer.seriesguide.ui.episodes.EpisodesActivity;
 import com.battlelancer.seriesguide.ui.search.AddShowDialogFragment;
@@ -60,11 +58,21 @@ public class ShowsNowFragment extends Fragment {
     private boolean isLoadingRecentlyWatched;
     private boolean isLoadingFriends;
 
+    private NowFragmentHelper nowFragmentHelper;
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
+
         View view = inflater.inflate(R.layout.fragment_now, container, false);
         unbinder = ButterKnife.bind(this, view);
+
+        // define dataset
+        adapter = new NowAdapter(getActivity(), itemClickListener);
+
+        nowFragmentHelper = new NowFragmentHelper(recyclerView, adapter,
+                emptyView, snackbarText, snackbar, isLoadingRecentlyWatched, isLoadingFriends, this,
+                swipeRefreshLayout);
 
         swipeRefreshLayout.setSwipeableChildren(R.id.scrollViewNow, R.id.recyclerViewNow);
         swipeRefreshLayout.setOnRefreshListener(this::refreshStream);
@@ -76,7 +84,7 @@ public class ShowsNowFragment extends Fragment {
 
         emptyView.setText(R.string.now_empty);
 
-        showError(null);
+        nowFragmentHelper.showError(null);
         snackbarButton.setText(R.string.refresh);
         snackbarButton.setOnClickListener(v -> refreshStream());
 
@@ -119,31 +127,13 @@ public class ShowsNowFragment extends Fragment {
 
         ViewTools.setSwipeRefreshLayoutColors(requireActivity().getTheme(), swipeRefreshLayout);
 
-        // define dataset
-        adapter = new NowAdapter(getActivity(), itemClickListener);
-        adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-            @Override
-            public void onChanged() {
-                updateEmptyState();
-            }
-
-            @Override
-            public void onItemRangeInserted(int positionStart, int itemCount) {
-                updateEmptyState();
-            }
-
-            @Override
-            public void onItemRangeRemoved(int positionStart, int itemCount) {
-                updateEmptyState();
-            }
-        });
-        recyclerView.setAdapter(adapter);
+        nowFragmentHelper.setMoviesNowFragmentAdapter();
 
         // if connected to trakt, replace local history with trakt history, show friends history
         if (TraktCredentials.get(getActivity()).hasCredentials()) {
             isLoadingRecentlyWatched = true;
             isLoadingFriends = true;
-            showProgressBar(true);
+            nowFragmentHelper.showProgressBar(true);
             LoaderManager loaderManager = LoaderManager.getInstance(this);
             loaderManager.initLoader(ShowsActivity.NOW_TRAKT_USER_LOADER_ID, null,
                     recentlyTraktCallbacks);
@@ -167,7 +157,7 @@ public class ShowsNowFragment extends Fragment {
          */
         if (!TraktCredentials.get(getActivity()).hasCredentials()) {
             isLoadingRecentlyWatched = true;
-            initAndMaybeRestartLoader(ShowsActivity.NOW_RECENTLY_LOADER_ID, recentlyLocalCallbacks);
+            initAndMaybeRestartLoader(recentlyLocalCallbacks);
         }
     }
 
@@ -175,13 +165,12 @@ public class ShowsNowFragment extends Fragment {
      * Init the loader. If the loader already exists, will restart it (the default behavior of init
      * would be to get the last loaded data).
      */
-    private <D> void initAndMaybeRestartLoader(int loaderId,
-            LoaderManager.LoaderCallbacks<D> callbacks) {
+    private <D> void initAndMaybeRestartLoader(LoaderManager.LoaderCallbacks<D> callbacks) {
         LoaderManager loaderManager = LoaderManager.getInstance(this);
-        boolean isLoaderExists = loaderManager.getLoader(loaderId) != null;
-        loaderManager.initLoader(loaderId, null, callbacks);
+        boolean isLoaderExists = loaderManager.getLoader(ShowsActivity.NOW_RECENTLY_LOADER_ID) != null;
+        loaderManager.initLoader(ShowsActivity.NOW_RECENTLY_LOADER_ID, null, callbacks);
         if (isLoaderExists) {
-            loaderManager.restartLoader(loaderId, null, callbacks);
+            loaderManager.restartLoader(ShowsActivity.NOW_RECENTLY_LOADER_ID, null, callbacks);
         }
     }
 
@@ -222,8 +211,8 @@ public class ShowsNowFragment extends Fragment {
     }
 
     private void refreshStream() {
-        showProgressBar(true);
-        showError(null);
+        nowFragmentHelper.showProgressBar(true);
+        nowFragmentHelper.showError(null);
 
         // if connected to trakt, replace local history with trakt history, show friends history
         // user might get disconnected during our life-time,
@@ -231,7 +220,7 @@ public class ShowsNowFragment extends Fragment {
         isLoadingRecentlyWatched = true;
         LoaderManager loaderManager = LoaderManager.getInstance(this);
         if (TraktCredentials.get(getActivity()).hasCredentials()) {
-            destroyLoaderIfExists(ShowsActivity.NOW_RECENTLY_LOADER_ID);
+            nowFragmentHelper.destroyLoaderIfExists(ShowsActivity.NOW_RECENTLY_LOADER_ID);
 
             loaderManager.restartLoader(ShowsActivity.NOW_TRAKT_USER_LOADER_ID, null,
                     recentlyTraktCallbacks);
@@ -240,69 +229,13 @@ public class ShowsNowFragment extends Fragment {
                     traktFriendsHistoryCallbacks);
         } else {
             // destroy trakt loaders and remove any shown error message
-            destroyLoaderIfExists(ShowsActivity.NOW_TRAKT_USER_LOADER_ID);
-            destroyLoaderIfExists(ShowsActivity.NOW_TRAKT_FRIENDS_LOADER_ID);
-            showError(null);
+            nowFragmentHelper.destroyLoaderIfExists(ShowsActivity.NOW_TRAKT_USER_LOADER_ID);
+            nowFragmentHelper.destroyLoaderIfExists(ShowsActivity.NOW_TRAKT_FRIENDS_LOADER_ID);
+            nowFragmentHelper.showError(null);
 
             loaderManager.restartLoader(ShowsActivity.NOW_RECENTLY_LOADER_ID, null,
                     recentlyLocalCallbacks);
         }
-    }
-
-    private void destroyLoaderIfExists(int loaderId) {
-        LoaderManager loaderManager = LoaderManager.getInstance(this);
-        if (loaderManager.getLoader(loaderId) != null) {
-            loaderManager.destroyLoader(loaderId);
-        }
-    }
-
-    /**
-     * Starts an activity to display the given episode.
-     */
-    private void showDetails(View view, int episodeId) {
-        Intent intent = new Intent();
-        intent.setClass(requireContext(), EpisodesActivity.class);
-        intent.putExtra(EpisodesActivity.EXTRA_EPISODE_TVDBID, episodeId);
-
-        ActivityCompat.startActivity(requireContext(), intent,
-                ActivityOptionsCompat
-                        .makeScaleUpAnimation(view, 0, 0, view.getWidth(), view.getHeight())
-                        .toBundle()
-        );
-    }
-
-    private void showError(@Nullable String errorText) {
-        boolean show = errorText != null;
-        if (show) {
-            snackbarText.setText(errorText);
-        }
-        if (snackbar.getVisibility() == (show ? View.VISIBLE : View.GONE)) {
-            // already in desired state, avoid replaying animation
-            return;
-        }
-        snackbar.startAnimation(AnimationUtils.loadAnimation(snackbar.getContext(),
-                show ? R.anim.fade_in : R.anim.fade_out));
-        snackbar.setVisibility(show ? View.VISIBLE : View.GONE);
-    }
-
-    /**
-     * Show or hide the progress bar of the {@link SwipeRefreshLayout}
-     * wrapping view.
-     */
-    private void showProgressBar(boolean show) {
-        // only hide if everybody has finished loading
-        if (!show) {
-            if (isLoadingRecentlyWatched || isLoadingFriends) {
-                return;
-            }
-        }
-        swipeRefreshLayout.setRefreshing(show);
-    }
-
-    private void updateEmptyState() {
-        boolean isEmpty = adapter.getItemCount() == 0;
-        recyclerView.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
-        emptyView.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -363,6 +296,21 @@ public class ShowsNowFragment extends Fragment {
             }
             query.close();
         }
+
+        /**
+         * Starts an activity to display the given episode.
+         */
+        private void showDetails(View view, int episodeId) {
+            Intent intent = new Intent();
+            intent.setClass(requireContext(), EpisodesActivity.class);
+            intent.putExtra(EpisodesActivity.EXTRA_EPISODE_TVDBID, episodeId);
+
+            ActivityCompat.startActivity(requireContext(), intent,
+                    ActivityOptionsCompat
+                            .makeScaleUpAnimation(view, 0, 0, view.getWidth(), view.getHeight())
+                            .toBundle()
+            );
+        }
     };
 
     private LoaderManager.LoaderCallbacks<List<NowAdapter.NowItem>> recentlyLocalCallbacks
@@ -380,7 +328,7 @@ public class ShowsNowFragment extends Fragment {
             }
             adapter.setRecentlyWatched(data);
             isLoadingRecentlyWatched = false;
-            showProgressBar(false);
+            nowFragmentHelper.showProgressBar(false);
         }
 
         @Override
@@ -409,8 +357,8 @@ public class ShowsNowFragment extends Fragment {
             }
             adapter.setRecentlyWatched(data.items);
             isLoadingRecentlyWatched = false;
-            showProgressBar(false);
-            showError(data.errorText);
+            nowFragmentHelper.showProgressBar(false);
+            nowFragmentHelper.showError(data.errorText);
         }
 
         @Override
@@ -438,7 +386,7 @@ public class ShowsNowFragment extends Fragment {
             }
             adapter.setFriendsRecentlyWatched(data);
             isLoadingFriends = false;
-            showProgressBar(false);
+            nowFragmentHelper.showProgressBar(false);
         }
 
         @Override

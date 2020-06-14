@@ -1,5 +1,7 @@
 package com.battlelancer.seriesguide.backend.settings;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ShowsColumns.HEXAGON_MERGE_COMPLETE;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -9,6 +11,10 @@ import com.battlelancer.seriesguide.provider.SeriesGuideContract;
 import com.battlelancer.seriesguide.util.Utils;
 
 public class HexagonSettings {
+
+    private HexagonSettings() {
+        throw new IllegalStateException("Utility class");
+    }
 
     public static final String AUDIENCE
             = "server:client_id:137959300653-9pg0ulu5d3d6jhm4fotn2onk789vsob7.apps.googleusercontent.com";
@@ -102,7 +108,7 @@ public class HexagonSettings {
     public static boolean resetSyncState(Context context) {
         // set all shows as not merged with Hexagon
         ContentValues values = new ContentValues();
-        values.put(SeriesGuideContract.Shows.HEXAGON_MERGE_COMPLETE, 0);
+        values.put(HEXAGON_MERGE_COMPLETE, 0);
         context.getContentResolver()
                 .update(SeriesGuideContract.Shows.CONTENT_URI, values, null, null);
 

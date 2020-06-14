@@ -14,6 +14,7 @@ class WrappingViewPager @JvmOverloads constructor(
     init {
         addOnPageChangeListener(object : OnPageChangeListener {
             override fun onPageScrollStateChanged(state: Int) {
+                // Empty
             }
 
             override fun onPageScrolled(
@@ -21,6 +22,7 @@ class WrappingViewPager @JvmOverloads constructor(
                 positionOffset: Float,
                 positionOffsetPixels: Int
             ) {
+                // Empty
             }
 
             override fun onPageSelected(position: Int) {

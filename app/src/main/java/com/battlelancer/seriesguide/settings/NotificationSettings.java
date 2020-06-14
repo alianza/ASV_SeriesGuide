@@ -15,6 +15,11 @@ import com.battlelancer.seriesguide.provider.SeriesGuideDatabase;
  * Access settings related to the notification service.
  */
 public class NotificationSettings {
+
+    private NotificationSettings() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static final String KEY_ENABLED = "com.battlelancer.seriesguide.notifications";
 
     public static final String KEY_FAVONLY = "com.battlelancer.seriesguide.notifications.favonly";
@@ -76,6 +81,7 @@ public class NotificationSettings {
             threshold = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context)
                     .getString(KEY_THRESHOLD, String.valueOf(THRESHOLD_DEFAULT_MIN)));
         } catch (NumberFormatException ignored) {
+            //Empty
         }
 
         return threshold;
@@ -138,15 +144,15 @@ public class NotificationSettings {
         if (ringtoneUri == null) {
             ringtoneUri = Settings.System.DEFAULT_NOTIFICATION_URI.toString();
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            // Xiaomi devices incorrectly allowed file:// uris
-            // protect against FileUriExposedException
-            if (ringtoneUri.length() > 0 /* not silent */ && !ringtoneUri.startsWith("content")) {
-                ringtoneUri = Settings.System.DEFAULT_NOTIFICATION_URI.toString();
-                PreferenceManager.getDefaultSharedPreferences(context).edit()
-                        .putString(KEY_RINGTONE, ringtoneUri)
-                        .apply();
-            }
+        // Xiaomi devices incorrectly allowed file:// uris
+        // protect against FileUriExposedException
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
+                && ringtoneUri.length() > 0 /* not silent */ && !ringtoneUri
+                .startsWith("content")) {
+            ringtoneUri = Settings.System.DEFAULT_NOTIFICATION_URI.toString();
+            PreferenceManager.getDefaultSharedPreferences(context).edit()
+                    .putString(KEY_RINGTONE, ringtoneUri)
+                    .apply();
         }
         return ringtoneUri;
     }

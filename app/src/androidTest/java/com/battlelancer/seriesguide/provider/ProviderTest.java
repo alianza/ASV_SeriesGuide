@@ -51,7 +51,7 @@ public class ProviderTest {
 
         SEASON = new Season();
         SEASON.tvdbId = 1234;
-        SEASON.season = 42;
+        SEASON.seasonProp = 42;
 
         EPISODE = new Episode();
         EPISODE.id = 123456;
@@ -139,7 +139,7 @@ public class ProviderTest {
     @Test
     public void seasonDefaultValues() throws Exception {
         ContentProviderOperation op = DBUtils
-                .buildSeasonOp(SHOW.tvdb_id, SEASON.tvdbId, SEASON.season, true);
+                .buildSeasonOp(SHOW.tvdb_id, SEASON.tvdbId, SEASON.seasonProp, true);
         insertAndAssertSeason(op);
     }
 
@@ -178,7 +178,7 @@ public class ProviderTest {
         assertThat(query.getInt(query.getColumnIndexOrThrow(Shows.REF_SHOW_ID)))
                 .isEqualTo(SHOW.tvdb_id);
         assertThat(query.getInt(query.getColumnIndexOrThrow(Seasons.COMBINED)))
-                .isEqualTo(SEASON.season);
+                .isEqualTo(SEASON.seasonProp);
         // getInt returns 0 if NULL, so check explicitly
         assertDefaultValue(query, Seasons.WATCHCOUNT, 0);
         assertDefaultValue(query, Seasons.UNAIREDCOUNT, 0);
@@ -215,7 +215,7 @@ public class ProviderTest {
                 .withValues(showValues).build();
 
         ContentProviderOperation seasonOp = DBUtils
-                .buildSeasonOp(SHOW.tvdb_id, SEASON.tvdbId, SEASON.season, true);
+                .buildSeasonOp(SHOW.tvdb_id, SEASON.tvdbId, SEASON.seasonProp, true);
 
         ContentProviderOperation episodeOp = ContentProviderOperation
                 .newInsert(Episodes.CONTENT_URI).withValues(episodeValues).build();

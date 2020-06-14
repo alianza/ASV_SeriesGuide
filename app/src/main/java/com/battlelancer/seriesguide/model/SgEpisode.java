@@ -1,12 +1,32 @@
 package com.battlelancer.seriesguide.model;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.ABSOLUTE_NUMBER;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.COLLECTED;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.DIRECTORS;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.DVDNUMBER;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.FIRSTAIREDMS;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.GUESTSTARS;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.IMAGE;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.IMDBID;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.LAST_EDITED;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.LAST_UPDATED;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.NUMBER;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.OVERVIEW;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.RATING_GLOBAL;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.RATING_USER;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.RATING_VOTES;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.SEASON;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.TITLE;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.WATCHED;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.WRITERS;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes._ID;
+
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
-import com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes;
 import com.battlelancer.seriesguide.provider.SeriesGuideContract.Seasons;
 import com.battlelancer.seriesguide.provider.SeriesGuideContract.SeasonsColumns;
 import com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows;
@@ -29,20 +49,20 @@ import com.battlelancer.seriesguide.provider.SeriesGuideDatabase.Tables;
 public class SgEpisode {
 
     @PrimaryKey
-    @ColumnInfo(name = Episodes._ID)
+    @ColumnInfo(name = _ID)
     public int tvdbId;
 
     @NonNull
-    @ColumnInfo(name = Episodes.TITLE)
+    @ColumnInfo(name = TITLE)
     public String title = "";
-    @ColumnInfo(name = Episodes.OVERVIEW)
+    @ColumnInfo(name = OVERVIEW)
     public String overview;
 
-    @ColumnInfo(name = Episodes.NUMBER)
+    @ColumnInfo(name = NUMBER)
     public int number = 0;
-    @ColumnInfo(name = Episodes.SEASON)
+    @ColumnInfo(name = SEASON)
     public int season = 0;
-    @ColumnInfo(name = Episodes.DVDNUMBER)
+    @ColumnInfo(name = DVDNUMBER)
     public Double dvdNumber;
 
     @ColumnInfo(name = SeasonsColumns.REF_SEASON_ID)
@@ -50,40 +70,40 @@ public class SgEpisode {
     @ColumnInfo(name = ShowsColumns.REF_SHOW_ID)
     public int showTvdbId;
 
-    @ColumnInfo(name = Episodes.WATCHED)
+    @ColumnInfo(name = WATCHED)
     public int watched = 0;
 
-    @ColumnInfo(name = Episodes.DIRECTORS)
+    @ColumnInfo(name = DIRECTORS)
     public String directors = "";
-    @ColumnInfo(name = Episodes.GUESTSTARS)
+    @ColumnInfo(name = GUESTSTARS)
     public String guestStars = "";
-    @ColumnInfo(name = Episodes.WRITERS)
+    @ColumnInfo(name = WRITERS)
     public String writers = "";
-    @ColumnInfo(name = Episodes.IMAGE)
+    @ColumnInfo(name = IMAGE)
     public String image = "";
 
-    @ColumnInfo(name = Episodes.FIRSTAIREDMS)
+    @ColumnInfo(name = FIRSTAIREDMS)
     public long firstReleasedMs = -1L;
 
-    @ColumnInfo(name = Episodes.COLLECTED)
+    @ColumnInfo(name = COLLECTED)
     public boolean collected = false;
 
-    @ColumnInfo(name = Episodes.RATING_GLOBAL)
+    @ColumnInfo(name = RATING_GLOBAL)
     public Double ratingGlobal;
-    @ColumnInfo(name = Episodes.RATING_VOTES)
+    @ColumnInfo(name = RATING_VOTES)
     public Integer ratingVotes;
-    @ColumnInfo(name = Episodes.RATING_USER)
+    @ColumnInfo(name = RATING_USER)
     public Integer ratingUser;
 
-    @ColumnInfo(name = Episodes.IMDBID)
+    @ColumnInfo(name = IMDBID)
     public String imdbId = "";
 
-    @ColumnInfo(name = Episodes.LAST_EDITED)
+    @ColumnInfo(name = LAST_EDITED)
     public long lastEditedSec = 0L;
 
-    @ColumnInfo(name = Episodes.ABSOLUTE_NUMBER)
+    @ColumnInfo(name = ABSOLUTE_NUMBER)
     public Integer absoluteNumber;
 
-    @ColumnInfo(name = Episodes.LAST_UPDATED)
+    @ColumnInfo(name = LAST_UPDATED)
     public long lastUpdatedSec = 0L;
 }

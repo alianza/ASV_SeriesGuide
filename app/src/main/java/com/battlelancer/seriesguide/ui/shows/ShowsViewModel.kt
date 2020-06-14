@@ -100,10 +100,8 @@ class ShowsViewModel(application: Application) : AndroidViewModel(application) {
         val upcomingLimitInDays = AdvancedSettings.getUpcomingLimitInDays(getApplication())
         val maxAirtime = timeInAnHour + upcomingLimitInDays * DateUtils.DAY_IN_MILLIS
 
-        if (filter.isFilterUnwatched != null || filter.isFilterUpcoming != null) {
-            if (selection.isNotEmpty()) {
-                selection.append(" AND ")
-            }
+        if ((filter.isFilterUnwatched != null || filter.isFilterUpcoming != null) && selection.isNotEmpty()) {
+            selection.append(" AND ")
         }
 
         if (filter.isFilterUnwatched.isTrue() && filter.isFilterUpcoming.isTrue()) {

@@ -1,10 +1,11 @@
 package com.battlelancer.seriesguide.ui.search;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows;
+
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.view.View;
-import com.battlelancer.seriesguide.provider.SeriesGuideContract;
 import com.battlelancer.seriesguide.thetvdbapi.TvdbImageTools;
 import com.battlelancer.seriesguide.ui.shows.BaseShowsAdapter;
 import com.battlelancer.seriesguide.util.DBUtils;
@@ -58,16 +59,16 @@ class ShowResultsAdapter extends BaseShowsAdapter {
 
     interface Query {
         String[] PROJECTION = new String[] {
-                SeriesGuideContract.Shows._ID, // 0
-                SeriesGuideContract.Shows.TITLE,
-                SeriesGuideContract.Shows.POSTER_SMALL,
-                SeriesGuideContract.Shows.FAVORITE,
-                SeriesGuideContract.Shows.HIDDEN, // 4
-                SeriesGuideContract.Shows.RELEASE_TIME,
-                SeriesGuideContract.Shows.RELEASE_WEEKDAY,
-                SeriesGuideContract.Shows.RELEASE_TIMEZONE,
-                SeriesGuideContract.Shows.RELEASE_COUNTRY,
-                SeriesGuideContract.Shows.NETWORK // 9
+                Shows._ID, // 0
+                Shows.TITLE,
+                Shows.POSTER_SMALL,
+                Shows.FAVORITE,
+                Shows.HIDDEN, // 4
+                Shows.RELEASE_TIME,
+                Shows.RELEASE_WEEKDAY,
+                Shows.RELEASE_TIMEZONE,
+                Shows.RELEASE_COUNTRY,
+                Shows.NETWORK // 9
         };
 
         int ID = 0;

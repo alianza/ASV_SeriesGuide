@@ -1,5 +1,10 @@
 package com.battlelancer.seriesguide.sync;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ListItems.ITEM_REF_ID;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ListItems.LIST_ITEM_ID;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ListItems.TYPE;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Lists.LIST_ID;
+
 import android.content.ContentProviderOperation;
 import android.content.Context;
 import android.content.OperationApplicationException;
@@ -79,7 +84,7 @@ public class HexagonListsSync {
                 return false;
             }
 
-            if (lists == null || lists.size() == 0) {
+            if (lists == null || lists.isEmpty()) {
                 break; // empty response, assume we are done
             }
 
@@ -118,7 +123,7 @@ public class HexagonListsSync {
                 // insert
                 builder = ContentProviderOperation
                         .newInsert(SeriesGuideContract.Lists.CONTENT_URI)
-                        .withValue(SeriesGuideContract.Lists.LIST_ID, listId);
+                        .withValue(LIST_ID, listId);
             }
             if (builder != null) {
                 builder.withValue(SeriesGuideContract.Lists.NAME, list.getName());
@@ -151,6 +156,7 @@ public class HexagonListsSync {
                         itemTvdbId = Integer.parseInt(brokenUpId[0]);
                         itemType = Integer.parseInt(brokenUpId[1]);
                     } catch (NumberFormatException ignored) {
+                        // Ignored
                     }
                     if (itemTvdbId == -1 || !SeriesGuideContract.ListItems.isValidItemType(
                             itemType)) {
@@ -160,10 +166,10 @@ public class HexagonListsSync {
                     // just insert the list item, if the id already exists it will be replaced
                     builder = ContentProviderOperation
                             .newInsert(SeriesGuideContract.ListItems.CONTENT_URI)
-                            .withValue(SeriesGuideContract.ListItems.LIST_ITEM_ID, listItemId)
-                            .withValue(SeriesGuideContract.ListItems.ITEM_REF_ID, itemTvdbId)
-                            .withValue(SeriesGuideContract.ListItems.TYPE, itemType)
-                            .withValue(SeriesGuideContract.Lists.LIST_ID, listId);
+                            .withValue(LIST_ITEM_ID, listItemId)
+                            .withValue(ITEM_REF_ID, itemTvdbId)
+                            .withValue(TYPE, itemType)
+                            .withValue(LIST_ID, listId);
                     batch.add(builder.build());
 
                     if (hasMergedLists) {
@@ -225,7 +231,7 @@ public class HexagonListsSync {
                 }
 
                 List<String> listIds = response.getListIds();
-                if (listIds == null || listIds.size() == 0) {
+                if (listIds == null || listIds.isEmpty()) {
                     break; // empty response, assume we got all ids
                 }
                 hexagonListIds.addAll(listIds);
@@ -248,7 +254,7 @@ public class HexagonListsSync {
         }
 
         // remove any list not on hexagon
-        if (localListIds.size() > 0) {
+        if (localListIds.isEmpty()) {
             ArrayList<ContentProviderOperation> batch = new ArrayList<>();
             for (String listId : localListIds) {
                 // note: this matches what RemoveListTask does

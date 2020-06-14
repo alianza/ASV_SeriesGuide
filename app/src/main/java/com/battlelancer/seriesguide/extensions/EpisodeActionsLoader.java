@@ -32,7 +32,7 @@ public class EpisodeActionsLoader extends GenericSimpleLoader<List<Action>> {
                 .getLatestEpisodeActions(getContext(), episodeTvdbId);
 
         // no actions available yet, request extensions to publish them
-        if (actions == null || actions.size() == 0) {
+        if (actions == null || actions.isEmpty()) {
             actions = new ArrayList<>();
 
             query = getContext().getContentResolver().query(

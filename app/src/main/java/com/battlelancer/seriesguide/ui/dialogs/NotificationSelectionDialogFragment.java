@@ -1,5 +1,8 @@
 package com.battlelancer.seriesguide.ui.dialogs;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ShowsColumns.TITLE;
+
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -22,7 +25,6 @@ import butterknife.Unbinder;
 import com.battlelancer.seriesguide.R;
 import com.battlelancer.seriesguide.SgApp;
 import com.battlelancer.seriesguide.adapters.CursorRecyclerViewAdapter;
-import com.battlelancer.seriesguide.provider.SeriesGuideContract;
 import com.battlelancer.seriesguide.settings.DisplaySettings;
 import com.battlelancer.seriesguide.ui.SeriesGuidePreferences;
 import org.greenrobot.eventbus.EventBus;
@@ -78,15 +80,15 @@ public class NotificationSelectionDialogFragment extends AppCompatDialogFragment
             = new LoaderManager.LoaderCallbacks<Cursor>() {
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-            return new CursorLoader(requireContext(), SeriesGuideContract.Shows.CONTENT_URI,
+            return new CursorLoader(requireContext(), Shows.CONTENT_URI,
                     new String[] {
-                            SeriesGuideContract.Shows._ID, // 0
-                            SeriesGuideContract.Shows.TITLE, // 1
-                            SeriesGuideContract.Shows.NOTIFY // 2
+                            Shows._ID, // 0
+                            TITLE, // 1
+                            Shows.NOTIFY // 2
                     }, null, null,
                     DisplaySettings.isSortOrderIgnoringArticles(getContext())
-                            ? SeriesGuideContract.Shows.SORT_TITLE_NOARTICLE
-                            : SeriesGuideContract.Shows.SORT_TITLE);
+                            ? Shows.SORT_TITLE_NOARTICLE
+                            : Shows.SORT_TITLE);
         }
 
         @Override

@@ -1,5 +1,11 @@
 package com.battlelancer.seriesguide.ui.shows;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.LAST_UPDATED;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ShowsColumns.LANGUAGE;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ShowsColumns.LASTWATCHED_MS;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ShowsColumns.POSTER_SMALL;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ShowsColumns.TRAKT_ID;
+
 import android.content.ContentProviderOperation;
 import android.content.ContentValues;
 import android.content.Context;
@@ -200,13 +206,13 @@ public class ShowTools {
 
             // change language
             ContentValues values = new ContentValues();
-            values.put(SeriesGuideContract.Shows.LANGUAGE, languageCode);
+            values.put(LANGUAGE, languageCode);
             context.getContentResolver()
                     .update(SeriesGuideContract.Shows.buildShowUri(showTvdbId), values, null,
                             null);
             // reset episode last edit time so all get updated
             values = new ContentValues();
-            values.put(SeriesGuideContract.Episodes.LAST_UPDATED, 0);
+            values.put(LAST_UPDATED, 0);
             context.getContentResolver()
                     .update(SeriesGuideContract.Episodes.buildEpisodesOfShowUri(showTvdbId),
                             values, null, null);
@@ -256,7 +262,7 @@ public class ShowTools {
             ArrayList<ContentProviderOperation> batch, int showTvdbId, long lastWatchedMsNew) {
         Uri uri = SeriesGuideContract.Shows.buildShowUri(showTvdbId);
         Cursor query = context.getContentResolver().query(uri, new String[]{
-                SeriesGuideContract.Shows.LASTWATCHED_MS}, null, null, null);
+                LASTWATCHED_MS}, null, null, null);
         if (query == null) {
             Timber.e("addLastWatchedTimeUpdateOpIfNewer: query was null.");
             return false;
@@ -271,7 +277,7 @@ public class ShowTools {
 
         if (lastWatchedMs < lastWatchedMsNew) {
             batch.add(ContentProviderOperation.newUpdate(uri)
-                    .withValue(SeriesGuideContract.Shows.LASTWATCHED_MS, lastWatchedMsNew)
+                    .withValue(LASTWATCHED_MS, lastWatchedMsNew)
                     .build());
         }
         return true;
@@ -285,7 +291,7 @@ public class ShowTools {
     public static Integer getShowTraktId(@NonNull Context context, int showTvdbId) {
         Cursor traktIdQuery = context.getContentResolver()
                 .query(SeriesGuideContract.Shows.buildShowUri(showTvdbId),
-                        new String[]{SeriesGuideContract.Shows.TRAKT_ID}, null, null, null);
+                        new String[]{TRAKT_ID}, null, null, null);
         if (traktIdQuery == null) {
             return null;
         }
@@ -338,7 +344,7 @@ public class ShowTools {
         SparseArrayCompat<String> existingShows = new SparseArrayCompat<>();
 
         Cursor shows = context.getContentResolver().query(SeriesGuideContract.Shows.CONTENT_URI,
-                new String[]{SeriesGuideContract.Shows._ID, SeriesGuideContract.Shows.POSTER_SMALL},
+                new String[]{SeriesGuideContract.Shows._ID, POSTER_SMALL},
                 null, null, null);
         if (shows == null) {
             return null;

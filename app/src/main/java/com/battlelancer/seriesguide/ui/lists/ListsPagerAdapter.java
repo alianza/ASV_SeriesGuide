@@ -1,6 +1,8 @@
 
 package com.battlelancer.seriesguide.ui.lists;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Lists.LIST_ID;
+
 import android.database.Cursor;
 import android.database.DataSetObserver;
 import androidx.annotation.NonNull;
@@ -19,6 +21,11 @@ public class ListsPagerAdapter extends MultiPagerAdapter {
     @Nullable private Cursor cursorLists;
     private boolean dataValid;
 
+    /**
+     * @deprecated ASV
+     * @param fm
+     */
+    @Deprecated
     public ListsPagerAdapter(FragmentManager fm) {
         super(fm);
         this.dataSetObserver = new ListsDataSetObserver();
@@ -46,7 +53,7 @@ public class ListsPagerAdapter extends MultiPagerAdapter {
     @Override
     public Fragment getItem(int position) {
         if (cursorLists == null || !dataValid) {
-            return null;
+            return new Fragment();
         }
         cursorLists.moveToPosition(position);
         return ListsFragment.newInstance(cursorLists.getString(0), position);
@@ -98,7 +105,7 @@ public class ListsPagerAdapter extends MultiPagerAdapter {
 
     public interface ListsQuery {
         String[] PROJECTION = new String[] {
-                Lists.LIST_ID,
+                LIST_ID,
                 Lists.NAME
         };
 

@@ -1,6 +1,10 @@
 package com.battlelancer.seriesguide.dataliberation;
 
+import static android.provider.BaseColumns._ID;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ListItems.CONTENT_URI;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ListItems.LIST_ITEM_ID;
 import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.SeasonsColumns.COMBINED;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -212,33 +216,34 @@ public class JsonExportTask extends AsyncTask<Void, Integer, Integer> {
 
         publishProgress(data.getCount(), 0);
 
-        // try to export all data
-        try {
-            // ensure the user has selected a backup file
-            Uri backupFileUri = getDataBackupFile(type);
-            if (backupFileUri == null) {
-                return ERROR_FILE_ACCESS;
-            }
+        // ensure the user has selected a backup file
+        Uri backupFileUri = getDataBackupFile(type);
+        if (backupFileUri == null) {
+            return ERROR_FILE_ACCESS;
+        }
 
-            ParcelFileDescriptor pfd = context.getContentResolver()
-                    .openFileDescriptor(backupFileUri, "w");
+        // try to export all data
+        try(ParcelFileDescriptor pfd = context.getContentResolver()
+                .openFileDescriptor(backupFileUri, "w");) {
+
             if (pfd == null) {
                 return ERROR_FILE_ACCESS;
             }
-            FileOutputStream out = new FileOutputStream(pfd.getFileDescriptor());
+            try (FileOutputStream out = new FileOutputStream(pfd.getFileDescriptor())) {
 
-            // Even though using streams and FileOutputStream does not append by
-            // default, using Storage Access Framework just overwrites existing
-            // bytes, potentially leaving old bytes hanging over:
-            // so truncate the file first to clear any existing bytes.
-            out.getChannel().truncate(0);
+                // Even though using streams and FileOutputStream does not append by
+                // default, using Storage Access Framework just overwrites existing
+                // bytes, potentially leaving old bytes hanging over:
+                // so truncate the file first to clear any existing bytes.
+                out.getChannel().truncate(0);
 
-            if (type == BACKUP_SHOWS) {
-                writeJsonStreamShows(out, data);
-            } else if (type == BACKUP_LISTS) {
-                writeJsonStreamLists(out, data);
-            } else if (type == BACKUP_MOVIES) {
-                writeJsonStreamMovies(out, data);
+                if (type == BACKUP_SHOWS) {
+                    writeJsonStreamShows(out, data);
+                } else if (type == BACKUP_LISTS) {
+                    writeJsonStreamLists(out, data);
+                } else if (type == BACKUP_MOVIES) {
+                    writeJsonStreamMovies(out, data);
+                }
             }
 
             // let the document provider know we're done.
@@ -316,7 +321,7 @@ public class JsonExportTask extends AsyncTask<Void, Integer, Integer> {
             show.tvdb_slug = shows.getString(ShowsQuery.SLUG);
             show.title = shows.getString(ShowsQuery.TITLE);
             show.favorite = shows.getInt(ShowsQuery.FAVORITE) == 1;
-            show.notify = shows.getInt(ShowsQuery.NOTIFY) == 1;
+            show.notifySg = shows.getInt(ShowsQuery.NOTIFY) == 1;
             show.hidden = shows.getInt(ShowsQuery.HIDDEN) == 1;
             show.language = shows.getString(ShowsQuery.LANGUAGE);
             show.release_time = shows.getInt(ShowsQuery.RELEASE_TIME);
@@ -360,8 +365,8 @@ public class JsonExportTask extends AsyncTask<Void, Integer, Integer> {
         final Cursor seasonsCursor = context.getContentResolver().query(
                 Seasons.buildSeasonsOfShowUri(String.valueOf(show.tvdb_id)),
                 new String[]{
-                        Seasons._ID,
-                        Seasons.COMBINED
+                        _ID,
+                        COMBINED
                 }, null, null, null
         );
 
@@ -372,7 +377,7 @@ public class JsonExportTask extends AsyncTask<Void, Integer, Integer> {
         while (seasonsCursor.moveToNext()) {
             Season season = new Season();
             season.tvdbId = seasonsCursor.getInt(0);
-            season.season = seasonsCursor.getInt(1);
+            season.seasonProp = seasonsCursor.getInt(1);
 
             addEpisodes(season);
 
@@ -396,7 +401,7 @@ public class JsonExportTask extends AsyncTask<Void, Integer, Integer> {
         while (episodesCursor.moveToNext()) {
             Episode episode = new Episode();
             episode.tvdbId = episodesCursor.getInt(EpisodesQuery.ID);
-            episode.episode = episodesCursor.getInt(EpisodesQuery.NUMBER);
+            episode.episodeItem = episodesCursor.getInt(EpisodesQuery.NUMBER);
             episode.episodeAbsolute = episodesCursor.getInt(EpisodesQuery.NUMBER_ABSOLUTE);
             episode.episodeDvd = episodesCursor.getDouble(EpisodesQuery.NUMBER_DVD);
             int episodeFlag = episodesCursor.getInt(EpisodesQuery.WATCHED);
@@ -406,7 +411,7 @@ public class JsonExportTask extends AsyncTask<Void, Integer, Integer> {
             episode.title = episodesCursor.getString(EpisodesQuery.TITLE);
             episode.firstAired = episodesCursor.getLong(EpisodesQuery.FIRSTAIRED);
             episode.imdbId = episodesCursor.getString(EpisodesQuery.IMDBID);
-            episode.rating_user = episodesCursor.getInt(EpisodesQuery.RATING_USER);
+            episode.ratingUser = episodesCursor.getInt(EpisodesQuery.RATING_USER);
             if (isFullDump) {
                 episode.overview = episodesCursor.getString(EpisodesQuery.OVERVIEW);
                 episode.image = episodesCursor.getString(EpisodesQuery.IMAGE);
@@ -414,7 +419,7 @@ public class JsonExportTask extends AsyncTask<Void, Integer, Integer> {
                 episode.gueststars = episodesCursor.getString(EpisodesQuery.GUESTSTARS);
                 episode.directors = episodesCursor.getString(EpisodesQuery.DIRECTORS);
                 episode.rating = episodesCursor.getDouble(EpisodesQuery.RATING_GLOBAL);
-                episode.rating_votes = episodesCursor.getInt(EpisodesQuery.RATING_VOTES);
+                episode.ratingVotes = episodesCursor.getInt(EpisodesQuery.RATING_VOTES);
                 episode.lastEdited = episodesCursor.getLong(EpisodesQuery.LAST_EDITED);
             }
 
@@ -455,7 +460,7 @@ public class JsonExportTask extends AsyncTask<Void, Integer, Integer> {
 
     private void addListItems(List list) {
         final Cursor listItems = context.getContentResolver().query(
-                ListItems.CONTENT_URI, ListItemsQuery.PROJECTION,
+                CONTENT_URI, ListItemsQuery.PROJECTION,
                 ListItemsQuery.SELECTION,
                 new String[]{
                         list.listId
@@ -480,6 +485,9 @@ public class JsonExportTask extends AsyncTask<Void, Integer, Integer> {
                 case ListItemTypes.EPISODE:
                     item.type = ListItemTypesExport.EPISODE;
                     break;
+                default:
+                    throw new IllegalStateException(
+                            "Unexpected value: " + listItems.getInt(ListItemsQuery.TYPE));
             }
 
             list.items.add(item);
@@ -528,7 +536,7 @@ public class JsonExportTask extends AsyncTask<Void, Integer, Integer> {
 
     public interface ShowsQuery {
         String[] PROJECTION_FULL = new String[]{
-                Shows._ID,
+                _ID,
                 Shows.TITLE,
                 Shows.FAVORITE,
                 Shows.NOTIFY,
@@ -592,7 +600,7 @@ public class JsonExportTask extends AsyncTask<Void, Integer, Integer> {
 
     public interface EpisodesQuery {
         String[] PROJECTION = new String[]{
-                Episodes._ID,
+                _ID,
                 Episodes.NUMBER,
                 Episodes.ABSOLUTE_NUMBER,
                 Episodes.WATCHED,
@@ -604,7 +612,7 @@ public class JsonExportTask extends AsyncTask<Void, Integer, Integer> {
                 Episodes.RATING_USER
         };
         String[] PROJECTION_FULL = new String[]{
-                Episodes._ID,
+                _ID,
                 Episodes.NUMBER,
                 Episodes.ABSOLUTE_NUMBER,
                 Episodes.WATCHED,
@@ -662,7 +670,7 @@ public class JsonExportTask extends AsyncTask<Void, Integer, Integer> {
 
     public interface ListItemsQuery {
         String[] PROJECTION = new String[]{
-                ListItems.LIST_ITEM_ID, SeriesGuideContract.Lists.LIST_ID, ListItems.ITEM_REF_ID,
+                LIST_ITEM_ID, SeriesGuideContract.Lists.LIST_ID, ListItems.ITEM_REF_ID,
                 ListItems.TYPE
         };
 
@@ -676,7 +684,7 @@ public class JsonExportTask extends AsyncTask<Void, Integer, Integer> {
 
     public interface MoviesQuery {
         String[] PROJECTION = new String[]{
-                Movies._ID,
+                _ID,
                 Movies.TMDB_ID,
                 Movies.IMDB_ID,
                 Movies.TITLE,

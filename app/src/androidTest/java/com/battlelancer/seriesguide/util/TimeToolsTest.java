@@ -19,11 +19,11 @@ import org.threeten.bp.ZonedDateTime;
  */
 public class TimeToolsTest {
 
-    public static final String AMERICA_NEW_YORK = "America/New_York";
-    public static final String AMERICA_LOS_ANGELES = "America/Los_Angeles";
-    public static final String EUROPE_BERLIN = "Europe/Berlin";
-    public static final String GERMANY = "de";
-    public static final String UNITED_STATES = "us";
+    private static final String AMERICA_NEW_YORK = "America/New_York";
+    private static final String AMERICA_LOS_ANGELES = "America/Los_Angeles";
+    private static final String EUROPE_BERLIN = "Europe/Berlin";
+    private static final String GERMANY = "de";
+    private static final String UNITED_STATES = "us";
 
     @Test
     public void test_getShowReleaseYear() {
@@ -41,7 +41,7 @@ public class TimeToolsTest {
         // (we can be sure that in May there is always DST in effect in America/New_York
         // so this test will likely not break if DST rules change)
         ZoneId showTimeZone = ZoneId.of(AMERICA_NEW_YORK);
-        long episodeReleaseTime = TimeTools.parseEpisodeReleaseDate(null,
+        long episodeReleaseTime = TimeTools.parseEpisodeReleaseDate(
                 showTimeZone,
                 "2013-05-31",
                 LocalTime.of(20, 0), // 20:00
@@ -59,7 +59,7 @@ public class TimeToolsTest {
         // (we can be sure that in May there is always DST in effect in Europe/Berlin
         // so this test will likely not break if DST rules change)
         ZoneId showTimeZone = ZoneId.of(EUROPE_BERLIN);
-        long episodeReleaseTime = TimeTools.parseEpisodeReleaseDate(null,
+        long episodeReleaseTime = TimeTools.parseEpisodeReleaseDate(
                 showTimeZone,
                 "2013-05-31",
                 LocalTime.of(20, 0), // 20:00
@@ -77,7 +77,7 @@ public class TimeToolsTest {
         // e.g. if 00:35, the episode date is typically (wrongly) that of the previous day
         // this is common for late night shows, e.g. "Monday night" is technically "early Tuesday"
         ZoneId showTimeZone = ZoneId.of(AMERICA_NEW_YORK);
-        long episodeReleaseTime = TimeTools.parseEpisodeReleaseDate(null,
+        long episodeReleaseTime = TimeTools.parseEpisodeReleaseDate(
                 showTimeZone,
                 "2013-05-31",
                 LocalTime.of(0, 35), // 00:35
@@ -94,7 +94,7 @@ public class TimeToolsTest {
         // ensure episodes releasing in the hour past midnight are NOT moved to the next day
         // if it is a Netflix show
         ZoneId showTimeZone = ZoneId.of(AMERICA_NEW_YORK);
-        long episodeReleaseTime = TimeTools.parseEpisodeReleaseDate(null,
+        long episodeReleaseTime = TimeTools.parseEpisodeReleaseDate(
                 showTimeZone,
                 "2013-06-01", // +one day here
                 LocalTime.of(0, 35), // 00:35

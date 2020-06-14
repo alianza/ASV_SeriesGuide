@@ -1,5 +1,10 @@
 package com.battlelancer.seriesguide.traktapi;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.RATING_GLOBAL;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.RATING_VOTES;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.buildEpisodeUri;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.buildShowUri;
+
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
@@ -113,10 +118,10 @@ public class TraktRatingsTask extends AsyncTask<Void, Void, Void> {
 
     private void saveEpisodeRating(Ratings ratings) {
         ContentValues values = new ContentValues();
-        values.put(SeriesGuideContract.Episodes.RATING_GLOBAL, ratings.rating);
-        values.put(SeriesGuideContract.Episodes.RATING_VOTES, ratings.votes);
+        values.put(RATING_GLOBAL, ratings.rating);
+        values.put(RATING_VOTES, ratings.votes);
         context.getContentResolver()
-                .update(SeriesGuideContract.Episodes.buildEpisodeUri(episodeTvdbId), values, null,
+                .update(buildEpisodeUri(episodeTvdbId), values, null,
                         null);
 
         // notify withshow uri as well (used by episode details view)
@@ -130,7 +135,7 @@ public class TraktRatingsTask extends AsyncTask<Void, Void, Void> {
         values.put(SeriesGuideContract.Shows.RATING_GLOBAL, ratings.rating);
         values.put(SeriesGuideContract.Shows.RATING_VOTES, ratings.votes);
         context.getContentResolver()
-                .update(SeriesGuideContract.Shows.buildShowUri(showTvdbId), values, null, null);
+                .update(buildShowUri(showTvdbId), values, null, null);
     }
 
     /**
@@ -139,6 +144,6 @@ public class TraktRatingsTask extends AsyncTask<Void, Void, Void> {
      */
     private long createUniqueId(int showTvdbId, int episodeTvdbId) {
         return ((showTvdbId + episodeTvdbId) * (showTvdbId + episodeTvdbId + 1) / 2)
-                + episodeTvdbId;
+                + (long) episodeTvdbId;
     }
 }

@@ -56,11 +56,11 @@ public class TraktCancelCheckinDialogFragment extends AppCompatDialogFragment {
                     = new CancelCheckInTask(requireContext(), args);
             cancelCheckinTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         });
-        builder.setNegativeButton(R.string.traktcheckin_wait, (dialog, which) -> {
+        builder.setNegativeButton(R.string.traktcheckin_wait, (dialog, which) ->
             // broadcast check-in success
             EventBus.getDefault().post(new TraktTask.TraktActionCompleteEvent(
-                    TraktAction.valueOf(args.getString(InitBundle.TRAKTACTION)), true, null));
-        });
+                    TraktAction.valueOf(args.getString(InitBundle.TRAKTACTION)), true, null))
+        );
 
         return builder.create();
     }

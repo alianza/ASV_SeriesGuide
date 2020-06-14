@@ -124,12 +124,7 @@ public class FastScrollerDecoration extends RecyclerView.ItemDecoration implemen
     final ValueAnimator mShowHideAnimator = ValueAnimator.ofFloat(0, 1);
     @SuppressWarnings("WeakerAccess") /* synthetic access */
     @AnimationState int mAnimationState = ANIMATION_STATE_OUT;
-    private final Runnable mHideRunnable = new Runnable() {
-        @Override
-        public void run() {
-            hide(HIDE_DURATION_MS);
-        }
-    };
+    private final Runnable mHideRunnable = () -> hide(HIDE_DURATION_MS);
     private final RecyclerView.OnScrollListener
             mOnScrollListener = new RecyclerView.OnScrollListener() {
         @Override
@@ -235,17 +230,23 @@ public class FastScrollerDecoration extends RecyclerView.ItemDecoration implemen
 
 
     public void show() {
-        switch (mAnimationState) {
-            case ANIMATION_STATE_FADING_OUT:
-                mShowHideAnimator.cancel();
-                // fall through
-            case ANIMATION_STATE_OUT:
-                mAnimationState = ANIMATION_STATE_FADING_IN;
-                mShowHideAnimator.setFloatValues((float) mShowHideAnimator.getAnimatedValue(), 1);
-                mShowHideAnimator.setDuration(SHOW_DURATION_MS);
-                mShowHideAnimator.setStartDelay(0);
-                mShowHideAnimator.start();
-                break;
+        if (mAnimationState == ANIMATION_STATE_FADING_OUT) {
+            mShowHideAnimator.cancel();
+            // fall through
+
+            mAnimationState = ANIMATION_STATE_FADING_IN;
+            mShowHideAnimator.setFloatValues((float) mShowHideAnimator.getAnimatedValue(), 1);
+            mShowHideAnimator.setDuration(SHOW_DURATION_MS);
+            mShowHideAnimator.setStartDelay(0);
+            mShowHideAnimator.start();
+        } else if (mAnimationState == ANIMATION_STATE_OUT) {
+            mAnimationState = ANIMATION_STATE_FADING_IN;
+            mShowHideAnimator.setFloatValues((float) mShowHideAnimator.getAnimatedValue(), 1);
+            mShowHideAnimator.setDuration(SHOW_DURATION_MS);
+            mShowHideAnimator.setStartDelay(0);
+            mShowHideAnimator.start();
+        } else {
+            throw new IllegalStateException("Unexpected value: " + mAnimationState);
         }
     }
 
@@ -255,16 +256,21 @@ public class FastScrollerDecoration extends RecyclerView.ItemDecoration implemen
 
     @VisibleForTesting
     void hide(int duration) {
-        switch (mAnimationState) {
-            case ANIMATION_STATE_FADING_IN:
-                mShowHideAnimator.cancel();
-                // fall through
-            case ANIMATION_STATE_IN:
-                mAnimationState = ANIMATION_STATE_FADING_OUT;
-                mShowHideAnimator.setFloatValues((float) mShowHideAnimator.getAnimatedValue(), 0);
-                mShowHideAnimator.setDuration(duration);
-                mShowHideAnimator.start();
-                break;
+        if (mAnimationState == ANIMATION_STATE_FADING_IN) {
+            mShowHideAnimator.cancel();
+            // fall through
+
+            mAnimationState = ANIMATION_STATE_FADING_OUT;
+            mShowHideAnimator.setFloatValues((float) mShowHideAnimator.getAnimatedValue(), 0);
+            mShowHideAnimator.setDuration(duration);
+            mShowHideAnimator.start();
+        } else if (mAnimationState == ANIMATION_STATE_IN) {
+            mAnimationState = ANIMATION_STATE_FADING_OUT;
+            mShowHideAnimator.setFloatValues((float) mShowHideAnimator.getAnimatedValue(), 0);
+            mShowHideAnimator.setDuration(duration);
+            mShowHideAnimator.start();
+        } else {
+            throw new IllegalStateException("Unexpected value: " + mAnimationState);
         }
     }
 
@@ -402,7 +408,7 @@ public class FastScrollerDecoration extends RecyclerView.ItemDecoration implemen
                 if (insideHorizontalThumb) {
                     mDragState = DRAG_X;
                     mHorizontalDragX = (int) ev.getX();
-                } else if (insideVerticalThumb) {
+                } else {
                     mDragState = DRAG_Y;
                     mVerticalDragY = (int) ev.getY();
                 }
@@ -433,7 +439,7 @@ public class FastScrollerDecoration extends RecyclerView.ItemDecoration implemen
                 if (insideHorizontalThumb) {
                     mDragState = DRAG_X;
                     mHorizontalDragX = (int) me.getX();
-                } else if (insideVerticalThumb) {
+                } else {
                     mDragState = DRAG_Y;
                     mVerticalDragY = (int) me.getY();
                 }
@@ -456,7 +462,9 @@ public class FastScrollerDecoration extends RecyclerView.ItemDecoration implemen
     }
 
     @Override
-    public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) { }
+    public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+        // Empty
+    }
 
     private void verticalScrollTo(float y) {
         final int[] scrollbarRange = getVerticalRange();

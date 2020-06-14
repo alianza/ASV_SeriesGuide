@@ -1,5 +1,7 @@
 package com.battlelancer.seriesguide.util.tasks;
 
+import static com.battlelancer.seriesguide.enums.Result.ERROR;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -39,7 +41,7 @@ public class RemoveShowTask extends AsyncTask<Integer, Void, Integer> {
     protected void onPostExecute(Integer result) {
         if (result == NetworkResult.OFFLINE) {
             Toast.makeText(context, R.string.offline, Toast.LENGTH_LONG).show();
-        } else if (result == NetworkResult.ERROR) {
+        } else if (result == ERROR) {
             Toast.makeText(context, R.string.delete_error, Toast.LENGTH_LONG).show();
         }
 

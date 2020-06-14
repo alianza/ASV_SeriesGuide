@@ -4,9 +4,9 @@ import android.app.Activity;
 import android.text.TextUtils;
 import com.battlelancer.seriesguide.R;
 import com.battlelancer.seriesguide.SgApp;
-import com.battlelancer.seriesguide.ui.shows.NowAdapter;
-import com.battlelancer.seriesguide.traktapi.TraktCredentials;
 import com.battlelancer.seriesguide.traktapi.SgTrakt;
+import com.battlelancer.seriesguide.traktapi.TraktCredentials;
+import com.battlelancer.seriesguide.ui.shows.NowAdapter;
 import com.uwetrottmann.androidutils.GenericSimpleLoader;
 import com.uwetrottmann.trakt5.entities.Friend;
 import com.uwetrottmann.trakt5.entities.HistoryEntry;
@@ -30,7 +30,7 @@ class TraktFriendsMovieHistoryLoader extends GenericSimpleLoader<List<NowAdapter
     @Override
     public List<NowAdapter.NowItem> loadInBackground() {
         if (!TraktCredentials.get(getContext()).hasCredentials()) {
-            return null;
+            return new ArrayList<>();
         }
 
         // get all trakt friends
@@ -38,12 +38,12 @@ class TraktFriendsMovieHistoryLoader extends GenericSimpleLoader<List<NowAdapter
         List<Friend> friends = SgTrakt.executeAuthenticatedCall(getContext(),
                 traktUsers.friends(UserSlug.ME, Extended.FULL), "get friends");
         if (friends == null) {
-            return null;
+            return new ArrayList<>();
         }
 
         int size = friends.size();
         if (size == 0) {
-            return null; // no friends, done.
+            return new ArrayList<>(); // no friends, done.
         }
 
         // estimate list size
@@ -70,7 +70,7 @@ class TraktFriendsMovieHistoryLoader extends GenericSimpleLoader<List<NowAdapter
             List<HistoryEntry> history = SgTrakt.executeCall(
                     traktUsers.history(new UserSlug(userSlug), HistoryType.MOVIES, 1, 1,
                             null, null, null), "get friend movie history");
-            if (history == null || history.size() == 0) {
+            if (history == null || history.isEmpty()) {
                 continue; // no history
             }
 

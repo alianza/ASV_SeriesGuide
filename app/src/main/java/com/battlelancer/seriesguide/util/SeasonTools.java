@@ -6,6 +6,10 @@ import com.battlelancer.seriesguide.enums.SeasonTags;
 
 public class SeasonTools {
 
+    private SeasonTools() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static boolean hasSkippedTag(String tags) {
         return SeasonTags.SKIPPED.equals(tags);
     }

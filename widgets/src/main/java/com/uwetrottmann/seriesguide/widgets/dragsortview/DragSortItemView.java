@@ -33,7 +33,6 @@ public class DragSortItemView extends ViewGroup {
                 LayoutParams.MATCH_PARENT,
                 LayoutParams.WRAP_CONTENT));
 
-        //setClipChildren(true);
     }
 
     public void setGravity(int gravity) {

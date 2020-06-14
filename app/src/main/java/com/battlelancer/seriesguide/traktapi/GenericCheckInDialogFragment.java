@@ -39,6 +39,7 @@ public abstract class GenericCheckInDialogFragment extends AppCompatDialogFragme
     }
 
     public class CheckInDialogDismissedEvent {
+        // Empty
     }
 
     @BindView(R.id.textInputLayoutCheckIn) TextInputLayout textInputLayout;

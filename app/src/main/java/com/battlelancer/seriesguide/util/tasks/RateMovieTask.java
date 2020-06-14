@@ -1,5 +1,7 @@
 package com.battlelancer.seriesguide.util.tasks;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.RATING_USER;
+
 import android.content.ContentValues;
 import android.content.Context;
 import androidx.annotation.NonNull;
@@ -41,7 +43,7 @@ public class RateMovieTask extends BaseRateItemTask {
     @Override
     protected boolean doDatabaseUpdate() {
         ContentValues values = new ContentValues();
-        values.put(SeriesGuideContract.Movies.RATING_USER, getRating().value);
+        values.put(RATING_USER, getRating().value);
 
         int rowsUpdated = getContext().getContentResolver()
                 .update(SeriesGuideContract.Movies.buildMovieUri(movieTmdbId), values, null, null);

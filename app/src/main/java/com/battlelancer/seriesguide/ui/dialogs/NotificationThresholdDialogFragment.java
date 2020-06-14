@@ -53,10 +53,10 @@ public class NotificationThresholdDialogFragment extends AppCompatDialogFragment
 
         editTextValue.addTextChangedListener(textWatcher);
 
-        radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+        radioGroup.setOnCheckedChangeListener((group, checkedId) ->
             // trigger text watcher, takes care of validating the value based on the new unit
-            editTextValue.setText(editTextValue.getText());
-        });
+            editTextValue.setText(editTextValue.getText())
+        );
 
         bindViews();
 
@@ -72,55 +72,56 @@ public class NotificationThresholdDialogFragment extends AppCompatDialogFragment
     private void bindViews() {
         int minutes = NotificationSettings.getLatestToIncludeTreshold(getContext());
 
-        int value;
+        int value1;
         if (minutes != 0 && minutes % (24 * 60) == 0) {
-            value = minutes / (24 * 60);
+            value1 = minutes / (24 * 60);
             radioGroup.check(R.id.radioButtonThresholdDays);
         } else if (minutes != 0 && minutes % 60 == 0) {
-            value = minutes / 60;
+            value1 = minutes / 60;
             radioGroup.check(R.id.radioButtonThresholdHours);
         } else {
-            value = minutes;
+            value1 = minutes;
             radioGroup.check(R.id.radioButtonThresholdMinutes);
         }
 
-        editTextValue.setText(String.valueOf(value));
+        editTextValue.setText(String.valueOf(value1));
         // radio buttons are updated by text watcher
     }
 
     private void parseAndUpdateValue(Editable s) {
-        int value = 0;
+        int value2 = 0;
         try {
-            value = Integer.parseInt(s.toString());
+            value2 = Integer.parseInt(s.toString());
         } catch (NumberFormatException ignored) {
+            Timber.e(ignored, "Error");
         }
 
         // do not allow values bigger than a threshold, based on the selected unit
         boolean resetValue = false;
         if (radioGroup.getCheckedRadioButtonId() == radioButtonMinutes.getId()
-                && value > 600) {
+                && value2 > 600) {
             resetValue = true;
-            value = 600;
+            value2 = 600;
         } else if (radioGroup.getCheckedRadioButtonId() == radioButtonHours.getId()
-                && value > 120) {
+                && value2 > 120) {
             resetValue = true;
-            value = 120;
+            value2 = 120;
         } else if (radioGroup.getCheckedRadioButtonId() == radioButtonDays.getId()
-                && value > 7) {
+                && value2 > 7) {
             resetValue = true;
-            value = 7;
-        } else if (value < 0) {
+            value2 = 7;
+        } else if (value2 < 0) {
             // should never happen due to text filter, but better safe than sorry
             resetValue = true;
-            value = 0;
+            value2 = 0;
         }
 
         if (resetValue) {
-            s.replace(0, s.length(), String.valueOf(value));
+            s.replace(0, s.length(), String.valueOf(value2));
         }
 
-        this.value = value;
-        updateRadioButtons(value);
+        this.value = value2;
+        updateRadioButtons(value2);
     }
 
     private void updateRadioButtons(int value) {
@@ -160,10 +161,12 @@ public class NotificationThresholdDialogFragment extends AppCompatDialogFragment
     private TextWatcher textWatcher = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            // Empty
         }
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
+            // Empty
         }
 
         @Override

@@ -123,13 +123,13 @@ public abstract class BaseOAuthActivity extends BaseActivity {
         buttonContainer.setVisibility(View.GONE);
 
         // Inflate the WebView on demand.
-        WebView webview = findViewById(R.id.webView);
-        if (webview == null) {
+        WebView webviewToInflate = findViewById(R.id.webView);
+        if (webviewToInflate == null) {
             FrameLayout container = findViewById(R.id.frameLayoutOauth);
             try {
                 LayoutInflater.from(container.getContext())
                         .inflate(R.layout.view_webview, container, true);
-                webview = findViewById(R.id.webView);
+                webviewToInflate = findViewById(R.id.webView);
             } catch (Exception e) {
                 // There are various crashes where inflating fails due to a
                 // "Failed to load WebView provider: No WebView installed" exception.
@@ -141,23 +141,23 @@ public abstract class BaseOAuthActivity extends BaseActivity {
                 return;
             }
         }
-        this.webview = webview;
+        this.webview = webviewToInflate;
 
-        webview.setVisibility(View.VISIBLE);
+        webviewToInflate.setVisibility(View.VISIBLE);
 
-        webview.setWebViewClient(webViewClient);
-        webview.getSettings().setJavaScriptEnabled(true);
+        webviewToInflate.setWebViewClient(webViewClient);
+        webviewToInflate.getSettings().setJavaScriptEnabled(true);
 
         // Clear all previous sign-in state.
         CookieManager cookieManager = CookieManager.getInstance();
         cookieManager.removeAllCookies(null);
-        webview.clearCache(true);
+        webviewToInflate.clearCache(true);
 
         // Load the authorization page.
         Timber.d("Initiating authorization request...");
         String authUrl = getAuthorizationUrl();
         if (authUrl != null) {
-            webview.loadUrl(authUrl);
+            webviewToInflate.loadUrl(authUrl);
         }
     }
 

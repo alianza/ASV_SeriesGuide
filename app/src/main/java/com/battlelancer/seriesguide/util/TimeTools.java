@@ -36,6 +36,10 @@ import timber.log.Timber;
  */
 public class TimeTools {
 
+    private TimeTools() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static final int RELEASE_WEEKDAY_UNKNOWN = -1;
     public static final int RELEASE_WEEKDAY_DAILY = 0;
 
@@ -82,6 +86,7 @@ public class TimeTools {
             try {
                 return ZoneId.of(timezone);
             } catch (DateTimeException ignored) {
+                Timber.e(ignored, "Error");
             }
         }
 
@@ -100,8 +105,8 @@ public class TimeTools {
         }
 
         // extract hour and minute, example: "20:30" => hour = 20, minute = 30
-        int hour = Integer.valueOf(localTime.substring(0, 2));
-        int minute = Integer.valueOf(localTime.substring(3, 5));
+        int hour = Integer.parseInt(localTime.substring(0, 2));
+        int minute = Integer.parseInt(localTime.substring(3, 5));
 
         // return int encoded time, e.g. hhmm (2030)
         return hour * 100 + minute;
@@ -136,10 +141,10 @@ public class TimeTools {
                 return DayOfWeek.SUNDAY.getValue();
             case "Daily":
                 return RELEASE_WEEKDAY_DAILY;
+            default:
+                // no match
+                return RELEASE_WEEKDAY_UNKNOWN;
         }
-
-        // no match
-        return RELEASE_WEEKDAY_UNKNOWN;
     }
 
     public static boolean isSameWeekDay(Date episodeDateTime, @Nullable Date showDateTime,
@@ -177,8 +182,7 @@ public class TimeTools {
      * @param showReleaseTime See {@link #getShowReleaseTime(int)}.
      * @return -1 if no conversion was possible. Otherwise, any other long value (may be negative!).
      */
-    public static long parseEpisodeReleaseDate(@Nullable Context context,
-            @NonNull ZoneId showTimeZone, @Nullable String releaseDate,
+    public static long parseEpisodeReleaseDate(@NonNull ZoneId showTimeZone, @Nullable String releaseDate,
             @NonNull LocalTime showReleaseTime, @Nullable String showCountry,
             @Nullable String showNetwork, @NonNull String deviceTimeZone) {
         if (releaseDate == null || releaseDate.length() == 0) {

@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.battlelancer.seriesguide.ui
 
 import androidx.test.filters.LargeTest
@@ -32,7 +34,7 @@ class R7 {
         mActivityTestRule.launchActivity(null)
         val endTime1 = System.currentTimeMillis()
 
-        val launchtime = endTime1 - startTime1;
+        val launchtime = endTime1 - startTime1
 
         println("App launch time: $launchtime ms")
 

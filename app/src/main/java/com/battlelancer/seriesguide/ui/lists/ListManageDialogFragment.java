@@ -1,6 +1,8 @@
 
 package com.battlelancer.seriesguide.ui.lists;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Lists.NAME;
+
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -109,7 +111,7 @@ public class ListManageDialogFragment extends AppCompatDialogFragment {
         // pre-populate list title
         final Cursor list = requireContext().getContentResolver()
                 .query(Lists.buildListUri(listId), new String[] {
-                        Lists.NAME
+                        NAME
                 }, null, null, null);
         if (list == null) {
             // list might have been removed, or query failed

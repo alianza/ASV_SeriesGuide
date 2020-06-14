@@ -129,7 +129,7 @@ public class StickyGridHeadersBaseAdapterWrapper extends BaseAdapter {
      * @return The data at the specified position.
      */
     @Override
-    public Object getItem(int position) throws ArrayIndexOutOfBoundsException {
+    public Object getItem(int position) {
         Position adapterPosition = translatePosition(position);
         if (adapterPosition.mPosition == POSITION_FILLER
                 || adapterPosition.mPosition == POSITION_HEADER) {
@@ -187,7 +187,7 @@ public class StickyGridHeadersBaseAdapterWrapper extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         Position adapterPosition = translatePosition(position);
         if (adapterPosition.mPosition == POSITION_HEADER) {
-            HeaderFillerView v = getHeaderFillerView(adapterPosition.mHeader, convertView, parent);
+            HeaderFillerView v = getHeaderFillerView(convertView);
             View view = mDelegate.getHeaderView(adapterPosition.mHeader, (View)v.getTag(), parent);
             v.setTag(view);
             v.removeAllViews();
@@ -196,9 +196,9 @@ public class StickyGridHeadersBaseAdapterWrapper extends BaseAdapter {
             convertView = v;
             mLastHeaderViewSeen = v;
         } else if (adapterPosition.mPosition == POSITION_HEADER_FILLER) {
-            convertView = getFillerView(convertView, parent, mLastHeaderViewSeen);
+            convertView = getFillerView(convertView, mLastHeaderViewSeen);
         } else if (adapterPosition.mPosition == POSITION_FILLER) {
-            convertView = getFillerView(convertView, parent, mLastViewSeen);
+            convertView = getFillerView(convertView, mLastViewSeen);
         } else {
             convertView = mDelegate.getView(adapterPosition.mPosition, convertView, parent);
             mLastViewSeen = convertView;
@@ -248,7 +248,6 @@ public class StickyGridHeadersBaseAdapterWrapper extends BaseAdapter {
     public void setNumColumns(int numColumns) {
         mNumColumns = numColumns;
         mCounted = false;
-        // notifyDataSetChanged();
     }
 
     @Override
@@ -256,7 +255,7 @@ public class StickyGridHeadersBaseAdapterWrapper extends BaseAdapter {
         mDelegate.unregisterDataSetObserver(observer);
     }
 
-    private FillerView getFillerView(View convertView, ViewGroup parent, View lastViewSeen) {
+    private FillerView getFillerView(View convertView, View lastViewSeen) {
         FillerView fillerView = (FillerView)convertView;
         if (fillerView == null) {
             fillerView = new FillerView(mContext);
@@ -267,8 +266,7 @@ public class StickyGridHeadersBaseAdapterWrapper extends BaseAdapter {
         return fillerView;
     }
 
-    private HeaderFillerView getHeaderFillerView(int headerPosition, View convertView,
-            ViewGroup parent) {
+    private HeaderFillerView getHeaderFillerView(View convertView) {
         HeaderFillerView headerFillerView = (HeaderFillerView)convertView;
         if (headerFillerView == null) {
             headerFillerView = new HeaderFillerView(mContext);
@@ -335,7 +333,6 @@ public class StickyGridHeadersBaseAdapterWrapper extends BaseAdapter {
                 return new Position(adapterPosition, i);
             }
 
-            // Skip past section end of section row filler;
             int filler = unFilledSpacesInHeaderGroup(i);
             adapterPosition -= filler;
             place -= sectionCount + filler;
@@ -391,9 +388,9 @@ public class StickyGridHeadersBaseAdapterWrapper extends BaseAdapter {
 
         @Override
         protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-            heightMeasureSpec = MeasureSpec.makeMeasureSpec(mMeasureTarget.getMeasuredHeight(),
+            int height = MeasureSpec.makeMeasureSpec(mMeasureTarget.getMeasuredHeight(),
                     MeasureSpec.EXACTLY);
-            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+            super.onMeasure(widthMeasureSpec, height);
         }
     }
 

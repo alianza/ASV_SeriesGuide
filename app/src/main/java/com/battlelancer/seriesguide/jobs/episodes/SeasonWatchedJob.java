@@ -1,5 +1,9 @@
 package com.battlelancer.seriesguide.jobs.episodes;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.FIRSTAIREDMS;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.NUMBER;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.WATCHED;
+
 import android.content.Context;
 import android.database.Cursor;
 import android.text.format.DateUtils;
@@ -30,7 +34,7 @@ public class SeasonWatchedJob extends SeasonBaseJob {
             // set watched or skipped
             // do NOT mark watched episodes again to avoid trakt adding a new watch
             // only mark episodes that have been released until within the hour
-            return SeriesGuideContract.Episodes.FIRSTAIREDMS + "<=" + (currentTime
+            return FIRSTAIREDMS + "<=" + (currentTime
                     + DateUtils.HOUR_IN_MILLIS)
                     + " AND " + SeriesGuideContract.Episodes.SELECTION_HAS_RELEASE_DATE
                     + " AND " + SeriesGuideContract.Episodes.SELECTION_UNWATCHED_OR_SKIPPED;
@@ -39,7 +43,7 @@ public class SeasonWatchedJob extends SeasonBaseJob {
 
     @Override
     protected String getDatabaseColumnToUpdate() {
-        return SeriesGuideContract.Episodes.WATCHED;
+        return WATCHED;
     }
 
     private int getLastWatchedEpisodeTvdbId(Context context) {
@@ -56,9 +60,9 @@ public class SeasonWatchedJob extends SeasonBaseJob {
                     SeriesGuideContract.Episodes.buildEpisodesOfSeasonUri(
                             String.valueOf(seasonTvdbId)),
                     BaseEpisodesJob.PROJECTION_EPISODE,
-                    SeriesGuideContract.Episodes.FIRSTAIREDMS + "<=" + (currentTime
+                    FIRSTAIREDMS + "<=" + (currentTime
                             + DateUtils.HOUR_IN_MILLIS), null,
-                    SeriesGuideContract.Episodes.NUMBER + " DESC"
+                    NUMBER + " DESC"
             );
             if (seasonEpisodes != null) {
                 if (seasonEpisodes.moveToFirst()) {

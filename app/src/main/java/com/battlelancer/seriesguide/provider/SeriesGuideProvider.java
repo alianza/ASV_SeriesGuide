@@ -3,14 +3,31 @@ package com.battlelancer.seriesguide.provider;
 import static android.database.sqlite.SQLiteDatabase.CONFLICT_NONE;
 import static android.database.sqlite.SQLiteDatabase.CONFLICT_REPLACE;
 import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Activity;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Activity.EPISODE_TVDB_ID;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Activity._ID;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Activity.buildActivityUri;
 import static com.battlelancer.seriesguide.provider.SeriesGuideContract.EpisodeSearch;
 import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes;
 import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ListItems;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ListItemsColumns.LIST_ITEM_ID;
 import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Lists;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ListsColumns.LIST_ID;
 import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.MoviesColumns.TMDB_ID;
 import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Seasons;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.SeasonsColumns.REF_SEASON_ID;
 import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.CONTENT_ITEM_TYPE;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.RATING_GLOBAL;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.REF_SHOW_ID;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.TITLE;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.buildShowUri;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.getShowId;
 import static com.battlelancer.seriesguide.provider.SeriesGuideDatabase.Tables;
+import static com.battlelancer.seriesguide.provider.SeriesGuideDatabase.Tables.EPISODES_JOIN_SHOWS;
+import static com.battlelancer.seriesguide.provider.SeriesGuideDatabase.Tables.EPISODES_SEARCH;
+import static com.battlelancer.seriesguide.provider.SeriesGuideDatabase.Tables.SHOWS_JOIN_EPISODES_ON_LAST_EPISODE;
+import static com.battlelancer.seriesguide.provider.SeriesGuideDatabase.Tables.SHOWS_JOIN_EPISODES_ON_NEXT_EPISODE;
 
 import android.app.SearchManager;
 import android.content.ContentProvider;
@@ -273,7 +290,7 @@ public class SeriesGuideProvider extends ContentProvider {
             case SHOWS_WITH_NEXT_EPISODE:
                 return Shows.CONTENT_TYPE;
             case SHOWS_ID:
-                return Shows.CONTENT_ITEM_TYPE;
+                return CONTENT_ITEM_TYPE;
             case EPISODES:
             case EPISODES_OFSHOW:
             case EPISODES_OFSEASON:
@@ -355,8 +372,6 @@ public class SeriesGuideProvider extends ContentProvider {
                 if (result != null) {
                     notifyChange = true;
                 }
-                // do not yield as a pre-caution to not break Room invalidation tracker
-                // db.yieldIfContendedSafely();
             }
             room.setTransactionSuccessful();
         } finally {
@@ -390,7 +405,7 @@ public class SeriesGuideProvider extends ContentProvider {
                 if (id < 0) {
                     break;
                 }
-                notifyUri = Shows.buildShowUri(values.getAsString(Shows._ID));
+                notifyUri = buildShowUri(values.getAsString(_ID));
                 break;
             }
             case SEASONS: {
@@ -424,7 +439,7 @@ public class SeriesGuideProvider extends ContentProvider {
                 if (id < 0) {
                     break;
                 }
-                notifyUri = Lists.buildListUri(values.getAsString(Lists.LIST_ID));
+                notifyUri = Lists.buildListUri(values.getAsString(LIST_ID));
                 break;
             }
             case LIST_ITEMS: {
@@ -433,7 +448,7 @@ public class SeriesGuideProvider extends ContentProvider {
                 if (id < 0) {
                     break;
                 }
-                notifyUri = ListItems.buildListItemUri(values.getAsString(ListItems.LIST_ITEM_ID));
+                notifyUri = ListItems.buildListItemUri(values.getAsString(LIST_ITEM_ID));
                 break;
             }
             case MOVIES: {
@@ -441,7 +456,7 @@ public class SeriesGuideProvider extends ContentProvider {
                 if (id < 0) {
                     break;
                 }
-                notifyUri = Movies.buildMovieUri(values.getAsInteger(Movies.TMDB_ID));
+                notifyUri = Movies.buildMovieUri(values.getAsInteger(TMDB_ID));
                 break;
             }
             case ACTIVITY: {
@@ -449,7 +464,7 @@ public class SeriesGuideProvider extends ContentProvider {
                 if (id < 0) {
                     break;
                 }
-                notifyUri = Activity.buildActivityUri(values.getAsString(Activity.EPISODE_TVDB_ID));
+                notifyUri = buildActivityUri(values.getAsString(EPISODE_TVDB_ID));
                 break;
             }
             case JOBS: {
@@ -574,10 +589,6 @@ public class SeriesGuideProvider extends ContentProvider {
             final ContentProviderResult[] results = new ContentProviderResult[numOperations];
             for (int i = 0; i < numOperations; i++) {
                 final ContentProviderOperation operation = operations.get(i);
-                // do not yield as a pre-caution to not break Room invalidation tracker
-//                if (i > 0 && operation.isYieldAllowed()) {
-//                    database.yieldIfContendedSafely();
-//                }
                 results[i] = operation.apply(this, results, i);
             }
             room.setTransactionSuccessful();
@@ -602,23 +613,23 @@ public class SeriesGuideProvider extends ContentProvider {
                 return builder.table(Tables.SHOWS);
             }
             case SHOWS_ID: {
-                final String showId = Shows.getShowId(uri);
-                return builder.table(Tables.SHOWS).where(Shows._ID + "=?", showId);
+                final String showId = getShowId(uri);
+                return builder.table(Tables.SHOWS).where(_ID + "=?", showId);
             }
             case SHOWS_FILTERED: {
                 final String filter = uri.getLastPathSegment();
-                return builder.table(Tables.SHOWS).where(Shows.TITLE + " LIKE ?",
+                return builder.table(Tables.SHOWS).where(TITLE + " LIKE ?",
                         "%" + filter + "%");
             }
             case SHOWS_WITH_LAST_EPISODE: {
-                return builder.table(Tables.SHOWS_JOIN_EPISODES_ON_LAST_EPISODE)
-                        .mapToTable(Shows._ID, Tables.SHOWS)
-                        .mapToTable(Shows.RATING_GLOBAL, Tables.SHOWS);
+                return builder.table(SHOWS_JOIN_EPISODES_ON_LAST_EPISODE)
+                        .mapToTable(_ID, Tables.SHOWS)
+                        .mapToTable(RATING_GLOBAL, Tables.SHOWS);
             }
             case SHOWS_WITH_NEXT_EPISODE: {
-                return builder.table(Tables.SHOWS_JOIN_EPISODES_ON_NEXT_EPISODE)
-                        .mapToTable(Shows._ID, Tables.SHOWS)
-                        .mapToTable(Shows.RATING_GLOBAL, Tables.SHOWS);
+                return builder.table(SHOWS_JOIN_EPISODES_ON_NEXT_EPISODE)
+                        .mapToTable(_ID, Tables.SHOWS)
+                        .mapToTable(RATING_GLOBAL, Tables.SHOWS);
             }
             case EPISODES: {
                 return builder.table(Tables.EPISODES);
@@ -629,27 +640,27 @@ public class SeriesGuideProvider extends ContentProvider {
             }
             case EPISODES_OFSHOW: {
                 final String showId = uri.getPathSegments().get(2);
-                return builder.table(Tables.EPISODES).where(Shows.REF_SHOW_ID + "=?", showId);
+                return builder.table(Tables.EPISODES).where(REF_SHOW_ID + "=?", showId);
             }
             case EPISODES_OFSEASON: {
                 final String seasonId = uri.getPathSegments().get(2);
-                return builder.table(Tables.EPISODES).where(Seasons.REF_SEASON_ID + "=?", seasonId);
+                return builder.table(Tables.EPISODES).where(REF_SEASON_ID + "=?", seasonId);
             }
             case EPISODES_OFSEASON_WITHSHOW: {
                 final String seasonId = uri.getPathSegments().get(3);
-                return builder.table(Tables.EPISODES_JOIN_SHOWS)
+                return builder.table(EPISODES_JOIN_SHOWS)
                         .mapToTable(Episodes._ID, Tables.EPISODES)
                         .mapToTable(Episodes.RATING_GLOBAL, Tables.EPISODES)
-                        .where(Seasons.REF_SEASON_ID + "=?", seasonId);
+                        .where(REF_SEASON_ID + "=?", seasonId);
             }
             case EPISODES_WITHSHOW: {
-                return builder.table(Tables.EPISODES_JOIN_SHOWS)
+                return builder.table(EPISODES_JOIN_SHOWS)
                         .mapToTable(Episodes._ID, Tables.EPISODES)
                         .mapToTable(Episodes.RATING_GLOBAL, Tables.EPISODES);
             }
             case EPISODES_ID_WITHSHOW: {
                 final String episodeId = Episodes.getEpisodeId(uri);
-                return builder.table(Tables.EPISODES_JOIN_SHOWS)
+                return builder.table(EPISODES_JOIN_SHOWS)
                         .mapToTable(Episodes._ID, Tables.EPISODES)
                         .mapToTable(Episodes.RATING_GLOBAL, Tables.EPISODES)
                         .where(Qualified.EPISODES_EPISODE_ID + "=?", episodeId);
@@ -663,11 +674,11 @@ public class SeriesGuideProvider extends ContentProvider {
             }
             case SEASONS_OFSHOW: {
                 final String showId = uri.getPathSegments().get(2);
-                return builder.table(Tables.SEASONS).where(Shows.REF_SHOW_ID + "=?", showId);
+                return builder.table(Tables.SEASONS).where(REF_SHOW_ID + "=?", showId);
             }
             case EPISODESEARCH_ID: {
                 final String rowid = EpisodeSearch.getDocId(uri);
-                return builder.table(Tables.EPISODES_SEARCH).where(EpisodeSearch._DOCID + "=?",
+                return builder.table(EPISODES_SEARCH).where(EpisodeSearch._DOCID + "=?",
                         rowid);
             }
             case LISTS: {
@@ -675,7 +686,7 @@ public class SeriesGuideProvider extends ContentProvider {
             }
             case LISTS_ID: {
                 final String listId = Lists.getId(uri);
-                return builder.table(Tables.LISTS).where(Lists.LIST_ID + "=?", listId);
+                return builder.table(Tables.LISTS).where(LIST_ID + "=?", listId);
             }
             case LISTS_WITH_LIST_ITEM_ID: {
                 final String itemId = uri.getPathSegments().get(2);
@@ -692,7 +703,7 @@ public class SeriesGuideProvider extends ContentProvider {
             }
             case LIST_ITEMS_ID: {
                 final String list_item_id = ListItems.getId(uri);
-                return builder.table(Tables.LIST_ITEMS).where(ListItems.LIST_ITEM_ID + "=?",
+                return builder.table(Tables.LIST_ITEMS).where(LIST_ITEM_ID + "=?",
                         list_item_id);
             }
             case LIST_ITEMS_WITH_DETAILS: {
@@ -703,7 +714,7 @@ public class SeriesGuideProvider extends ContentProvider {
             }
             case MOVIES_ID: {
                 final String movieId = Movies.getId(uri);
-                return builder.table(Tables.MOVIES).where(Movies.TMDB_ID + "=?", movieId);
+                return builder.table(Tables.MOVIES).where(TMDB_ID + "=?", movieId);
             }
             case ACTIVITY: {
                 return builder.table(Tables.ACTIVITY);
@@ -725,7 +736,7 @@ public class SeriesGuideProvider extends ContentProvider {
 
         String LISTS_LIST_ITEM_ID = "SELECT * FROM "
                 + Tables.LIST_ITEMS + " WHERE "
-                + ListItems.LIST_ITEM_ID + " LIKE ";
+                + LIST_ITEM_ID + " LIKE ";
     }
 
     /**
@@ -736,8 +747,8 @@ public class SeriesGuideProvider extends ContentProvider {
 
         String EPISODES_EPISODE_ID = Tables.EPISODES + "." + Episodes._ID;
 
-        String LISTS_LIST_ID = Tables.LISTS + "." + Lists.LIST_ID;
+        String LISTS_LIST_ID = Tables.LISTS + "." + LIST_ID;
 
-        String LIST_ITEMS_LIST_ID = Tables.LIST_ITEMS + "." + Lists.LIST_ID;
+        String LIST_ITEMS_LIST_ID = Tables.LIST_ITEMS + "." + LIST_ID;
     }
 }

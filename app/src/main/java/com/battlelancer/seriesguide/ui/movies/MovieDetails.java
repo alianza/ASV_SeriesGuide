@@ -1,9 +1,27 @@
 package com.battlelancer.seriesguide.ui.movies;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.IMDB_ID;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.IN_COLLECTION;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.IN_WATCHLIST;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.LAST_UPDATED;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.OVERVIEW;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.PLAYS;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.POSTER;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.RATING_TMDB;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.RATING_TRAKT;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.RATING_VOTES_TMDB;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.RATING_VOTES_TRAKT;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.RELEASED_UTC_MS;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.RUNTIME_MIN;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.TITLE;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.TITLE_NOARTICLE;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.TMDB_ID;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.WATCHED;
+import static com.battlelancer.seriesguide.util.DBUtils.convertBooleanToInt;
+import static com.battlelancer.seriesguide.util.DBUtils.trimLeadingArticle;
+
 import android.content.ContentValues;
 import androidx.annotation.Nullable;
-import com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies;
-import com.battlelancer.seriesguide.util.DBUtils;
 import com.uwetrottmann.tmdb2.entities.Movie;
 import com.uwetrottmann.trakt5.entities.Ratings;
 import java.util.Date;
@@ -84,28 +102,28 @@ public class MovieDetails {
 
         // data from trakt
         if (traktRatings != null) {
-            values.put(Movies.RATING_TRAKT, traktRatings.rating != null ? traktRatings.rating : 0);
-            values.put(Movies.RATING_VOTES_TRAKT, traktRatings.votes != null
+            values.put(RATING_TRAKT, traktRatings.rating != null ? traktRatings.rating : 0);
+            values.put(RATING_VOTES_TRAKT, traktRatings.votes != null
                     ? traktRatings.votes : 0);
         }
 
         // data from TMDb
         if (tmdbMovie != null) {
-            values.put(Movies.IMDB_ID, tmdbMovie.imdb_id);
-            values.put(Movies.TITLE, tmdbMovie.title);
-            values.put(Movies.TITLE_NOARTICLE,
-                    DBUtils.trimLeadingArticle(tmdbMovie.title));
-            values.put(Movies.OVERVIEW, tmdbMovie.overview);
-            values.put(Movies.POSTER, tmdbMovie.poster_path);
-            values.put(Movies.RUNTIME_MIN, tmdbMovie.runtime != null ? tmdbMovie.runtime : 0);
-            values.put(Movies.RATING_TMDB, tmdbMovie.vote_average != null
+            values.put(IMDB_ID, tmdbMovie.imdb_id);
+            values.put(TITLE, tmdbMovie.title);
+            values.put(TITLE_NOARTICLE,
+                    trimLeadingArticle(tmdbMovie.title));
+            values.put(OVERVIEW, tmdbMovie.overview);
+            values.put(POSTER, tmdbMovie.poster_path);
+            values.put(RUNTIME_MIN, tmdbMovie.runtime != null ? tmdbMovie.runtime : 0);
+            values.put(RATING_TMDB, tmdbMovie.vote_average != null
                     ? tmdbMovie.vote_average : 0);
-            values.put(Movies.RATING_VOTES_TMDB, tmdbMovie.vote_count != null
+            values.put(RATING_VOTES_TMDB, tmdbMovie.vote_count != null
                     ? tmdbMovie.vote_count : 0);
             // if there is no release date, store Long.MAX as it is likely in the future
             // also helps correctly sorting movies by release date
             Date releaseDate = tmdbMovie.release_date;
-            values.put(Movies.RELEASED_UTC_MS,
+            values.put(RELEASED_UTC_MS,
                     releaseDate == null ? Long.MAX_VALUE : releaseDate.getTime());
         }
 
@@ -118,17 +136,17 @@ public class MovieDetails {
      */
     public ContentValues toContentValuesInsert() {
         ContentValues values = toContentValuesUpdate();
-        values.put(Movies.TMDB_ID, tmdbMovie.id);
-        values.put(Movies.IN_COLLECTION, DBUtils.convertBooleanToInt(inCollection));
-        values.put(Movies.IN_WATCHLIST, DBUtils.convertBooleanToInt(inWatchlist));
-        values.put(Movies.WATCHED, DBUtils.convertBooleanToInt(isWatched));
+        values.put(TMDB_ID, tmdbMovie.id);
+        values.put(IN_COLLECTION, convertBooleanToInt(inCollection));
+        values.put(IN_WATCHLIST, convertBooleanToInt(inWatchlist));
+        values.put(WATCHED, convertBooleanToInt(isWatched));
         // set default values
-        values.put(Movies.PLAYS, 0);
-        values.put(Movies.RATING_TMDB, 0);
-        values.put(Movies.RATING_VOTES_TMDB, 0);
-        values.put(Movies.RATING_TRAKT, 0);
-        values.put(Movies.RATING_VOTES_TRAKT, 0);
-        values.put(Movies.LAST_UPDATED, System.currentTimeMillis());
+        values.put(PLAYS, 0);
+        values.put(RATING_TMDB, 0);
+        values.put(RATING_VOTES_TMDB, 0);
+        values.put(RATING_TRAKT, 0);
+        values.put(RATING_VOTES_TRAKT, 0);
+        values.put(LAST_UPDATED, System.currentTimeMillis());
         return values;
     }
 }

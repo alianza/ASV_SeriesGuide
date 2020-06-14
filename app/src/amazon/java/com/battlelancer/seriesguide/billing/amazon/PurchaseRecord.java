@@ -10,30 +10,30 @@ package com.battlelancer.seriesguide.billing.amazon;
  * the to valid to date is the optional cancel date of the purchase.
  */
 public class PurchaseRecord {
-    public static int VALID_TO_DATE_NOT_SET = -1;
+    static final int VALID_TO_DATE_NOT_SET = -1;
     private String amazonReceiptId;
     private long validFrom;
     private long validTo = VALID_TO_DATE_NOT_SET;
     private String amazonUserId;
     private String sku;
 
-    public long getValidFrom() {
+    long getValidFrom() {
         return validFrom;
     }
 
-    public void setValidFrom(final long validFrom) {
+    void setValidFrom(final long validFrom) {
         this.validFrom = validFrom;
     }
 
-    public long getValidTo() {
+    long getValidTo() {
         return validTo;
     }
 
-    public void setValidTo(final long subscriptionTo) {
+    void setValidTo(final long subscriptionTo) {
         this.validTo = subscriptionTo;
     }
 
-    public boolean isActiveNow() {
+    boolean isActiveNow() {
         return VALID_TO_DATE_NOT_SET == validTo;
     }
 

@@ -99,7 +99,7 @@ public class OverviewActivity extends BaseMessageActivity {
             // ...multi-pane overview and seasons fragment
 
             // clear up left-over fragments from single-pane layout
-            boolean isSwitchingLayouts = getActiveFragments().size() != 0;
+            boolean isSwitchingLayouts = getActiveFragments().isEmpty();
             for (Fragment fragment : getActiveFragments()) {
                 getSupportFragmentManager().beginTransaction().remove(fragment).commit();
             }
@@ -176,14 +176,12 @@ public class OverviewActivity extends BaseMessageActivity {
         }
     }
 
-    public ArrayList<Fragment> getActiveFragments() {
+    public List<Fragment> getActiveFragments() {
         ArrayList<Fragment> ret = new ArrayList<>();
         for (WeakReference<Fragment> ref : fragments) {
             Fragment f = ref.get();
-            if (f != null) {
-                if (f.isAdded()) {
-                    ret.add(f);
-                }
+            if (f != null && f.isAdded()) {
+                ret.add(f);
             }
         }
         return ret;

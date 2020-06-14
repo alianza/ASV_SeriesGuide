@@ -1,5 +1,10 @@
 package com.battlelancer.seriesguide.sync;
 
+import static android.provider.BaseColumns._ID;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Shows.CONTENT_URI;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ShowsColumns.LASTUPDATED;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ShowsColumns.RELEASE_WEEKDAY;
+
 import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -17,6 +22,7 @@ import dagger.Lazy;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import timber.log.Timber;
 
 public class TvdbSync {
@@ -51,10 +57,8 @@ public class TvdbSync {
         hasUpdatedShows = false;
 
         int[] showsToUpdate = getShowsToUpdate(context, resolver, currentTime);
-        if (showsToUpdate == null) {
-            return null;
-        }
-        Timber.d("Updating %d show(s)...", showsToUpdate.length);
+
+        Timber.d("Updating %d show(s)...", Objects.requireNonNull(showsToUpdate).length);
 
         // from here on we need more sophisticated abort handling, so keep track of errors
         SgSyncAdapter.UpdateResult resultCode = SgSyncAdapter.UpdateResult.SUCCESS;
@@ -92,7 +96,7 @@ public class TvdbSync {
                 Timber.e(e, message);
 
                 Throwable cause = e.getCause();
-                if (cause != null && cause instanceof SocketTimeoutException) {
+                if (cause instanceof SocketTimeoutException) {
                     consecutiveTimeouts++;
                 } else if (consecutiveTimeouts > 0) {
                     consecutiveTimeouts--;
@@ -114,25 +118,24 @@ public class TvdbSync {
     @Nullable
     private int[] getShowsToUpdate(Context context, ContentResolver resolver, long currentTime) {
         switch (syncType) {
-            case SINGLE: {
+            case SINGLE:
                 int showTvdbId = singleShowTvdbId;
                 if (showTvdbId == 0) {
                     Timber.e("Syncing...ABORT_INVALID_SHOW_TVDB_ID");
-                    return null;
+                    return new int[0];
                 }
                 return new int[]{showTvdbId};
-            }
-            case FULL: {
+            case FULL:
                 // get all show IDs for a full update
                 final Cursor showsQuery = resolver.query(
-                        SeriesGuideContract.Shows.CONTENT_URI,
+                        CONTENT_URI,
                         new String[]{
-                                SeriesGuideContract.Shows._ID
+                                _ID
                         }, null, null, null
                 );
                 if (showsQuery == null) {
                     Timber.e("Syncing...ABORT_SHOW_QUERY_FAILED");
-                    return null;
+                    return new int[0];
                 }
 
                 int[] showIds = new int[showsQuery.getCount()];
@@ -143,7 +146,6 @@ public class TvdbSync {
                 }
                 showsQuery.close();
                 return showIds;
-            }
             case DELTA:
                 return getShowsToDeltaUpdate(context, resolver, currentTime);
             default:
@@ -159,13 +161,13 @@ public class TvdbSync {
             long currentTime) {
         // get existing show ids
         final Cursor shows = resolver
-                .query(SeriesGuideContract.Shows.CONTENT_URI, new String[]{
-                        SeriesGuideContract.Shows._ID, SeriesGuideContract.Shows.LASTUPDATED,
-                        SeriesGuideContract.Shows.RELEASE_WEEKDAY
+                .query(CONTENT_URI, new String[]{
+                        _ID, LASTUPDATED,
+                        RELEASE_WEEKDAY
                 }, null, null, null);
         if (shows == null) {
             Timber.e("Syncing...ABORT_SHOW_QUERY_FAILED");
-            return null;
+            return new int[0];
         }
 
         final List<Integer> updatableShowIds = new ArrayList<>();

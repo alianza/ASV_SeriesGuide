@@ -1,5 +1,7 @@
 package com.battlelancer.seriesguide.ui.shows;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ShowsColumns.TITLE;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
@@ -127,7 +129,7 @@ public class RemoveShowDialogFragment extends AppCompatDialogFragment {
             final Cursor show = context.getContentResolver().query(
                     Shows.buildShowUri(showTvdbId),
                     new String[] {
-                            Shows.TITLE
+                            TITLE
                     }, null, null, null
             );
             if (show != null) {

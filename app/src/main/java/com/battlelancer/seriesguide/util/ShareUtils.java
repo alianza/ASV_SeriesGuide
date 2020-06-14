@@ -19,6 +19,10 @@ import com.battlelancer.seriesguide.thetvdbapi.TvdbLinks;
  */
 public class ShareUtils {
 
+    private ShareUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static void shareEpisode(Activity activity, @Nullable String showTvdbSlug,
             int showTvdbId, int seasonTvdbId, int episodeTvdbId, int seasonNumber,
             int episodeNumber, String showTitle, String episodeTitle) {

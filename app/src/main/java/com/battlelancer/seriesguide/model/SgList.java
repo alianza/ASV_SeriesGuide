@@ -1,32 +1,36 @@
 package com.battlelancer.seriesguide.model;
 
+import static android.provider.BaseColumns._ID;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Lists.LIST_ID;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Lists.NAME;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Lists.ORDER;
+
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
-import com.battlelancer.seriesguide.provider.SeriesGuideContract.Lists;
 import com.battlelancer.seriesguide.provider.SeriesGuideDatabase.Tables;
 
 /**
  * Note: ensure to use CONFLICT_REPLACE when inserting to mimic SQLite UNIQUE x ON CONFLICT REPLACE.
  */
 @Entity(tableName = Tables.LISTS,
-        indices = {@Index(value = Lists.LIST_ID, unique = true)})
+        indices = {@Index(value = LIST_ID, unique = true)})
 public class SgList {
 
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = Lists._ID)
+    @ColumnInfo(name = _ID)
     public Integer id;
 
     /**
      * Unique string identifier.
      */
-    @ColumnInfo(name = Lists.LIST_ID)
+    @ColumnInfo(name = LIST_ID)
     @NonNull
     public String listId;
 
-    @ColumnInfo(name = Lists.NAME)
+    @ColumnInfo(name = NAME)
     @NonNull
     public String name;
 
@@ -37,7 +41,7 @@ public class SgList {
      * Default: 0
      * </pre>
      */
-    @ColumnInfo(name = Lists.ORDER)
+    @ColumnInfo(name = ORDER)
     public Integer order = 0;
 
 }

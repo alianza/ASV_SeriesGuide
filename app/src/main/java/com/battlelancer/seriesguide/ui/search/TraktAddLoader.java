@@ -92,7 +92,7 @@ public class TraktAddLoader extends GenericSimpleLoader<TraktAddLoader.Result> {
         }
 
         // return empty list right away if there are no results
-        if (shows.size() == 0) {
+        if (shows.isEmpty()) {
             return buildResultSuccess(new LinkedList<>());
         }
 
@@ -143,8 +143,11 @@ public class TraktAddLoader extends GenericSimpleLoader<TraktAddLoader.Result> {
             result.setTvdbid(show.ids.tvdb);
             result.setTitle(show.title);
             // search results return an overview, while trending and other lists do not
-            result.setOverview(!TextUtils.isEmpty(show.overview) ? show.overview
-                    : show.year != null ? String.valueOf(show.year) : "");
+            if (!TextUtils.isEmpty(show.overview)) {
+                result.setOverview(show.overview);
+            } else {
+                result.setOverview(show.year != null ? String.valueOf(show.year) : "");
+            }
             if (existingPosterPaths != null && existingPosterPaths.indexOfKey(show.ids.tvdb) >= 0) {
                 // is already in local database
                 result.setState(SearchResult.STATE_ADDED);

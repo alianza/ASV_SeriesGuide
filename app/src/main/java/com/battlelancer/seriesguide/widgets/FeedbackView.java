@@ -38,10 +38,6 @@ public class FeedbackView extends FrameLayout {
         int FEEDBACK = 2;
     }
 
-    private static final String ACTION_QUESTION_ENJOY = "Enjoy";
-    private static final String ACTION_QUESTION_RATE = "Rate";
-    private static final String ACTION_QUESTION_FEEDBACK = "Feedback";
-
     private TextView questionTextView;
     private Button negativeButton;
     private Button positiveButton;

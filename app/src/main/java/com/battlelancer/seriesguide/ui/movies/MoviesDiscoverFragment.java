@@ -39,6 +39,7 @@ public class MoviesDiscoverFragment extends Fragment {
     private Unbinder unbinder;
 
     public MoviesDiscoverFragment() {
+        // Empty
     }
 
     @Override

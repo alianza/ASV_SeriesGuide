@@ -45,10 +45,8 @@ public abstract class MovieJob extends BaseJob implements FlagJob {
         }
 
         // persist network job after successful local updates
-        if (requiresNetworkJob) {
-            if (!persistNetworkJob(context, networkJobInfo)) {
-                return false;
-            }
+        if (requiresNetworkJob && !persistNetworkJob(context, networkJobInfo)) {
+            return false;
         }
 
         // post event to update button states

@@ -1,5 +1,11 @@
 package com.battlelancer.seriesguide.traktapi;
 
+import static com.battlelancer.seriesguide.enums.NetworkResult.OFFLINE;
+import static com.battlelancer.seriesguide.enums.Result.ERROR;
+import static com.battlelancer.seriesguide.enums.Result.SUCCESS;
+import static com.battlelancer.seriesguide.traktapi.TraktResult.API_ERROR;
+import static com.battlelancer.seriesguide.traktapi.TraktResult.AUTH_ERROR;
+
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -111,7 +117,7 @@ public class TraktAuthActivity extends BaseOAuthActivity {
         taskFragment.setTask(null);
 
         int resultCode = event.resultCode;
-        if (resultCode == TraktResult.SUCCESS) {
+        if (resultCode == SUCCESS) {
             // if we got here, looks like credentials were stored successfully
             finish();
             return;
@@ -120,14 +126,14 @@ public class TraktAuthActivity extends BaseOAuthActivity {
         // handle errors
         String errorText;
         switch (resultCode) {
-            case TraktResult.OFFLINE:
+            case OFFLINE:
                 errorText = getString(R.string.offline);
                 break;
-            case TraktResult.API_ERROR:
+            case API_ERROR:
                 errorText = getString(R.string.api_error_generic, getString(R.string.trakt));
                 break;
-            case TraktResult.AUTH_ERROR:
-            case TraktResult.ERROR:
+            case AUTH_ERROR:
+            case ERROR:
             default:
                 errorText = getString(R.string.trakt_error_credentials);
                 break;

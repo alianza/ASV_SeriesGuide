@@ -1,12 +1,14 @@
 package com.battlelancer.seriesguide.ui.lists;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ListItems;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Lists;
+
 import android.content.Context;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import com.battlelancer.seriesguide.provider.SeriesGuideContract;
 import com.battlelancer.seriesguide.util.tasks.AddListTask;
 import com.battlelancer.seriesguide.util.tasks.ChangeListItemListsTask;
 import com.battlelancer.seriesguide.util.tasks.RemoveListItemTask;
@@ -27,19 +29,19 @@ public class ListsTools {
 
     public interface Query {
         String[] PROJECTION_LIST_ID = new String[] {
-                SeriesGuideContract.Lists.LIST_ID
+                Lists.LIST_ID
         };
         String[] PROJECTION_LIST = new String[] {
-                SeriesGuideContract.Lists.LIST_ID,
-                SeriesGuideContract.Lists.NAME,
-                SeriesGuideContract.Lists.ORDER
+                Lists.LIST_ID,
+                Lists.NAME,
+                Lists.ORDER
         };
         int LIST_ID = 0;
         int NAME = 1;
         int ORDER = 2;
 
         String[] PROJECTION_LIST_ITEMS = new String[] {
-                SeriesGuideContract.ListItems.LIST_ITEM_ID
+                ListItems.LIST_ITEM_ID
         };
         int LIST_ITEM_ID = 0;
     }
@@ -84,7 +86,7 @@ public class ListsTools {
      * @return null if there was an error, empty list if there are no lists.
      */
     public static HashSet<String> getListIds(Context context) {
-        Cursor query = context.getContentResolver().query(SeriesGuideContract.Lists.CONTENT_URI,
+        Cursor query = context.getContentResolver().query(Lists.CONTENT_URI,
                 Query.PROJECTION_LIST_ID, null, null, null);
         if (query == null) {
             return null;
@@ -107,9 +109,9 @@ public class ListsTools {
      */
     public static HashSet<String> getListItemIds(Context context, String listId) {
         SELECTION_ARG[0] = listId;
-        Cursor query = context.getContentResolver().query(SeriesGuideContract.ListItems.CONTENT_URI,
+        Cursor query = context.getContentResolver().query(ListItems.CONTENT_URI,
                 Query.PROJECTION_LIST_ITEMS,
-                SeriesGuideContract.ListItems.SELECTION_LIST,
+                ListItems.SELECTION_LIST,
                 SELECTION_ARG, null);
         if (query == null) {
             return null;
@@ -129,18 +131,18 @@ public class ListsTools {
     public static List<SgListItem> getListItems(Context context, String listId) {
         SELECTION_ARG[0] = listId;
         Cursor query = context.getContentResolver()
-                .query(SeriesGuideContract.ListItems.CONTENT_URI,
+                .query(ListItems.CONTENT_URI,
                         Query.PROJECTION_LIST_ITEMS,
-                        SeriesGuideContract.ListItems.SELECTION_LIST,
+                        ListItems.SELECTION_LIST,
                         SELECTION_ARG, null);
         if (query == null) {
-            return null; // query failed
+            return new ArrayList<>(); // query failed
         }
 
         int itemCount = query.getCount();
         if (itemCount == 0) {
             query.close();
-            return null; // no items in this list
+            return new ArrayList<>(); // no items in this list
         }
 
         List<SgListItem> items = new ArrayList<>(itemCount);

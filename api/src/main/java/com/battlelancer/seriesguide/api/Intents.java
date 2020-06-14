@@ -7,6 +7,10 @@ import android.content.Intent;
  */
 public class Intents {
 
+    private Intents() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static final String ACTION_VIEW_EPISODE
             = "com.battlelancer.seriesguide.api.action.VIEW_EPISODE";
 

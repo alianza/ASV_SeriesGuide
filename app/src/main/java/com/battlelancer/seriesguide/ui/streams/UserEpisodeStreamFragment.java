@@ -1,5 +1,8 @@
 package com.battlelancer.seriesguide.ui.streams;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.NUMBER;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.SEASON;
+
 import android.database.Cursor;
 import android.os.Bundle;
 import android.widget.ListAdapter;
@@ -8,6 +11,7 @@ import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 import com.battlelancer.seriesguide.provider.SeriesGuideContract;
 import com.battlelancer.seriesguide.ui.search.AddShowDialogFragment;
+import com.battlelancer.seriesguide.ui.streams.SectionedHistoryAdapter.OnItemClickListener;
 
 /**
  * Displays the latest trakt episode activity of the user.
@@ -38,7 +42,7 @@ public class UserEpisodeStreamFragment extends StreamFragment {
                         activityLoaderCallbacks);
     }
 
-    private EpisodeHistoryAdapter.OnItemClickListener itemClickListener = (view, item) -> {
+    private OnItemClickListener itemClickListener = (view, item) -> {
         if (item == null) {
             return;
         }
@@ -53,8 +57,8 @@ public class UserEpisodeStreamFragment extends StreamFragment {
                 SeriesGuideContract.Episodes.buildEpisodesOfShowUri(item.show.ids.tvdb),
                 new String[]{
                         SeriesGuideContract.Episodes._ID
-                }, SeriesGuideContract.Episodes.NUMBER + "=" + item.episode.number + " AND "
-                        + SeriesGuideContract.Episodes.SEASON + "=" + item.episode.season, null,
+                }, NUMBER + "=" + item.episode.number + " AND "
+                        + SEASON + "=" + item.episode.season, null,
                 null
         );
         if (episodeQuery == null) {

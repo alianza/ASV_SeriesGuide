@@ -278,8 +278,9 @@ public class NowAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 return ViewType.MORE_LINK;
             case ItemType.HEADER:
                 return ViewType.HEADER;
+            default:
+                return 0;
         }
-        return 0;
     }
 
     protected Context getContext() {

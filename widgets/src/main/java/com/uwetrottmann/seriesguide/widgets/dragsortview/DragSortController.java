@@ -1,5 +1,6 @@
 package com.uwetrottmann.seriesguide.widgets.dragsortview;
 
+import android.annotation.SuppressLint;
 import android.graphics.Point;
 import android.view.GestureDetector;
 import android.view.HapticFeedbackConstants;
@@ -235,6 +236,7 @@ public class DragSortController extends SimpleFloatViewManager
         return mDragging;
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouch(View v, MotionEvent ev) {
         if (!mDslv.isDragEnabled() || mDslv.listViewIntercepted()) {
@@ -260,10 +262,13 @@ public class DragSortController extends SimpleFloatViewManager
                         mDslv.stopDragWithVelocity(true, 0);
                     }
                 }
+                break;
             case MotionEvent.ACTION_CANCEL:
                 mIsRemoving = false;
                 mDragging = false;
                 break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + action);
         }
 
         return false;
@@ -321,7 +326,6 @@ public class DragSortController extends SimpleFloatViewManager
         final int numFooters = mDslv.getFooterViewsCount();
         final int count = mDslv.getCount();
 
-        // Log.d("mobeta", "touch down on position " + itemnum);
         // We're only interested if the touch was on an
         // item that's not a header or footer.
         if (touchPos != AdapterView.INVALID_POSITION && touchPos >= numHeaders
@@ -403,7 +407,6 @@ public class DragSortController extends SimpleFloatViewManager
 
     @Override
     public void onLongPress(MotionEvent e) {
-        // Log.d("mobeta", "lift listener long pressed");
         if (mHitPos != MISS && mDragInitMode == ON_LONG_PRESS) {
             mDslv.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
             startDrag(mHitPos, mCurrX - mItemX, mCurrY - mItemY);
@@ -419,10 +422,8 @@ public class DragSortController extends SimpleFloatViewManager
     // complete the OnGestureListener interface
     @Override
     public boolean onSingleTapUp(MotionEvent ev) {
-        if (mRemoveEnabled && mRemoveMode == CLICK_REMOVE) {
-            if (mClickRemoveHitPos != MISS) {
-                mDslv.removeItem(mClickRemoveHitPos - mDslv.getHeaderViewsCount());
-            }
+        if (mRemoveEnabled && mRemoveMode == CLICK_REMOVE && mClickRemoveHitPos != MISS) {
+            mDslv.removeItem(mClickRemoveHitPos - mDslv.getHeaderViewsCount());
         }
         return true;
     }
@@ -438,7 +439,6 @@ public class DragSortController extends SimpleFloatViewManager
                 @Override
                 public final boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
                         float velocityY) {
-                    // Log.d("mobeta", "on fling remove called");
                     if (mRemoveEnabled && mIsRemoving) {
                         int w = mDslv.getWidth();
                         int minPos = w / 5;
@@ -446,10 +446,8 @@ public class DragSortController extends SimpleFloatViewManager
                             if (mPositionX > -minPos) {
                                 mDslv.stopDragWithVelocity(true, velocityX);
                             }
-                        } else if (velocityX < -mFlingSpeed) {
-                            if (mPositionX < minPos) {
-                                mDslv.stopDragWithVelocity(true, velocityX);
-                            }
+                        } else if (velocityX < -mFlingSpeed && mPositionX < minPos) {
+                            mDslv.stopDragWithVelocity(true, velocityX);
                         }
                         mIsRemoving = false;
                     }

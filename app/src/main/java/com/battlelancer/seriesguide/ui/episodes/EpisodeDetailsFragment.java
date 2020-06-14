@@ -674,8 +674,7 @@ public class EpisodeDetailsFragment extends Fragment implements EpisodeActionsCo
                         Timber.d("onLoadFinished: received %s actions for %s", data.size(),
                                 episodeTvdbId);
                     }
-                    ActionsHelper.populateActions(requireActivity().getLayoutInflater(),
-                            requireActivity().getTheme(), bindingActions.containerEpisodeActions,
+                    ActionsHelper.populateActions(requireActivity().getLayoutInflater(), bindingActions.containerEpisodeActions,
                             data);
                 }
 

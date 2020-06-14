@@ -60,10 +60,8 @@ abstract class MoviesBaseFragment : Fragment(), LoaderManager.LoaderCallbacks<Cu
             .observe(
                 viewLifecycleOwner,
                 Observer {
-                    if (it != null) {
-                        if (it.tabPosition == getTabPosition(it.isShowingNowTab)) {
-                            gridView.smoothScrollToPosition(0)
-                        }
+                    if (it != null && it.tabPosition == getTabPosition(it.isShowingNowTab)) {
+                        gridView.smoothScrollToPosition(0)
                     }
                 }
             )

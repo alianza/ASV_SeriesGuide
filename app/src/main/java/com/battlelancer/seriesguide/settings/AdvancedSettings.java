@@ -3,11 +3,16 @@ package com.battlelancer.seriesguide.settings;
 
 import android.content.Context;
 import androidx.preference.PreferenceManager;
+import timber.log.Timber;
 
 /**
  * Access advanced settings for auto backup and auto update.
  */
 public class AdvancedSettings {
+
+    private AdvancedSettings() {
+        throw new IllegalStateException("Utility class");
+    }
 
     private static final String KEY_LAST_SUPPORTER_STATE
             = "com.battlelancer.seriesguide.lastupgradestate";
@@ -42,6 +47,7 @@ public class AdvancedSettings {
                     .getDefaultSharedPreferences(context).getString(
                             KEY_UPCOMING_LIMIT, "3"));
         } catch (NumberFormatException ignored) {
+            Timber.e(ignored, "getUpcomingLimitInDays: ");
         }
 
         return upcomingLimit;

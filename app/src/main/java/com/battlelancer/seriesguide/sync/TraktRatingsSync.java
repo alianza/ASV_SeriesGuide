@@ -7,6 +7,7 @@ import android.text.format.DateUtils;
 import androidx.annotation.Nullable;
 import androidx.preference.PreferenceManager;
 import com.battlelancer.seriesguide.provider.SeriesGuideContract;
+import com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies;
 import com.battlelancer.seriesguide.traktapi.SgTrakt;
 import com.battlelancer.seriesguide.traktapi.TraktCredentials;
 import com.battlelancer.seriesguide.traktapi.TraktSettings;
@@ -24,7 +25,7 @@ import org.threeten.bp.OffsetDateTime;
 import retrofit2.Response;
 import timber.log.Timber;
 
-public class TraktRatingsSync {
+class TraktRatingsSync {
 
     private Context context;
     private Sync traktSync;
@@ -39,7 +40,7 @@ public class TraktRatingsSync {
      *
      * <p> To apply all ratings, set {@link TraktSettings#KEY_LAST_SHOWS_RATED_AT} to 0.
      */
-    public boolean downloadForShows(@Nullable OffsetDateTime ratedAt) {
+    boolean downloadForShows(@Nullable OffsetDateTime ratedAt) {
         if (ratedAt == null) {
             Timber.e("downloadForShows: null rated_at");
             return false;
@@ -105,7 +106,7 @@ public class TraktRatingsSync {
             // if a show does not exist, this update will do nothing
             ContentProviderOperation op = ContentProviderOperation.newUpdate(
                     SeriesGuideContract.Shows.buildShowUri(show.show.ids.tvdb))
-                    .withValue(SeriesGuideContract.Shows.RATING_USER, show.rating.value)
+                    .withValue(SeriesGuideContract.ShowsColumns.RATING_USER, show.rating.value)
                     .build();
             batch.add(op);
         }
@@ -135,7 +136,7 @@ public class TraktRatingsSync {
      *
      * <p> To apply all ratings, set {@link TraktSettings#KEY_LAST_EPISODES_RATED_AT} to 0.
      */
-    public boolean downloadForEpisodes(@Nullable OffsetDateTime ratedAt) {
+    boolean downloadForEpisodes(@Nullable OffsetDateTime ratedAt) {
         if (ratedAt == null) {
             Timber.e("downloadForEpisodes: null rated_at");
             return false;
@@ -230,7 +231,7 @@ public class TraktRatingsSync {
      *
      * <p> To apply all ratings, set {@link TraktSettings#KEY_LAST_MOVIES_RATED_AT} to 0.
      */
-    public boolean downloadForMovies(OffsetDateTime ratedAt) {
+    boolean downloadForMovies(OffsetDateTime ratedAt) {
         if (ratedAt == null) {
             Timber.e("downloadForMovies: null rated_at");
             return false;
@@ -295,8 +296,8 @@ public class TraktRatingsSync {
 
             // if a movie does not exist, this update will do nothing
             ContentProviderOperation op = ContentProviderOperation.newUpdate(
-                    SeriesGuideContract.Movies.buildMovieUri(movie.movie.ids.tmdb))
-                    .withValue(SeriesGuideContract.Movies.RATING_USER, movie.rating.value)
+                    Movies.buildMovieUri(movie.movie.ids.tmdb))
+                    .withValue(Movies.RATING_USER, movie.rating.value)
                     .build();
             batch.add(op);
         }

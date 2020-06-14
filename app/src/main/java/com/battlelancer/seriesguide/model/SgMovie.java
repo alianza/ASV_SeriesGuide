@@ -1,10 +1,32 @@
 package com.battlelancer.seriesguide.model;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.CERTIFICATION;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.GENRES;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.IMDB_ID;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.IN_COLLECTION;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.IN_WATCHLIST;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.LAST_UPDATED;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.OVERVIEW;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.PLAYS;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.POSTER;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.RATING_TMDB;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.RATING_TRAKT;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.RATING_USER;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.RATING_VOTES_TMDB;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.RATING_VOTES_TRAKT;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.RELEASED_UTC_MS;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.RUNTIME_MIN;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.TITLE;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.TITLE_NOARTICLE;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.TMDB_ID;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.TRAILER;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.WATCHED;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies._ID;
+
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
-import com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies;
 import com.battlelancer.seriesguide.provider.SeriesGuideDatabase.Tables;
 
 /**
@@ -12,60 +34,60 @@ import com.battlelancer.seriesguide.provider.SeriesGuideDatabase.Tables;
  */
 @Entity(
         tableName = Tables.MOVIES,
-        indices = {@Index(value = Movies.TMDB_ID, unique = true)}
+        indices = {@Index(value = TMDB_ID, unique = true)}
 )
 public class SgMovie {
 
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = Movies._ID)
+    @ColumnInfo(name = _ID)
     public Integer id;
 
-    @ColumnInfo(name = Movies.TMDB_ID)
+    @ColumnInfo(name = TMDB_ID)
     public int tmdbId;
 
-    @ColumnInfo(name = Movies.IMDB_ID)
+    @ColumnInfo(name = IMDB_ID)
     public String imdbId;
 
-    @ColumnInfo(name = Movies.TITLE)
+    @ColumnInfo(name = TITLE)
     public String title;
-    @ColumnInfo(name = Movies.TITLE_NOARTICLE)
+    @ColumnInfo(name = TITLE_NOARTICLE)
     public String titleNoArticle;
 
-    @ColumnInfo(name = Movies.POSTER)
+    @ColumnInfo(name = POSTER)
     public String poster;
-    @ColumnInfo(name = Movies.GENRES)
+    @ColumnInfo(name = GENRES)
     public String genres;
-    @ColumnInfo(name = Movies.OVERVIEW)
+    @ColumnInfo(name = OVERVIEW)
     public String overview;
-    @ColumnInfo(name = Movies.RELEASED_UTC_MS)
+    @ColumnInfo(name = RELEASED_UTC_MS)
     public Long releasedMs;
-    @ColumnInfo(name = Movies.RUNTIME_MIN)
+    @ColumnInfo(name = RUNTIME_MIN)
     public Integer runtimeMin = 0;
-    @ColumnInfo(name = Movies.TRAILER)
+    @ColumnInfo(name = TRAILER)
     public String trailer;
-    @ColumnInfo(name = Movies.CERTIFICATION)
+    @ColumnInfo(name = CERTIFICATION)
     public String certification;
 
-    @ColumnInfo(name = Movies.IN_COLLECTION)
+    @ColumnInfo(name = IN_COLLECTION)
     public Boolean inCollection = false;
-    @ColumnInfo(name = Movies.IN_WATCHLIST)
+    @ColumnInfo(name = IN_WATCHLIST)
     public Boolean inWatchlist = false;
-    @ColumnInfo(name = Movies.PLAYS)
+    @ColumnInfo(name = PLAYS)
     public Integer plays = 0;
-    @ColumnInfo(name = Movies.WATCHED)
+    @ColumnInfo(name = WATCHED)
     public Boolean watched = false;
 
-    @ColumnInfo(name = Movies.RATING_TMDB)
+    @ColumnInfo(name = RATING_TMDB)
     public Double ratingTmdb = 0.0;
-    @ColumnInfo(name = Movies.RATING_VOTES_TMDB)
+    @ColumnInfo(name = RATING_VOTES_TMDB)
     public Integer ratingVotesTmdb = 0;
-    @ColumnInfo(name = Movies.RATING_TRAKT)
+    @ColumnInfo(name = RATING_TRAKT)
     public Integer ratingTrakt = 0;
-    @ColumnInfo(name = Movies.RATING_VOTES_TRAKT)
+    @ColumnInfo(name = RATING_VOTES_TRAKT)
     public Integer ratingVotesTrakt = 0;
-    @ColumnInfo(name = Movies.RATING_USER)
+    @ColumnInfo(name = RATING_USER)
     public Integer ratingUser;
 
-    @ColumnInfo(name = Movies.LAST_UPDATED)
+    @ColumnInfo(name = LAST_UPDATED)
     public Long lastUpdated;
 }

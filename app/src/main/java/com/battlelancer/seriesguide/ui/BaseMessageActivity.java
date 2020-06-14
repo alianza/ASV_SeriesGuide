@@ -1,12 +1,15 @@
 package com.battlelancer.seriesguide.ui;
 
+import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_INDEFINITE;
+import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_LONG;
+import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT;
+
 import android.content.Context;
 import android.view.View;
 import androidx.annotation.Nullable;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import com.battlelancer.seriesguide.R;
 import com.battlelancer.seriesguide.jobs.FlagJob;
-import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -36,11 +39,11 @@ public abstract class BaseMessageActivity extends BaseActivity {
             this.shouldSendToTrakt = shouldSendToTrakt;
         }
 
-        public boolean shouldDisplayMessage() {
+        boolean shouldDisplayMessage() {
             return shouldSendToHexagon || shouldSendToTrakt;
         }
 
-        public String getStatusMessage(Context context) {
+        String getStatusMessage(Context context) {
             StringBuilder statusText = new StringBuilder();
             if (shouldSendToHexagon) {
                 statusText.append(context.getString(R.string.hexagon_api_queued));
@@ -93,7 +96,7 @@ public abstract class BaseMessageActivity extends BaseActivity {
             // show a confirmation/error text
             Snackbar snackbarCompleted = Snackbar
                     .make(getSnackbarParentView(), event.confirmationText,
-                            event.isSuccessful ? Snackbar.LENGTH_SHORT : Snackbar.LENGTH_LONG);
+                            event.isSuccessful ? LENGTH_SHORT : LENGTH_LONG);
             // replaces any previous snackbar, including the indefinite progress one
             snackbarCompleted.show();
         } else {
@@ -113,10 +116,10 @@ public abstract class BaseMessageActivity extends BaseActivity {
         if (event != null && event.shouldDisplayMessage()) {
             if (snackbarProgress == null) {
                 snackbarProgress = Snackbar.make(getSnackbarParentView(),
-                        event.getStatusMessage(this), Snackbar.LENGTH_INDEFINITE);
+                        event.getStatusMessage(this), LENGTH_INDEFINITE);
             } else {
                 snackbarProgress.setText(event.getStatusMessage(this));
-                snackbarProgress.setDuration(BaseTransientBottomBar.LENGTH_INDEFINITE);
+                snackbarProgress.setDuration(LENGTH_INDEFINITE);
             }
             snackbarProgress.show();
         } else if (snackbarProgress != null) {

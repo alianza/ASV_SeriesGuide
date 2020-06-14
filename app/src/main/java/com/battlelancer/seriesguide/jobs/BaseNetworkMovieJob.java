@@ -1,5 +1,7 @@
 package com.battlelancer.seriesguide.jobs;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies.TITLE;
+
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -35,7 +37,7 @@ public abstract class BaseNetworkMovieJob extends BaseNetworkJob {
             return null;
         }
         String title = query.getString(
-                query.getColumnIndexOrThrow(SeriesGuideContract.Movies.TITLE));
+                query.getColumnIndexOrThrow(TITLE));
         query.close();
         return title;
     }

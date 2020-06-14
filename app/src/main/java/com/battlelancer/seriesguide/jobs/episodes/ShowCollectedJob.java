@@ -1,5 +1,7 @@
 package com.battlelancer.seriesguide.jobs.episodes;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.COLLECTED;
+
 import android.content.Context;
 import androidx.annotation.NonNull;
 import com.battlelancer.seriesguide.R;
@@ -22,7 +24,7 @@ public class ShowCollectedJob extends ShowBaseJob {
 
     @Override
     protected String getDatabaseColumnToUpdate() {
-        return SeriesGuideContract.Episodes.COLLECTED;
+        return COLLECTED;
     }
 
     @NonNull

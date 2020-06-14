@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 47,
-    "identityHash": "fc7240c863375864236b3f0108c0a68e",
+    "identityHash": "43f3d0c736b1d23c6095491e244c0793",
     "entities": [
       {
         "tableName": "series",
@@ -213,7 +213,7 @@
             "notNull": true
           },
           {
-            "fieldPath": "notify",
+            "fieldPath": "notifySg",
             "columnName": "series_notify",
             "affinity": "INTEGER",
             "notNull": true
@@ -294,7 +294,7 @@
             "columnNames": [
               "series_id"
             ],
-            "createSql": "CREATE  INDEX `index_seasons_series_id` ON `${TABLE_NAME}` (`series_id`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_seasons_series_id` ON `${TABLE_NAME}` (`series_id`)"
           }
         ],
         "foreignKeys": [
@@ -461,7 +461,7 @@
             "columnNames": [
               "season_id"
             ],
-            "createSql": "CREATE  INDEX `index_episodes_season_id` ON `${TABLE_NAME}` (`season_id`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_episodes_season_id` ON `${TABLE_NAME}` (`season_id`)"
           },
           {
             "name": "index_episodes_series_id",
@@ -469,7 +469,7 @@
             "columnNames": [
               "series_id"
             ],
-            "createSql": "CREATE  INDEX `index_episodes_series_id` ON `${TABLE_NAME}` (`series_id`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_episodes_series_id` ON `${TABLE_NAME}` (`series_id`)"
           }
         ],
         "foreignKeys": [
@@ -539,14 +539,14 @@
             "columnNames": [
               "list_id"
             ],
-            "createSql": "CREATE UNIQUE INDEX `index_lists_list_id` ON `${TABLE_NAME}` (`list_id`)"
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_lists_list_id` ON `${TABLE_NAME}` (`list_id`)"
           }
         ],
         "foreignKeys": []
       },
       {
         "tableName": "listitems",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` INTEGER PRIMARY KEY AUTOINCREMENT, `list_item_id` TEXT NOT NULL, `item_ref_id` TEXT NOT NULL, `item_type` INTEGER NOT NULL, `list_id` TEXT, FOREIGN KEY(`list_id`) REFERENCES `lists`(`list_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` INTEGER PRIMARY KEY AUTOINCREMENT, `list_item_id` TEXT NOT NULL, `item_type` INTEGER NOT NULL, `list_id` TEXT, FOREIGN KEY(`list_id`) REFERENCES `lists`(`list_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
         "fields": [
           {
             "fieldPath": "id",
@@ -557,12 +557,6 @@
           {
             "fieldPath": "listItemId",
             "columnName": "list_item_id",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "itemRefId",
-            "columnName": "item_ref_id",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -592,7 +586,7 @@
             "columnNames": [
               "list_item_id"
             ],
-            "createSql": "CREATE UNIQUE INDEX `index_listitems_list_item_id` ON `${TABLE_NAME}` (`list_item_id`)"
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_listitems_list_item_id` ON `${TABLE_NAME}` (`list_item_id`)"
           },
           {
             "name": "index_listitems_list_id",
@@ -600,7 +594,7 @@
             "columnNames": [
               "list_id"
             ],
-            "createSql": "CREATE  INDEX `index_listitems_list_id` ON `${TABLE_NAME}` (`list_id`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_listitems_list_id` ON `${TABLE_NAME}` (`list_id`)"
           }
         ],
         "foreignKeys": [
@@ -767,7 +761,7 @@
             "columnNames": [
               "movies_tmdbid"
             ],
-            "createSql": "CREATE UNIQUE INDEX `index_movies_movies_tmdbid` ON `${TABLE_NAME}` (`movies_tmdbid`)"
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_movies_movies_tmdbid` ON `${TABLE_NAME}` (`movies_tmdbid`)"
           }
         ],
         "foreignKeys": []
@@ -814,7 +808,7 @@
             "columnNames": [
               "activity_episode"
             ],
-            "createSql": "CREATE UNIQUE INDEX `index_activity_activity_episode` ON `${TABLE_NAME}` (`activity_episode`)"
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_activity_activity_episode` ON `${TABLE_NAME}` (`activity_episode`)"
           }
         ],
         "foreignKeys": []
@@ -861,15 +855,16 @@
             "columnNames": [
               "job_created_at"
             ],
-            "createSql": "CREATE UNIQUE INDEX `index_jobs_job_created_at` ON `${TABLE_NAME}` (`job_created_at`)"
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_jobs_job_created_at` ON `${TABLE_NAME}` (`job_created_at`)"
           }
         ],
         "foreignKeys": []
       }
     ],
+    "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"fc7240c863375864236b3f0108c0a68e\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '43f3d0c736b1d23c6095491e244c0793')"
     ]
   }
 }

@@ -1,6 +1,7 @@
 package com.battlelancer.seriesguide.ui.movies;
 
 import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Movies._ID;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -112,8 +113,8 @@ class MoviesCursorAdapter extends CursorAdapter {
 
     public interface MoviesQuery {
 
-        String[] PROJECTION = { Movies._ID, Movies.TMDB_ID, Movies.TITLE, Movies.POSTER,
-                Movies.RELEASED_UTC_MS };
+        String[] PROJECTION = { _ID, Movies.TMDB_ID, Movies.TITLE, Movies.POSTER,
+                Movies.RELEASED_UTC_MS};
 
         int ID = 0;
         int TMDB_ID = 1;

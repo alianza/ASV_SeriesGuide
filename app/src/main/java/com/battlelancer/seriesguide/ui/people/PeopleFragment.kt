@@ -217,7 +217,9 @@ class PeopleFragment : Fragment() {
         private const val STATE_ACTIVATED_POSITION = "activated_position"
 
         private val sDummyListener: OnShowPersonListener = object : OnShowPersonListener {
-            override fun showPerson(tmdbId: Int) {}
+            override fun showPerson(tmdbId: Int) {
+                 // Empty
+            }
         }
     }
 }

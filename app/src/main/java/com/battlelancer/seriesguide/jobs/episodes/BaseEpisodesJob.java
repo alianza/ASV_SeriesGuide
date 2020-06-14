@@ -1,5 +1,14 @@
 package com.battlelancer.seriesguide.jobs.episodes;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.CONTENT_URI;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.NUMBER;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.SEASON;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.SORT_NUMBER_ASC;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes.SORT_SEASON_ASC;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.Episodes._ID;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ShowsColumns.LASTWATCHEDID;
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ShowsColumns.LASTWATCHED_MS;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -19,15 +28,15 @@ import com.google.flatbuffers.FlatBufferBuilder;
 
 public abstract class BaseEpisodesJob extends BaseJob implements FlagJob {
 
-    public static final String[] PROJECTION_EPISODE = new String[] {
-            Episodes._ID
+    protected static final String[] PROJECTION_EPISODE = new String[] {
+            _ID
     };
-    public static final String[] PROJECTION_SEASON_NUMBER = new String[] {
-            Episodes.SEASON,
-            Episodes.NUMBER
+    protected static final String[] PROJECTION_SEASON_NUMBER = new String[] {
+            SEASON,
+            NUMBER
     };
-    public static final String ORDER_SEASON_ASC_NUMBER_ASC =
-            Episodes.SORT_SEASON_ASC + ", " + Episodes.SORT_NUMBER_ASC;
+    protected static final String ORDER_SEASON_ASC_NUMBER_ASC =
+            SORT_SEASON_ASC + ", " + SORT_NUMBER_ASC;
 
     private final int showTvdbId;
     private final int flagValue;
@@ -100,15 +109,13 @@ public abstract class BaseEpisodesJob extends BaseJob implements FlagJob {
         }
 
         // persist network job after successful local updates
-        if (requiresNetworkJob) {
-            if (!persistNetworkJob(context, networkJobInfo)) {
-                return false;
-            }
+        if (requiresNetworkJob && !persistNetworkJob(context, networkJobInfo)) {
+            return false;
         }
 
         // notify some other URIs about updates
         context.getContentResolver()
-                .notifyChange(Episodes.CONTENT_URI, null);
+                .notifyChange(CONTENT_URI, null);
         context.getContentResolver()
                 .notifyChange(SeriesGuideContract.ListItems.CONTENT_WITH_DETAILS_URI, null);
 
@@ -122,11 +129,11 @@ public abstract class BaseEpisodesJob extends BaseJob implements FlagJob {
                 .query(uri, PROJECTION_SEASON_NUMBER, getDatabaseSelection(), null,
                         ORDER_SEASON_ASC_NUMBER_ASC);
         if (query == null) {
-            return null;
+            return new byte[0];
         }
         if (!query.moveToFirst()) {
             query.close();
-            return null;
+            return new byte[0];
         }
 
         FlatBufferBuilder builder = new FlatBufferBuilder(0);
@@ -161,10 +168,10 @@ public abstract class BaseEpisodesJob extends BaseJob implements FlagJob {
         if (lastWatchedEpisodeId != -1 || setLastWatchedToNow) {
             ContentValues values = new ContentValues();
             if (lastWatchedEpisodeId != -1) {
-                values.put(SeriesGuideContract.Shows.LASTWATCHEDID, lastWatchedEpisodeId);
+                values.put(LASTWATCHEDID, lastWatchedEpisodeId);
             }
             if (setLastWatchedToNow) {
-                values.put(SeriesGuideContract.Shows.LASTWATCHED_MS,
+                values.put(LASTWATCHED_MS,
                         System.currentTimeMillis());
             }
             context.getContentResolver().update(

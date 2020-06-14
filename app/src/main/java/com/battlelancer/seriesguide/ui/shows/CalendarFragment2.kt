@@ -115,14 +115,12 @@ class CalendarFragment2 : Fragment() {
             .observe(
                 viewLifecycleOwner,
                 Observer { tabPosition: Int? ->
-                    if (tabPosition != null) {
-                        if (CalendarType.UPCOMING == type
-                            && tabPosition == ShowsActivity.InitBundle.INDEX_TAB_UPCOMING
-                            || CalendarType.RECENT == type
-                            && tabPosition == ShowsActivity.InitBundle.INDEX_TAB_RECENT) {
+                    if (tabPosition != null && (CalendarType.UPCOMING == type
+                                && tabPosition == ShowsActivity.InitBundle.INDEX_TAB_UPCOMING
+                                || CalendarType.RECENT == type
+                                && tabPosition == ShowsActivity.InitBundle.INDEX_TAB_RECENT)) {
                             recyclerView.smoothScrollToPosition(0)
                         }
-                    }
                 }
             )
     }

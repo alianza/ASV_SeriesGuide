@@ -1,5 +1,7 @@
 package com.battlelancer.seriesguide.jobs;
 
+import static com.battlelancer.seriesguide.provider.SeriesGuideContract.ShowsColumns.TITLE;
+
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -13,10 +15,11 @@ import com.battlelancer.seriesguide.provider.SeriesGuideContract;
 import com.battlelancer.seriesguide.ui.OverviewActivity;
 import com.battlelancer.seriesguide.ui.ShowsActivity;
 import com.battlelancer.seriesguide.ui.episodes.EpisodeFlags;
+import java.util.Objects;
 
 public abstract class BaseNetworkEpisodeJob extends BaseNetworkJob {
 
-    public BaseNetworkEpisodeJob(JobAction action, SgJobInfo jobInfo) {
+    BaseNetworkEpisodeJob(JobAction action, SgJobInfo jobInfo) {
         super(action, jobInfo);
     }
 
@@ -35,7 +38,7 @@ public abstract class BaseNetworkEpisodeJob extends BaseNetworkJob {
             return null;
         }
         String title = query.getString(
-                query.getColumnIndexOrThrow(SeriesGuideContract.Shows.TITLE));
+                query.getColumnIndexOrThrow(TITLE));
         query.close();
         return title;
     }
@@ -62,10 +65,10 @@ public abstract class BaseNetworkEpisodeJob extends BaseNetworkJob {
     @NonNull
     protected PendingIntent getErrorIntent(Context context) {
         // tapping the notification should open the affected show
-        return TaskStackBuilder.create(context)
+        return Objects.requireNonNull(TaskStackBuilder.create(context)
                 .addNextIntent(new Intent(context, ShowsActivity.class))
                 .addNextIntent(OverviewActivity.intentShow(context, jobInfo.showTvdbId()))
-                .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+                .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT));
     }
 
 }

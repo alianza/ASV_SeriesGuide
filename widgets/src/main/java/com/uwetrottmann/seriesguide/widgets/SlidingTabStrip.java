@@ -110,13 +110,6 @@ class SlidingTabStrip extends LinearLayout {
     }
 
     /**
-     * Set the alpha value of the {@code color} to be the given {@code alpha} value.
-     */
-    private static int setColorAlpha(int color, byte alpha) {
-        return Color.argb(alpha, Color.red(color), Color.green(color), Color.blue(color));
-    }
-
-    /**
      * Blend {@code color1} and {@code color2} using the given ratio.
      *
      * @param ratio of which to blend. 1.0 will return {@code color1}, 0.5 will give an even blend,

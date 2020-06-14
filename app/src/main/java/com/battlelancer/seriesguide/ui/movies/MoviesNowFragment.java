@@ -8,7 +8,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -19,15 +18,17 @@ import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import com.battlelancer.seriesguide.R;
 import com.battlelancer.seriesguide.traktapi.TraktCredentials;
 import com.battlelancer.seriesguide.ui.MoviesActivity;
+import com.battlelancer.seriesguide.ui.NowFragmentHelper;
 import com.battlelancer.seriesguide.ui.ShowsActivity;
 import com.battlelancer.seriesguide.ui.shows.NowAdapter;
+import com.battlelancer.seriesguide.ui.shows.NowAdapter.ItemClickListener;
+import com.battlelancer.seriesguide.ui.shows.TraktRecentEpisodeHistoryLoader.Result;
 import com.battlelancer.seriesguide.ui.streams.HistoryActivity;
 import com.battlelancer.seriesguide.util.Utils;
 import com.battlelancer.seriesguide.util.ViewTools;
@@ -53,12 +54,22 @@ public class MoviesNowFragment extends Fragment {
     private boolean isLoadingFriends;
     private Unbinder unbinder;
 
+    private NowFragmentHelper nowFragmentHelper;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
+
         View view = inflater.inflate(R.layout.fragment_now, container, false);
         unbinder = ButterKnife.bind(this, view);
+
+        // define dataset
+        adapter = new MoviesNowAdapter(getContext(), itemClickListener);
+
+        nowFragmentHelper = new NowFragmentHelper(recyclerView, adapter,
+                emptyView, snackbarText, snackbar, isLoadingRecentlyWatched, isLoadingFriends, this,
+                swipeRefreshLayout);
 
         swipeRefreshLayout.setSwipeableChildren(R.id.scrollViewNow, R.id.recyclerViewNow);
         swipeRefreshLayout.setOnRefreshListener(this::refreshStream);
@@ -70,7 +81,7 @@ public class MoviesNowFragment extends Fragment {
 
         emptyView.setText(R.string.now_movies_empty);
 
-        showError(null);
+        nowFragmentHelper.showError(null);
         snackbarButton.setText(R.string.refresh);
         snackbarButton.setOnClickListener(v -> refreshStream());
 
@@ -113,31 +124,13 @@ public class MoviesNowFragment extends Fragment {
 
         ViewTools.setSwipeRefreshLayoutColors(requireActivity().getTheme(), swipeRefreshLayout);
 
-        // define dataset
-        adapter = new MoviesNowAdapter(getContext(), itemClickListener);
-        adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-            @Override
-            public void onChanged() {
-                updateEmptyState();
-            }
-
-            @Override
-            public void onItemRangeInserted(int positionStart, int itemCount) {
-                updateEmptyState();
-            }
-
-            @Override
-            public void onItemRangeRemoved(int positionStart, int itemCount) {
-                updateEmptyState();
-            }
-        });
-        recyclerView.setAdapter(adapter);
+        nowFragmentHelper.setMoviesNowFragmentAdapter();
 
         // if connected to trakt, replace local history with trakt history, show friends history
         if (TraktCredentials.get(getActivity()).hasCredentials()) {
             isLoadingRecentlyWatched = true;
             isLoadingFriends = true;
-            showProgressBar(true);
+            nowFragmentHelper.showProgressBar(true);
             LoaderManager loaderManager = LoaderManager.getInstance(this);
             loaderManager.initLoader(MoviesActivity.NOW_TRAKT_USER_LOADER_ID, null,
                     recentlyTraktCallbacks);
@@ -178,8 +171,8 @@ public class MoviesNowFragment extends Fragment {
     }
 
     private void refreshStream() {
-        showProgressBar(true);
-        showError(null);
+        nowFragmentHelper.showProgressBar(true);
+        nowFragmentHelper.showError(null);
 
         // user might get disconnected during our life-time,
         // so properly clean up old loaders so they won't interfere
@@ -193,54 +186,13 @@ public class MoviesNowFragment extends Fragment {
                     traktFriendsHistoryCallbacks);
         } else {
             // destroy trakt loaders and remove any shown error message
-            destroyLoaderIfExists(MoviesActivity.NOW_TRAKT_USER_LOADER_ID);
-            destroyLoaderIfExists(MoviesActivity.NOW_TRAKT_FRIENDS_LOADER_ID);
-            showError(null);
+            nowFragmentHelper.destroyLoaderIfExists(MoviesActivity.NOW_TRAKT_USER_LOADER_ID);
+            nowFragmentHelper.destroyLoaderIfExists(MoviesActivity.NOW_TRAKT_FRIENDS_LOADER_ID);
+            nowFragmentHelper.showError(null);
         }
     }
 
-    private void destroyLoaderIfExists(int loaderId) {
-        LoaderManager loaderManager = LoaderManager.getInstance(this);
-        if (loaderManager.getLoader(loaderId) != null) {
-            loaderManager.destroyLoader(loaderId);
-        }
-    }
-
-    private void showError(@Nullable String errorText) {
-        boolean show = errorText != null;
-        if (show) {
-            snackbarText.setText(errorText);
-        }
-        if (snackbar.getVisibility() == (show ? View.VISIBLE : View.GONE)) {
-            // already in desired state, avoid replaying animation
-            return;
-        }
-        snackbar.startAnimation(AnimationUtils.loadAnimation(snackbar.getContext(),
-                show ? R.anim.fade_in : R.anim.fade_out));
-        snackbar.setVisibility(show ? View.VISIBLE : View.GONE);
-    }
-
-    /**
-     * Show or hide the progress bar of the {@link SwipeRefreshLayout}
-     * wrapping view.
-     */
-    private void showProgressBar(boolean show) {
-        // only hide if everybody has finished loading
-        if (!show) {
-            if (isLoadingRecentlyWatched || isLoadingFriends) {
-                return;
-            }
-        }
-        swipeRefreshLayout.setRefreshing(show);
-    }
-
-    private void updateEmptyState() {
-        boolean isEmpty = adapter.getItemCount() == 0;
-        recyclerView.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
-        emptyView.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
-    }
-
-    private NowAdapter.ItemClickListener itemClickListener = new NowAdapter.ItemClickListener() {
+    private ItemClickListener itemClickListener = new ItemClickListener() {
         @Override
         public void onItemClick(View view, int position) {
             NowAdapter.NowItem item = adapter.getItem(position);
@@ -268,28 +220,28 @@ public class MoviesNowFragment extends Fragment {
         }
     };
 
-    private LoaderManager.LoaderCallbacks<TraktRecentMovieHistoryLoader.Result>
+    private LoaderManager.LoaderCallbacks<Result>
             recentlyTraktCallbacks
-            = new LoaderManager.LoaderCallbacks<TraktRecentMovieHistoryLoader.Result>() {
+            = new LoaderManager.LoaderCallbacks<Result>() {
         @Override
-        public Loader<TraktRecentMovieHistoryLoader.Result> onCreateLoader(int id, Bundle args) {
+        public Loader<Result> onCreateLoader(int id, Bundle args) {
             return new TraktRecentMovieHistoryLoader(getActivity());
         }
 
         @Override
-        public void onLoadFinished(@NonNull Loader<TraktRecentMovieHistoryLoader.Result> loader,
-                TraktRecentMovieHistoryLoader.Result data) {
+        public void onLoadFinished(@NonNull Loader<Result> loader,
+                Result data) {
             if (!isAdded()) {
                 return;
             }
             adapter.setRecentlyWatched(data.items);
             isLoadingRecentlyWatched = false;
-            showProgressBar(false);
-            showError(data.errorText);
+            nowFragmentHelper.showProgressBar(false);
+            nowFragmentHelper.showError(data.errorText);
         }
 
         @Override
-        public void onLoaderReset(@NonNull Loader<TraktRecentMovieHistoryLoader.Result> loader) {
+        public void onLoaderReset(@NonNull Loader<Result> loader) {
             if (!isVisible()) {
                 return;
             }
@@ -313,7 +265,7 @@ public class MoviesNowFragment extends Fragment {
             }
             adapter.setFriendsRecentlyWatched(data);
             isLoadingFriends = false;
-            showProgressBar(false);
+            nowFragmentHelper.showProgressBar(false);
         }
 
         @Override

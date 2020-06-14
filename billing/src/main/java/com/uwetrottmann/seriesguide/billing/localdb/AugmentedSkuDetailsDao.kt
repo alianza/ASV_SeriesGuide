@@ -41,7 +41,7 @@ interface AugmentedSkuDetailsDao {
     @Transaction
     fun insertOrUpdate(skuDetails: SkuDetails) = skuDetails.apply {
         val result = getById(sku)
-        val canPurchase = if (result == null) true else result.canPurchase
+        val canPurchase = result?.canPurchase ?: true
         val originalJson = toString().substring("SkuDetails: ".length)
         val detail = AugmentedSkuDetails(
             canPurchase,

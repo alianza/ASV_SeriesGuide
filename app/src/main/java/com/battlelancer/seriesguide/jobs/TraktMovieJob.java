@@ -131,15 +131,8 @@ public class TraktMovieJob extends BaseNetworkEpisodeJob {
      * false}.
      */
     private static boolean isSyncSuccessful(@Nullable SyncResponse response) {
-        if (response == null || response.not_found == null) {
-            return true;
-        }
-
-        //noinspection RedundantIfStatement
-        if (response.not_found.movies != null && !response.not_found.movies.isEmpty()) {
-            return false; // movie not found
-        }
-
-        return true;
+        // movie not found
+        return response == null || response.not_found == null || response.not_found.movies == null
+                || response.not_found.movies.isEmpty();
     }
 }
