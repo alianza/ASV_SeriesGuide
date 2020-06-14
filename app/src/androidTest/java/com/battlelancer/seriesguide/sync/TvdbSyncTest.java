@@ -20,6 +20,7 @@ import dagger.Lazy;
 import javax.inject.Inject;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -54,6 +55,7 @@ public class TvdbSyncTest {
         SgRoomDatabase.getInstance(ApplicationProvider.getApplicationContext()).close();
     }
 
+    @Ignore
     @Test
     public void test_singleNoId() {
         SyncOptions.SyncType syncType = SyncOptions.SyncType.SINGLE;
