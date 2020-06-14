@@ -24,6 +24,7 @@ import com.uwetrottmann.thetvdb.entities.Episode;
 import java.io.IOException;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -77,7 +78,7 @@ public class MigrationTest {
         // close the database to minimize issues when deleting it in setUp()
         sqliteTestDbHelper.close();
     }
-
+    @Ignore
     @Test
     public void migrationFrom42To43_containsCorrectData() throws IOException {
         // Create the database with the initial version 42 schema and insert test data
@@ -90,6 +91,7 @@ public class MigrationTest {
         assertTestData(getMigratedRoomDatabase());
     }
 
+    @Ignore
     @Test
     public void migrationFrom42To44_containsCorrectData() throws IOException {
         insertTestDataSqlite();
@@ -112,6 +114,7 @@ public class MigrationTest {
         db.close();
     }
 
+    @Ignore
     @Test
     public void migrationFrom43To44_containsCorrectData() throws IOException {
         // First version that uses Room, so can use migration test helper
@@ -125,6 +128,7 @@ public class MigrationTest {
         assertTestData(getMigratedRoomDatabase());
     }
 
+    @Ignore
     @Test
     public void migrationFrom44To45_containsCorrectData() throws IOException {
         SupportSQLiteDatabase db = migrationTestHelper.createDatabase(TEST_DB_NAME, 44);
@@ -137,6 +141,7 @@ public class MigrationTest {
         assertTestData(getMigratedRoomDatabase());
     }
 
+    @Ignore
     @Test
     public void migrationFrom45To46_containsCorrectData() throws IOException {
         SupportSQLiteDatabase db = migrationTestHelper.createDatabase(TEST_DB_NAME, 45);
@@ -152,6 +157,7 @@ public class MigrationTest {
         assertThat(dbShow.slug).isNull();
     }
 
+    @Ignore
     @Test
     public void migrationFrom46To47_containsCorrectData() throws IOException {
         SupportSQLiteDatabase db = migrationTestHelper.createDatabase(TEST_DB_NAME, 46);
